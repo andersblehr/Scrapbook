@@ -40,9 +40,9 @@ var   fileName                  : string;
 	thisParameter             : string;
 
 
-    function getParameterValue(parameterString : string) : byte;
+    function getParameterValue(parameterString : string) : word;
 
-    var   value                     : byte;
+    var   value                     : word;
 	  result                    : integer;
 
     begin
@@ -62,7 +62,8 @@ var   fileName                  : string;
 	  case thisParameter[2] of
 	    'r' : filterRadius:=getParameterValue(thisParameter);
 	    't' : filterThreshold:=getParameterValue(thisParameter);
-	    's' : sobelThreshold:=getParameterValue(thisParameter)
+	    's' : sobelThreshold:=getParameterValue(thisParameter);
+	    'n' : numberOfIterations:=getParameterValue(thisParameter)
 	  else
 	    fatalError('Illegal option: -'+thisParameter[2])
 	  end
