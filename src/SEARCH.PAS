@@ -12,8 +12,8 @@ const maxSize                   = 512;
       north                     = -1;
       south                     = 1;
 
-      ascendingMask             = 1;
-      descendingMask            = -1;
+      point                     = 0;
+      star                      = 1;
 
 type  variableRPtr              = ^variableR;
       variableR                 = record
@@ -42,6 +42,7 @@ type  variableRPtr              = ^variableR;
 const filterRadius              : byte = 0;
       filterThreshold           : byte = 1;
       sobelThreshold            : byte = 5;
+      nonSearchRadius           : byte = 0;
 
       minPupilRadiusFraction    : byte = 5;   (* Per cent *)
       maxPupilRadiusFraction    : byte = 20;  (* Per cent *)
@@ -56,28 +57,28 @@ const filterRadius              : byte = 0;
       startX                    : word = 0;
       startY                    : word = 0;
 
+      showSearch                : boolean = false;
+
 var   image                     : pixelMatrixPtr;
 
       searchAreaLeft            : word;
       searchAreaTop             : word;
       xSizeSearchArea           : word;
       ySizeSearchArea           : word;
+      minSearchStep             : word;
 
       minPupilRadius            : word;
-      minSearchStep             : word;
       starRadius                : word;
-
-      aPupilPoint               : pointPtr;
-      pupilPosition             : pointPtr;
 
 
 procedure initGlobals(xSize,ySize : word);
 
-procedure markPosition(x,y : word);
+procedure markPosition(x,y : word; pointOrStar : byte);
 
 function findPupilPoint : pointPtr;
 
-function applySobelMask(x,y : word; mask : shortInt) : word;
+function applySobelMask(x,y                     : word;
+                        northOrSouth,eastOrWest : shortInt) : integer;
 
 function findPosition(aPupilPoint : pointPtr) : pointPtr;
 
@@ -115,6 +116,8 @@ begin
               filterThreshold:=variable^.value
             else if (variable^.name='sobelThreshold') then
               sobelThreshold:=variable^.value
+            else if (variable^.name='nonSearchRadius') then
+              nonSearchRadius:=variable^.value
             else if (variable^.name='minPupilRadiusFraction') then
               minPupilRadiusFraction:=variable^.value
             else if (variable^.name='maxPupilRadiusFraction') then
@@ -288,12 +291,18 @@ begin
 end;
 
 
-procedure markPosition(x,y : word);
+procedure markPosition(x,y : word; pointOrStar : byte);
 
 begin
-  setColor(63);
-  line(startX+x-3,startY+y,startX+x+3,startY+y);
-  line(startX+x,startY+y-3,startX+x,startY+y+3)
+  case pointOrStar of
+    point : putPixel(startX+x,startY+y,63);
+    star  :
+      begin
+        setColor(63);
+        line(startX+x-3,startY+y,startX+x+3,startY+y);
+        line(startX+x,startY+y-3,startX+x,startY+y+3)
+      end
+  end
 end;
 
 
@@ -370,22 +379,41 @@ begin
 end;
 
 
-function applySobelMask(x,y : word; mask : shortInt) : word;
+function applySobelMask(x,y                     : word;
+                        northOrSouth,eastOrWest : shortInt) : integer;
 
 begin
-  case mask of
-    descendingMask : applySobelMask:=2*abs(-image^[y-1]^[x  ]-
-                                            image^[y-1]^[x+1]+
-                                            image^[y  ]^[x-1]-
-                                            image^[y  ]^[x+1]+
-                                            image^[y+1]^[x-1]+
-                                            image^[y+1]^[x  ]);
-    ascendingMask  : applySobelMask:=2*abs(-image^[y-1]^[x-1]-
-                                            image^[y-1]^[x  ]-
-                                            image^[y  ]^[x-1]+
-                                            image^[y  ]^[x+1]+
-                                            image^[y+1]^[x  ]+
-                                            image^[y+1]^[x+1])
+  case northOrSouth of
+    north :
+      case eastOrWest of
+        west : applySobelMask:=image^[y-1]^[x-1]+
+                               image^[y-1]^[x  ]+
+                               image^[y  ]^[x-1]-
+                               image^[y  ]^[x+1]-
+                               image^[y+1]^[x  ]-
+                               image^[y+1]^[x+1];
+        east : applySobelMask:=image^[y-1]^[x  ]+
+                               image^[y-1]^[x+1]-
+                               image^[y  ]^[x-1]+
+                               image^[y  ]^[x+1]-
+                               image^[y+1]^[x-1]-
+                               image^[y+1]^[x  ]
+      end;
+    south :
+      case eastOrWest of
+        west : applySobelMask:=-image^[y-1]^[x  ]-
+                                image^[y-1]^[x+1]+
+                                image^[y  ]^[x-1]-
+                                image^[y  ]^[x+1]+
+                                image^[y+1]^[x-1]+
+                                image^[y+1]^[x  ];
+        east : applySobelMask:=-image^[y-1]^[x-1]-
+                                image^[y-1]^[x  ]-
+                                image^[y  ]^[x-1]+
+                                image^[y  ]^[x+1]+
+                                image^[y+1]^[x  ]+
+                                image^[y+1]^[x+1]
+      end
   end
 end;
 
@@ -397,30 +425,34 @@ var   ascendingCenter           : pointPtr;
       position                  : pointPtr;
 
 
-  function getMiddlePoint(x,y : word; mask : shortInt) : pointPtr;
+  function getMiddlePoint(x,y : word; direction : shortInt) : pointPtr;
 
   var   leftPoint                 : pointPtr;
         rightPoint                : pointPtr;
         middlePoint               : pointPtr;
 
 
-    function searchEdge(x,y : word; dX,dY,mask : shortInt) : pointPtr;
+    function searchEdge(x,y : word; dX,dY : shortInt) : pointPtr;
 
     begin
+      inc(x,dX*nonSearchRadius-1);
+      inc(y,dY*nonSearchRadius-1);
       repeat
         inc(x,dX);
         inc(y,dY);
+        if showSearch then
+          markPosition(x,y,point);
         if ((x<=searchAreaLeft) or (x>=searchAreaLeft+xSizeSearchArea) or
             (y<=searchAreaTop ) or (y>=searchAreaTop +ySizeSearchArea)) then
           fatalError('searchEdge: No edge found!')
-      until (applySobelMask(x,y,mask)>=sobelThreshold);
+      until (applySobelMask(x,y,dY,dX)>=sobelThreshold);
       searchEdge:=makePoint(x,y)
     end;
 
 
   begin
-    leftPoint:=searchEdge(x,y,west,-mask,mask);
-    rightPoint:=searchEdge(x,y,east,mask,mask);
+    leftPoint:=searchEdge(x,y,west,-direction);
+    rightPoint:=searchEdge(x,y,east,direction);
     middlePoint:=makePoint(leftPoint^.x+round((rightPoint^.x-leftPoint^.x)/2),
                     leftPoint^.y+round(integer(rightPoint^.y-leftPoint^.y)/2));
     dispose(leftPoint);
@@ -432,8 +464,8 @@ var   ascendingCenter           : pointPtr;
 begin
   with aPupilPoint^ do
     begin
-      ascendingCenter:=getMiddlePoint(x,y,ascendingMask);
-      descendingCenter:=getMiddlePoint(x,y,descendingMask);
+      ascendingCenter:=getMiddlePoint(x,y,south);
+      descendingCenter:=getMiddlePoint(x,y,north);
       position:=makePoint(ascendingCenter^.x+descendingCenter^.x-x,
                           ascendingCenter^.y+descendingCenter^.y-y)
     end;
