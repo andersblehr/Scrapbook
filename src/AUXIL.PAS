@@ -24,6 +24,8 @@ function pcxPath(fileName : string) : string;
 
 function palettePath(fileName : string) : string;
 
+function epsPath(fileName : string) : string;
+
 function nextWord(var aLine : string; whiteSpace : charSet) : string;
 
 function appendExtension(path : pathStr; wantedExtension : extStr) : pathStr;
@@ -61,6 +63,7 @@ const homeDirectory             = 'c:\user\blehr\';
       picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
       pcxDirectory              = 'c:\user\blehr\fag\diplom\bilder\pcx\';
       palDirectory              = 'c:\user\blehr\fag\diplom\bilder\pal\';
+      epsDirectory              = 'c:\user\blehr\fag\diplom\rapport\figurer\eps\';
 
 
 (**************************************************************************
@@ -132,6 +135,13 @@ function palettePath(fileName : string) : string;
 
 begin
   palettePath:=palDirectory+fileName+possibleLackingExtension(fileName,'.pal')
+end;
+
+
+function epsPath(fileName : string) : string;
+
+begin
+  epsPath:=epsDirectory+fileName+possibleLackingExtension(fileName,'.eps')
 end;
 
 
