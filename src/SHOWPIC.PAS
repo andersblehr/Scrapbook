@@ -17,5 +17,5 @@ begin
       closeGraph
     end
   else
-    fatalError('Usage: showeye <file name (no extension)>')
+    fatalError('Usage: showpic <file name (no extension)>')
 end.
