@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:24:49 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 25 03:09:16 1993
+%%% Last Modified On: Sat Mar 27 20:26:19 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,8 +17,8 @@ operate directly on these pixels.
 
 An image in the spatial domain can be described by the two-dimensional
 light-intensity function $f(x,y)$, whose the value at location $(x,y)$
-refers to the intensity (or {\em gray level\/}) of the image at that
-point.  Image-processing functions in the spatial domain may be
+corresponds to the intensity (or {\em gray level\/}) of the image at
+that point.  Image-processing functions in the spatial domain may be
 expressed as
 \begin{equation}
 \label{eq:spatial_operator}
@@ -27,7 +27,7 @@ g(x,y)=T[f(x,y)]\mbox{,}
 where $g(x,y)$ is the processed image, and $T$ is an operator on the
 input image $f$, defined over some neighbourhood of $(x,y)$.  In other
 words, the value of $g$ at $(x,y)$ is determined by the values of $f$
-within this neighbourhood.
+in this neighbourhood.
 
 \insertepswidth{neighbor}{\label{fig:neighbour}A $3\times 3$
   neighbourhood about a point $(x,y)$ in an image.}{0.4}
@@ -66,12 +66,14 @@ Section~\ref{image:segment:threshold}.
 
 One of the principle approaches to the formulation in
 Eq.~(\ref{eq:spatial_operator}) is the use of so-called {\em spatial
-  masks\/}.  A spatial mask, or just mask, is a small two-dimensional
-array ($m\times n$ or, more commonly, $n\times n$) whose elements
-$w_{i}$ are coefficients used to compute $g$ at $(x,y)$.  In
-Fig.~\ref{fig:mask}, a $3\times 3$ sub-image centred at $(x,y)$ is
-shown, together with a $3\times 3$ mask with general coefficients
-$w_{i}$.  The value of $g$ at this location is given by the relation
+  masks\/}.  A spatial mask, or just {\em mask\/}, is a small
+two-dimensional array ($m\times n$ or, more commonly, $n\times n$)
+whose elements $w_{i}$ are coefficients used to compute $g$ at
+$(x,y)$.  In Fig.~\ref{fig:mask}, a $3\times 3$ sub-image centred at
+$(x,y)$ is shown, together with a $3\times 3$ mask with general
+coefficients $w_{i}$.  When convolving the original image $f$ with
+this mask, the value at location $(x,y)$ of the resulting image $g$ is
+given by the relation
 \begin{equation}
 \label{eq:mask}
 g(x,y)=T[f(x)]=w_{1}f(x-1,y-1)+w_{2}f(x,y-1)+\cdots+w_{9}f(x+1,y+1)\mbox{.}
@@ -80,10 +82,7 @@ To compute the transformed image $g$, the mask is moved from pixel to
 pixel in the same manner as for the neighbourhood operator shown in
 Fig.~\ref{fig:neighbour}.  As pointed out above, if $f$ is of size
 $N\times N$, the number of operations required to compute $g$ is
-$O(N^{2})$.  In addition, nine multiplications and eight additions
-have are required at each pixel location in the general case, as seen
-from Eq.~(\ref{eq:mask}), making the application of spatial masks
-rather expensive computationally.
+$O(N^{2})$.
 
 The coefficients $w_{i}$ of the mask are chosen to detect given
 properties in an image.  For example, if all $w_{i}$ are chosen to be
@@ -100,7 +99,9 @@ perform a variety of useful image operations, among which are {\em
   noise reduction\/} (Section~\ref{image:noise}) and {\em edge
   detection\/} (Section~\ref{image:edge}).  It is worth noting,
 however, that applying a mask at each pixel location in an image is a
-computationally expensive task.  For example, applying the mask of
-Fig.~\ref{fig:mask}(b) to a $512\times 512$ image requires nine
-multiplications and eight additions at each pixel location, adding up
-to a total of 2,359,296 multiplications and 2,097,152 additions.
+computationally expensive task.  From Eq.~(\ref{eq:mask}), it is seen
+that, for $3\times 3$ masks, nine multiplications and eight additions
+are required to compute $g(x,y)$ at a given location $(x,y)$.  Thus,
+convolving a $512\times 512$ image with a $3\times 3$ mask like the
+one in Fig.~\ref{fig:mask}(b), requires a total of 2,359,296
+multiplications and 2,097,152 additions.

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 25 03:08:42 1993
+%%% Last Modified On: Sat Mar 27 20:39:51 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -133,7 +133,7 @@ When a continuous function $f(x)$, is discretized into a sequence
 $\{f(x_{0}),f(x_{0}+\Delta x),f(x_{0}+2\Delta x),\ldots,
 f(x_{0}+(N-1)\Delta x)\}$ by taking $N$ samples $\Delta x$ units
 apart, its {\em discrete\/} Fourier transform is given by\footnote{For
-  a proof of these results, see for instance~\cite{brigham}}
+  a proof of these results, see for instance~\cite{brigham}.}
 \begin{equation}
 \label{eq:fourier:discrete}
   F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{-\frac{j2\pi ux}{N}}
@@ -411,7 +411,7 @@ see~\cite{digim}, p.\ 89.
 The two-dimensional {\em discrete\/} convolution is formulated by
 letting $f(x,y)$ and $g(x,y)$ be discrete arrays of size $A\times B$
 and $C\times D$.  For reasons elaborated upon in~\cite{brigham}, these
-arrays must be assumed to be periodic with some period $M$ and $N$ in
+arrays must be assumed to be periodic with some periods $M$ and $N$ in
 the $x$- and $y$-directions, respectively.  It can be
 shown~(\cite{brigham}) that unless
 \begin{equation}
@@ -450,8 +450,14 @@ for $x=0,1,2,\ldots,M-1$ and $y=0,1,2,\ldots,N-1$.
 The two-dimensional convolution theorem stated in
 Eqs.~(\ref{eq:convolution:2Da}) and~(\ref{eq:convolution:2Db}) also
 apply to the discrete case with $u=0,1,2,\ldots,M-1$ and
-$v=0,1,2,\ldots,n-1$.  All computations involve, as indicated above,
-the extended functions $f_{e}(x,y)$ and $h_{e}(x,y)$.
+$v=0,1,2,\ldots,n-1$.  
+
+All computations involve, as indicated above, the extended functions
+$f_{e}(x,y)$ and $h_{e}(x,y)$.  It is worth noting, however, that in
+practice, the energy of an image tends to be concentrated around the
+origin of the frequency plane.  This reduces the wraparound error due
+to overlap to a non-discernable minimum, thus obliterating the need to
+use $f_{e}$ and $g_{e}$ in most practical applications.
 
 \subsubsection{Application of Convolution in Digital Image Processing}
 
@@ -492,9 +498,9 @@ $H$ using an {\fft} algorithm, multiplying the Fourier transforms to
 obtain $G$, and then applying the inverse Fourier transform to obtain
 the desired image $g$.  Brigham shows, however, in~\cite{brigham},
 that for one-dimensional arrays, the {\fft} approach is faster only if
-the number of points is greater than 32.  Thus, when applying small
-operators, it would be convenient to be able to perform the
-convolution in the spatial domain.
+the number of points contributing to the operator is greater than 32.
+Thus, when applying small operators, it would be convenient to be able
+to perform the convolution in the spatial domain.
 
 A useful observation in that respect is that the convolution of an
 image $f$ with an operator $h$, as expressed by
@@ -580,14 +586,14 @@ High frequency emphasis is actually a special case of what is known as
 
 The illumination component of an image is generally characterized by
 slow spatial variation, and is thus low frequency in content.  The
-reflection, on the other hand, depends on the nature of the objects of
-which the image is composed, and tends to vary abruptly, thus being
-high frequency in content.  Assuming that $\gamma_{L}$ and
-$\gamma_{H}$ are chosen so that $\gamma_{L}<1$ and $\gamma_{H}>1$, the
-filter function in Fig.~\ref{fig:homomorphic} affects the low and high
-frequency components of an image differently, attenuating the low
-frequencies and amplifying the high frequencies.  The net result is
-simultaneous dynamic range compression and contrast enhancement.  On
-pp.\ 192-193 in~\cite{digpic} is shown the result of applying the
-filter in Fig.~\ref{fig:homomorphic} with $\gamma_{L}=0.5$ and
-$\gamma_{H}=2.0$ on an image with little contrast.
+reflection, on the other hand, depends on the nature of the objects in
+image, and tends to vary abruptly, thus being high frequency in
+content.  Assuming that $\gamma_{L}$ and $\gamma_{H}$ are chosen so
+that $\gamma_{L}<1$ and $\gamma_{H}>1$, the filter function in
+Fig.~\ref{fig:homomorphic} affects the low and high frequency
+components of an image differently, attenuating the low frequencies
+and amplifying the high frequencies.  The net result is simultaneous
+dynamic range compression and contrast enhancement.  On pp.\ 192-193
+in~\cite{digpic} is shown the result of applying the filter in
+Fig.~\ref{fig:homomorphic} with $\gamma_{L}=0.5$ and $\gamma_{H}=2.0$
+on an image with little contrast.

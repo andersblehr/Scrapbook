@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 18 04:05:10 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 18 04:07:24 1993
+%%% Last Modified On: Sun Mar 28 06:37:44 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -11,5 +11,131 @@
 \section{Introduction}
 \label{algo:intro}
 
-Her skal de forskjellige teknikkene fra Kap.\ 3 diskuteres, og en
-konklusjon skal trekkes som samsvarer med min algoritme.
+In this chapter, the proposed eye-tracking algorithm is given a
+thorough presentation.  The name of the algorithm, {\octopus}, arises
+from the fact that the search part of the algorithm can be compared to
+a four-armed octopus looking for the sea.  Also, the line-oriented
+edge detection, as described in the previous chapter, is for each
+iteration performed in a pattern similar to an eight-armed octopus.
+
+\subsection{Problem Definition}
+\label{algo:intro:problem}
+
+The problem definition to which my thesis work has been related was
+given as the {\em algorithmic\/} problem definition in
+Section~\ref{intro:problem}.  For the sake of easy reference, it is
+repeated here:
+
+\paragraph{Problem definition:}
+Design, implement and, as extensively as possible, test an algorithm
+to, on the basis of a given image of the eye, decide the position of
+the (centre of the) pupil, relative to some given reference point.
+The algorithm must to be fast enough to run in the CPU of the
+computer, and has to satisfy the following requirements:
+\begin{itemize}
+\item The position of the pupil is to be decided with an accuracy
+  corresponding to 1 pixel in the digitized image.
+\item Whenever the pupil cannot be found (due to blinking,
+  disturbances, etc.), an error signal is to be returned.
+\item The total running time of the algorithm may not exceed 20 ms in
+  the worst case.
+\end{itemize}
+Whether the accuracy requirement above complies with
+requirement~\ref{req:2} in Section~\ref{intro:motivation} depends on
+the resolution of the image, and on the fraction of the image occupied
+by the pupil.  Preferably, the image should have a resolution of
+$512\times 512$ pixels with 256 gray levels, and the eye should fill
+the entire image.
+\vspace*{0.5cm}
+
+\noindent Some vague points in this definition have to be clarified
+before continuing the presentation of the algorithm.  These are:
+\begin{description}
+\item[Reference point:] ``{\em\ldots decide the position\ldots
+    relative to some reference point\ldots\/}'' The upper left corner
+  of the image has been as reference point, having coordinates
+  $(0,0)$.
+\item[Error signal:] ``{\em\ldots an error signal is to be
+    returned\ldots\/}'' The position deciding procedure has been
+  implemented as a boolean function, returning {\em false\/} if the
+  pupil cannot be found in an image.
+\item[Resolution:] ``{\em Preferably, the image should have a
+    resolution of 512$\times$512 pixels with 256 gray levels, and the
+    eye should fill the entire image.\/}'' The frame-grabber that was
+  purchased supplies images that have a resolution of $320\times 284$
+  pixels with 64 gray levels.  In addition, due to limitations of the
+  video camera which has been available, it was not possible to get
+  close-ups of the monkey's eye that filled the entire field of view.
+  Thus, these close-ups had to be made by shaving away the
+  uninteresting portions of the images, leaving test images having an
+  even lower resolution of approximately $100\times 100$ pixels.
+  Lastly, the darkest gray level in the images supplied by the
+  frame-grabber is 15, thus reducing the actual number of gray levels
+  to 48.
+\end{description}
+Particularly the relatively low resolution of the test images has
+put limitations on the quality of the tests that the algorithm has
+been subjected to.  Details about the test images are given in the
+next section.
+
+\subsection{The Test Images}
+\label{algo:intro:images}
+
+\begin{figure}[tb]
+  \epsfxsize 0.3\textwidth
+  \makebox[0.45\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbl01.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbr01.eps}}\\
+  \hspace*{0.28\textwidth}(a)\hspace*{0.38\textwidth}(b)
+  \paragraph{}
+  \makebox[0.425\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbl02.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbr02.eps}}\\
+  \hspace*{0.28\textwidth}(c)\hspace*{0.38\textwidth}(d)
+  \paragraph{}
+  \makebox[0.425\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbl05.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbr03.eps}}\\
+  \hspace*{0.28\textwidth}(e)\hspace*{0.38\textwidth}(f)
+  \caption{\label{fig:testimages}The test images used while developing
+    and testing {\octopus}.}
+\end{figure}
+
+The test images used while developing and testing {\octopus} are shown
+in Fig.~\ref{fig:testimages}.  Note that the image in
+Fig.~\ref{fig:compare}(a) is identical to image (e) above.  As can be
+seen, the quality of the test images is not very good.  Note in
+particular the strong reflections present in the images, and their
+``flat'' appearance.
+
+\subsection{Structure of the Chapter}
+\label{algot:intro:structure}
+
+As was pointed out in the basic algorithm formulation in
+Section~\ref{eval:approach:algo}, the algorithm decided upon can be
+seen as consisting of two main steps: 
+\begin{description}
+\item[Step 1:] Apply a search strategy employing some sort of pixel
+  filter to locate a point that can be unambigously classified as a
+  pupil point.
+\item[Step 2:] Assign the pupil point returned by the search strategy
+  to the origin of operation, and use line oriented edge detection on
+  as high a number of line pairs as allowed by the time available, in
+  order to obtain as accurate an estimate of the centre position of
+  the pupil as possible.
+\end{description}
+
+Section~\ref{algo:seek} presents the {\em swimming octopus\/} search
+algorithm as a realization of the search strategy and pixel filter
+required by Step 1, and Section~\ref{algo:pos} describes how Step 2 is
+realized in {\octopus}; in particular, the gradient operators employed
+are elaborated upon.  In Section~\ref{algo:test}, {\octopus} is run on
+a number of test images, and the results obtained are evaluated with
+respect to accuracy and time consumption.  Some known problems and
+uncertainty factors are described in Section~\ref{algo:problem}, and
+in Section~\ref{algo:future}, the most important aspects pertaining to
+the incorporation of {\octopus} in a complete eye-tracking system are
+discussed.

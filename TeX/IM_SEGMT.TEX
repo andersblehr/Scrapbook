@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 23 04:48:33 1993
+%%% Last Modified On: Sun Mar 28 00:01:43 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,8 +114,8 @@ location in the image, thus having several regions grow
 simultaneously.  This is referred to as {\em multiple\/} region
 growing, as opposed to {\em single\/} region growing, applying only
 one seed point.  In the following, only single region growing is
-discussed.  The principles presented are, however, easily extended to
-multiple region growing.
+discussed.  The principles presented are, however, easily extendable
+to multiple region growing.
 
 Two immediate problems with region growing are the selection of a seed
 point which properly represents the region of interest, and the
@@ -131,7 +131,7 @@ does not belong to the region of interest, since single pixels outside
 the region of interest may share properties with it.  Thus it is
 important to equip the search strategy with a very tight stop
 criterion, in order to minimize the chance of erroneously choosing a
-non-region seed point.  
+non-region seed point (confer Section~\ref{eval:eval:segment}).
 
 A usual similarity criterion for the inclusion of new points during
 the growing process is that the gray level of a pixel to be included
@@ -157,17 +157,17 @@ objects from their background.  These characteristics, however,
 include neither {\em geometrical\/} (e.g., shape) nor {\em textural
   properties\/} (e.g., dark and bright regions) of the objects to be
 segmented out.  Thus, if one wants to be able to recognize an object
-in an image, having an arbitrary pattern of gray levels, other
+in an image having an arbitrary pattern of gray levels, other
 techniques have to be found.
 
 {\em Template matching\/} is, perhaps, one of the most straightforward
 methods for locating the presence of an object in an image, based on
 specific geometrical and textural properties.  The idea is that an
 object with given properties can be detected in an image by matching
-the image at different locations against a {\em template\/}, having
-the sought properties, as illustrated in Fig.~\ref{fig:template}.
-This must be done at every pixel location in the image, and, if the
-sought object is allowed to rotate, at every possible orientation.
+the image at different locations against a {\em template\/} having the
+sought properties, as illustrated in Fig.~\ref{fig:template}.  This
+must be done at every pixel location in the image, and, if the sought
+object is allowed to rotate, at every possible orientation.
 
 \inserteps{template}{\label{fig:template}An image (a), and a template
   designed to locate the bull's head (b).

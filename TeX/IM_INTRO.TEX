@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:37:29 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Mar 26 21:22:12 1993
+%%% Last Modified On: Sat Mar 27 20:16:31 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,7 +43,7 @@ four main categories.  These categories are~(\cite{digim}):
 \begin{description}
 \item[Image digitization:] In order to be in a form suitable for
   processing in a computer, an image has to be discretized (digitized)
-  both spatially and in amplitude.  {\em Image digitation\/} is the
+  both spatially and in amplitude.  {\em Image digitization\/} is the
   process of converting continuous (real) images into digitized form.
 \item[Image enhancement and restoration:] Often an image is unsuited
   for machine and/or human perception, due to its being blurred,
@@ -51,19 +51,21 @@ four main categories.  These categories are~(\cite{digim}):
   degraded images for machine or human perception is generally
   referred to as {\em image enhancement and restoration\/}.
 \item[Image encoding:] Techniques for representing an image, or the
-  information contained in the image, with fewer bits than the ``raw''
-  digitized image needs are categorized as {\em image encoding\/}
-  techniques.
-\item[Image segmentation, representation, and description:] Normally,
-  an image consists of contiguous regions, representing the objects
-  that make up the image.  Often, one is interested in segmenting out
-  one or several objects in an image.  This can be done by applying
-  techniques classified as {\em image segmentation\/} techniques.  In
-  addition, one may be interested in representing the constituent
-  parts of an image in forms suitable for further computer processing
-  and to describe them in terms of parts and properties.  This is
-  referred to as {\em image representation\/} and {\em description\/},
-  respectively.
+  information contained in the image, with fewer bits than required
+  for the ``raw'' digitized image are categorized as {\em image
+    encoding\/} techniques.
+\item[Image segmentation, representation, and description:] An image
+  is normally composed of contiguous regions, each region being
+  characterized by a set of properties that the pixels belonging to
+  the region share.  These regions correspond to the objects that make
+  up the image.  Often, one is interested in segmenting out one or
+  more of the objects that are present in an image.  This can be done
+  by applying techniques classified as {\em image segmentation\/}
+  techniques.  In addition, one may be interested in representing the
+  constituent parts of an image in forms suitable for further computer
+  processing, and to describe them in terms of parts and properties.
+  This is referred to as {\em image representation\/} and {\em
+    description\/}, respectively.
 \end{description}
 
 The field of {\em digital\/} image processing is concerned with the
@@ -75,17 +77,16 @@ described in the next section.
 \subsection{Structure of the Chapter}
 \label{image:intro:structure}
 
-The focus in this chapter is on spatial domain techniques, these being
-computationally cheaper as compared to frequency domain methods.  A
-theoretical introduction to the spatial domain and terms pertaining to
-it is given in Section~\ref{image:spatial}.  Still, due to its wide
-scope of application in image processing problems, the theoretical
-basis of frequency domain techniques, the Fourier transform, is given
-a relatively extensive presentation in Section~\ref{image:frequency},
-along with a basic description of its use in image processing.
+In this chapter, both spatial and frequency domain techniques are
+presented.  A theoretical introduction to the spatial domain and terms
+pertaining to it is given in Section~\ref{image:spatial}.  The
+theoretical foundations of frequency domain techniques, the Fourier
+transform and the convolution theorem, are given a relatively
+extensive presentation in Section~\ref{image:frequency}, along with a
+basic description of their use in image processing.
 
 A usual problem when processing digital images, is that they often
-have been subjected to some kind of noise.  In
+have been subjected to some sort of noise.  In
 Section~\ref{image:noise}, some approaches to the problem of reducing
 the amount of noise present in a given image are presented.  
 

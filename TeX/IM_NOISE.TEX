@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:38:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 25 03:09:01 1993
+%%% Last Modified On: Sat Mar 27 20:41:25 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,6 +73,7 @@ instead of Eq.~(\ref{eq:averaging:neighbourhood}):
       \frac{1}{M}\sum_{(m,n)\in S}f(m,n) &
         \mbox{if $\left|f(x,y)-\frac{1}{M}\sum_{(m,n)\in
             S}f(m,n)\right|<T$} \\
+             & \\
       f(x,y) & \mbox{otherwise,}
     \end{array}\right.
 \end{equation}
@@ -87,7 +88,7 @@ with reduced noise level can be computed by assigning to each pixel
 the average value of the gray levels of the corresponding pixels in
 all the noisy images at hand:
 \begin{equation}
-  \overline{g}(x,y)=\frac{1}{M}\sum_{i=1}^{M}f_{i}(x,y)\mbox{,}
+  \overline{g}(x,y)=\frac{1}{M}\sum_{i=1}^{M}g_{i}(x,y)\mbox{,}
 \end{equation}
 where $M$ is the number of noisy images.  Since the mean of the noise
 function $\eta(x,y)$ is 0, the expected value of $\overline{g}$ at any

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Wed Mar 24 07:04:27 1993
+%%% Last Modified On: Sun Mar 28 00:08:04 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,7 +146,7 @@ yielding the following expression for $G[f(x,y)]$:
 \label{eq:gradient:simple}
   G[f(x,y)]\simeq|f(x,y)-f(x+1,y)|+|f(x,y)-f(x,y+1)|\mbox{.}
 \end{equation}
-This approximation use first-order differences in the horizontal and
+This approximation uses first-order differences in the horizontal and
 vertical directions about $(x,y)$ to compute $G[f(x,y)]$.  Another
 approximation, commonly referred to as the {\em Roberts gradient\/},
 uses differences symmetrical about the imaginary interpolation point
@@ -184,7 +184,7 @@ the following definitions of $G_{x}$ and $G_{y}$:
 \insertepswidth{sobelop}{\label{fig:sobelop}Spatial masks used to
   compute $G_{x}$ (a) and $G_{y}$ (b), as defined by
   Eqs.~(\protect\ref{eq:sobel:x})
-  and~(\protect\ref{eq:sobel:y}).}{0.5}
+  and~(\protect\ref{eq:sobel:y}).}{0.4}
 
 The spatial masks shown in Figs.~\ref{fig:sobelop}(a) and (b)
 implement $G_{x}$ and $G_{y}$, respectively.  These two masks are
@@ -200,8 +200,8 @@ result often being referred to as a {\em gradient image\/}.
 Higher order derivative operators can also be used to detect edges in
 an image.  The {\em Laplacian\/} operator $L[f(x,y)]$ is a
 second-order derivative operator which is direction insensitive, as
-opposed to the $G_{x}$ and $G_{y}$ operators above.  In the continuous
-case, the Laplacian is defined by the equation
+opposed to the Sobel-operators.  In the continuous case, the Laplacian
+is defined by the equation
 \begin{equation}
   L[f(x,y)]=\frac{\partial^{2}f}{\partial x^{2}}+
   \frac{\partial^{2}f}{\partial y^{2}}\mbox{.}
@@ -220,7 +220,7 @@ section of edges, as expected of a second-order derivative operator.
 
 As a consequence of its being a second-order derivative operator,
 however, the Laplacian tends to be unacceptably sensitive to noise.
-It also does not respond as strongly to edges than do the other
+It also does not respond as strongly to edges as do the other
 operators described thus far.  On the other hand, it responds far more
 strongly to single points, lines and line ends than these do.  It can
 also be applied to detect whether a given pixel is on the dark or
@@ -294,7 +294,9 @@ curve or edge which can be described by the relation
 $g(\vec{x},\vec{c})=0$.  The equation
 $(x-c_{1})^{2}+(y-c_{2})^{2}=c_{3}^{2}$, for example, describes a
 circle, and can thus be used correspondingly to the above procedure to
-detect circles in an image.
+detect circles in an image.  One possible application would be to
+detect the (circular) pupil in an image of the eye (see
+Section~\ref{eval:eval:edge}).
 
 If the number of points in the image equals $N^{2}$ (i.e., an image of
 size $N\times N$), and the $a$ axis is divided into $K$ equal

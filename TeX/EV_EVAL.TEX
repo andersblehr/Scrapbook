@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Mar 26 22:01:02 1993
+%%% Last Modified On: Sun Mar 28 00:14:44 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,7 +58,7 @@ As pointed out in Section~\ref{image:spatial}, applying spatial
 operators on an image generally requires $O(N^{2})$ operations.  Thus
 all the spatial noise reduction schemes presented in
 Sections~\ref{image:noise:averaging} and~\ref{image:noise:median},
-neighbourhood averaging, averaging of multiple images, and median
+neighbourhood averaging, averaging of multiple images and median
 filtering, perform in $O(N^{2})$ time.
 
 Of the two averaging techniques, averaging of multiple images can be
@@ -72,9 +72,8 @@ As pointed out in Section~\ref{image:noise:median}, median filtering
 turns out to be clearly superior to averaging techniques, both with
 respect to removing noise from an image, and to maintaining edges in
 the image.  In addition, median filtering is, when carefully
-implemented (e.g., by using binary trees to sort the values),
-computationally cheaper than averaging schemes, in that it requires
-mostly comparisons and no multiplications.
+implemented, computationally cheaper than averaging schemes, in that
+it requires mostly comparisons and no multiplications.
 
 \subsubsection{Frequency Domain Approaches}
 
@@ -164,7 +163,7 @@ expected to return such a point.
 
 Another problem is to chose the similarity criteria such that as many
 actual pupil points as possible and as few non-pupil points as
-possible be included.  A possible similarity criterion would be to
+possible are included.  A possible similarity criterion would be to
 include those pixels whose values are below a given threshold value
 $T$, assuming that the value of the seed point also is below $T$.
 This would, however, result in exactly the same unsuitable pupil
@@ -172,9 +171,9 @@ region as the one supplied by the pixel-by-pixel thresholding scheme
 above, given that the image and $T$ are the same.  A usual, and
 better, similarity criterion is that the gray level of a pixel to be
 included not differ from that of the seed point by more than a
-specified amount.  This is, however, also a form of thresholding (ref.
-Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1}), and puts a
-rigid limit on the interval of gray levels accepted.
+specified amount.  This is, however, also a form of thresholding
+(ref.\ Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1}), and
+puts a rigid limit on the interval of gray levels accepted.
 
 Since the pupil is assumed to constitute the darkest region in the
 image, having a relatively well defined edge to the surrounding iris,
@@ -201,7 +200,7 @@ After a region has been grown that corresponds as closely to the pupil
 as possible, the problem remains of deciding the position of the {\em
   centre\/} of the pupil.  This can be done by, by means of some data
 structure, registering the coordinates of the end points of the rows
-and columns in the region being grown.  When the region is complete,
+and columns of the region being grown.  When the region is complete,
 the $x$-position of its centre (and thus of the pupil's, assuming that
 the correspondance between the region and the pupil is approximately
 1:1) is computed by taking the average of the centre points of all
@@ -294,7 +293,7 @@ the previous section.
 \begin{figure}[tb]
   \epsfxsize 0.3\textwidth
   \makebox[0.45\textwidth][r]{
-    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/histbl05.eps}}
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/monkbl05.eps}}
   \makebox[0.4\textwidth][r]{
     \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/threshld.eps}}\\
   \hspace*{0.28\textwidth}(a)\hspace*{0.38\textwidth}(b)
