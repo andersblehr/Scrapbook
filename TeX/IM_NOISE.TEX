@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:38:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 23:17:31 1993
+%%% Last Modified On: Sat Mar 20 05:58:52 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,14 +109,12 @@ was the case in the previous section.  The median of a set of values
 is the value that is such that half of the values in the set is
 smaller than or equal to it, and the other half is greater than or
 equal to it.  For exampel, suppose that a $3\times 3$ {\em median
-  filter\/} covers a neighbourhood with the following values
-\begin{center}
-  \begin{tabular}{|c|c|c|} \hline
-    51 & 49 & 47 \\ \hline
-    53 & 98 & 50 \\ \hline
-    51 & 52 & 49 \\ \hline
-  \end{tabular}
-\end{center}
+  filter\/} covers a neighbourhood having values as shown in
+Fig.~\ref{fig:median}.
+
+\insertepswidth{median}{\label{fig:median}A $3\times 3$ neighbourhood
+  in an image.}{0.15}
+
 The value of the central pixel corresponds to a single-pixel spike,
 and can be assumed to represent a noise point.  The values of the
 neighbourhood are sorted as $(47,49,49,50,50,51,52,53,98)$.  The

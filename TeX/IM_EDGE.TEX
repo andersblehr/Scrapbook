@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Mar 19 07:09:06 1993
+%%% Last Modified On: Sat Mar 20 05:10:19 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -20,6 +20,14 @@ approach for detecting discontinuties in gray level.  An {\em edge\/}
 is defined as the boundary between two regions characterized by having
 relatively distinct gray levels.
 
+A difficulty with edge detection as an approach to image segmentation
+is that the detected edges often have gaps in them, due to places
+where transistions between regions are not abrupt enough that an edge
+be detected.  In addition, if the image is noisy, edges may be
+detected at points which are not parts of region boundaries, as
+discussed below.  Thus the detected edges will not necessarily form
+closed, connected curves which surround closed, connected regions.
+
 \subsection{Thresholding}
 \label{image:edge:threshold}
 
@@ -28,7 +36,7 @@ Section~\ref{image:segment:threshold} can, with slight modifications,
 be applied to detect edges in an image, as described in~\cite{digim}.
 The idea is to choose a threshold $T$, based on some criteria,
 dividing the gray scale of the image into two distinct bands.  Then
-the image is scanned in the $x$- and $y$-directions separately.  Each
+the image is scanned in the $x$ and $y$ directions separately.  Each
 time a change in gray level from one band to the other occurs, this
 indicates the presence of a boundary point.  The procedure performs in
 two passes as follows:
@@ -58,8 +66,11 @@ following relation:
       L_{B} & \mbox{otherwise.}
     \end{array}\right.
 \end{equation}
-The desired image, consisting of the boundary points of the object of
-interest on a uniform background, is then given by the relation:
+\vspace*{0.1cm}
+
+\noindent The desired image, consisting of the boundary points of the
+object of interest on a uniform background, is then given by the
+relation:
 \begin{equation}
   g(x,y)=\left\{
     \begin{array}{ll}
@@ -74,7 +85,7 @@ If the image has been subjected to additive noise, so that in regions
 with gray levels in the proximity of $T$, pixel values are randomly
 distributed on both sides of $T$, this method will detect an edge
 point each time a transition from one band to another occurs, thus
-making it difficult to distinguish between the actual edge, and edges
+making it difficult to distinguish between an actual edge, and edges
 detected due to noise.  This is less of a problem if the edges of
 interest are relatively sharp, that is, they approximate a step edge
 rather than a ramp edge.  Sharp edges are present in ``sharp'' images
@@ -129,23 +140,38 @@ $2\times 2$ neighbourhood.  A typical approximation in this respect is
 \end{equation}
 yielding the following expression for $G[f(x,y)]$:
 \begin{equation}
+\label{eq:gradient:simple}
   G[f(x,y)]\simeq|f(x,y)-f(x+1,y)|+|f(x,y)-f(x,y+1)|\mbox{.}
 \end{equation}
+This approximation use first-order differences in the horizontal and
+vertical directions about $(x,y)$ to compute $G[f(x,y)]$.  Another
+approximation, commonly referred to as the {\em Roberts gradient\/},
+uses differences symmetrical about the imaginary interpolation point
+$(x+\frac{1}{2}, y+\frac{1}{2})$:
+\begin{equation}
+\label{eq:gradient:roberts}
+  G[f(x,y)]\simeq|f(x,y)-f(x+1,y+1)|+|f(x+1,y)-f(x,y+1)|\mbox{.}
+\end{equation}
+The approximations in Eqs.~(\ref{eq:gradient:simple})
+and~(\ref{eq:gradient:roberts}) use the differences between two pairs
+of adjacent pixels to compute the gradient.  Thus, for about the same
+reasons given in Section~\ref{image:edge:threshold}, these
+approximations tend to be sensitive to noise.
 
 \subsubsection{Sobel Operators}
 
-Approximations of the kind described above tend to be too sensitive to
-noise, in that only two pixels in each direction are taken into
-consideration.  Using a $3\times 3$ neighbourhood to compute the
-gradient has the advantage of increased smoothing over $2\times 2$
-operators.  Consider the following definitions of $G_{x}$ and $G_{y}$:
+Using a $3\times 3$ neighbourhood to compute the gradient has the
+advantage of increased smoothing over $2\times 2$ operators.  Consider
+the following definitions of $G_{x}$ and $G_{y}$:
 \begin{equation}
+\label{eq:sobel:x}
   \begin{array}{lll}
     G_{x} & = & [f(x-1,y+1)+2f(x,y+1)+f(x+1,y+1)]\ - \\
           &   & [f(x-1,y-1)+2f(x,y-1)+f(x+1,y-1)]
   \end{array}
 \end{equation}
 \begin{equation}
+\label{eq:sobel:y}
   \begin{array}{lll}
     G_{y} & = & [f(x+1,y-1)+2f(x+1,y)+f(x+1,y+1)]\ - \\
           &   & [f(x-1,y-1)+2f(x-1,y)+f(x-1,y+1)]\mbox{.}
@@ -153,7 +179,9 @@ operators.  Consider the following definitions of $G_{x}$ and $G_{y}$:
 \end{equation}
 
 \insertepswidth{sobelop}{\label{fig:sobel}Spatial masks used to
-  compute $G_{x}$ (a) and $G_{y}$ (b).}{0.3}
+  compute $G_{x}$ (a) and $G_{y}$ (b), as defined by
+  Eqs.~(\protect\ref{eq:sobel:x})
+  and~(\protect\ref{eq:sobel:y}).}{0.5}
 
 The spatial masks shown in Figs.~\ref{fig:sobel}(a) and (b) implement
 $G_{x}$ and $G_{y}$, respectively.  These two masks are commonly
@@ -167,27 +195,112 @@ gradient image based on Eq.~(\ref{eq:gradient:abs}) is shown in
 Fig.~\ref{fig:gradient}.
 
 \inserttwoeps{histbl05}{gradbl05}{\label{fig:gradient}An image of a
-  monkey's eye (left), and the result of applying the Sobel operators
-  on this image (right).}
+  monkey's eye (a), and the result of applying the Sobel operators in
+  Fig.~\protect\ref{fig:sobel} on this image (b).}
 
 \subsubsection{The Laplacian Operator}
 
-The {\em Laplacian operator\/} $L[f(x,y)]$ is a second-order
-derivative operator, an is in the continuous case defined by the
-equation
+Higher order derivative operators can also be used to detect edges in
+an image.  The {\em Laplacian\/} operator $L[f(x,y)]$ is a
+second-order derivative operator which is direction insensitive, as
+opposed to the $G_{x}$ and $G_{y}$ operators above.  In the continuous
+case, the Laplacian is defined by the equation
 \begin{equation}
   L[f(x,y)]=\frac{\partial^{2}f}{\partial x^{2}}+
   \frac{\partial^{2}f}{\partial y^{2}}\mbox{.}
 \end{equation}
-In the discrete case, the Laplacian at point $(x,y)$ is approximated
-by the relation
+In the digital case, it is approximated by
 \begin{equation}
+\label{eq:laplacian}
   L[f(x,y)]\simeq f(x,y-1)+f(x-1,y)+f(x+1,y)+f(x,y+1)-4f(x,y)\mbox{.}
 \end{equation}
+A mask implementing Eq.~(\ref{eq:laplacian}) is shown in
+Fig.~\ref{fig:laplacian}.  Note that Eq.~(\ref{eq:laplacian}) implies
+that $L[f(x,y)]$ takes on both positive and negative values.  If only
+positive values are desired, the absolute value can be used.  Note
+also that the Laplacian is zero in constant areas, and on the ramp
+section of edges, as expected of a second-order derivative operator.
 
-\subsection{The Hough Transform}
-\label{image:edge:hough}
+As a consequence of its being a second-order derivative operator,
+however, the Laplacian tends to be unacceptably sensitive to noise.
+It also does not respond as strongly to edges than do the other
+operators described thus far.  On the other hand, it responds far more
+strongly to single points, lines and line ends than these do.  It can
+also be applied to detect whether a given pixel is on the dark or
+bright side of an edge.
+
+\insertepswidth{laplace}{\label{fig:laplacian}Spatial mask used to
+  compute the Laplacian as defined by
+  Eq.~(\protect\ref{eq:laplacian})}{0.15}
 
 \subsection{Highpass Filtering}
 \label{image:edge:highpass}
 
+Convolving an image with any of the gradient operators described above
+is equivalent to highpass filtering in the frequency domain.  Thus it
+ought to be possible to detect edges in an image by highpass filtering
+the Fourier transform of the image directly.  Highpass filtering the
+Fourier transform of a given image indeed has effects similar to those
+of applying the above operators.  The usefulness of direct highpass
+filtering as an edge detection technique is, however, questionable, in
+that the responses returned are relatively weak as compared to the
+results obtained using the above techniques.  This is clearly
+demonstrated in Figs.~9 and~10 on pp.~281--283 in~\cite{digpic}.
+
+\subsection{The Hough Transform}
+\label{image:edge:hough}
+
+The last approach to edge detection discussed here, is the so-called
+{\em Hough transform\/}.  The discussion below is directed towards
+applying the Hough transform to detect straight lines and edges in an
+image, but the principle can be extended to detecting any line or
+edge that can be described by the equation $g(\vec{x},\vec{c})=0$,
+where $\vec{x}$ is a vector of coordinates, and $\vec{c}$ is a vector
+of coefficients.
+
+Consider a point $(x_{i},y_{i})$ in an image.  An infinite number of
+lines, satisfying the equation $y_{i}=ax_{i}+b$ for varying values of
+$a$ and $b$, pass through this point.  However, the equation
+$b=-x_{i}a+y_{i}$, which is equivalent to the previous one, describes
+a {\em single\/} line in the {\it ab\/} plane (often referred to as
+{\em parameter space\/}) for a fixed pair $(x_{i},y_{i})$.
+Correspondingly, a second image point $(x_{j},y_{j})$ also has a line
+in parameter space associated with it.  This line intercepts the line
+associated with $(x_{i},y_{i})$ at a point $(a',b')$, where $a'$ is
+the slope and $b'$ the intercept of the line in the {\it xy\/} plane
+(the image) containing both $(x_{i},y_{i})$ and $(x_{j},y_{j})$.  All
+points on this line will have lines in parameter space which intercept
+at $(a',b')$.
+
+By associating with each point $(a_{i},b_{i})$ in parameter space an
+{\em accumulator cell\/}, it is possible to keep track of how many
+points in the {\it xy\/} plane lie on a given line.  This is done by
+letting, for every point $(x_{k},y_{k})$ in the image, $a$ vary along
+the entire $a$ axis in parameter space, and for each $a_{l}$ solve for
+$b_{l}$ using the relation $b_{l}=-x_{k}a_{l}+y_{k}$.  The value of
+the accumulator cell associated with $(a_{l},b_{l})$ is then
+incremented by one, and at the end of the procedure, a value of $M$ in
+the accumulator cell associated with $(a_{i},b_{j})$ corresponds to
+$M$ points in the image lying on the line $y=a_{i}x+b_{j}$.
+
+A problem with describing a line with the equation $y=ax+b$ is that
+both slope and intercept approach infinity as the line approaches a
+vertical position.  This problem is circumvented by using the {\em
+  normal\/} description $x\cos\theta+y\sin\theta=\rho$ of the line
+instead.  The only difference in using this representation when
+constructing the set of accumulator cells, is that the intercepts in
+parameter space ($\rho\theta$ plane) are between sinusoidal curves
+instead of straight lines.
+
+As mentioned above, these principles can be applied to detect any line
+or edge which can be described by the relation $g(\vec{x},\vec{c})=0$.
+The equation $(x-c_{1})^{2}+(y-c_{2})^{2}=c_{3}^{2}$, for example,
+describes a circle, and can thus be used correspondingly to the above
+procedure to detect circles in an image.
+
+If the number of points in the image equals $n$, and the $a$ axis is
+divided into $K$ equal increments, the number of computations needed
+for the above procedure is $nK$, since, for each image point
+$(x_{i},y_{i})$, $a$ is varied from $a_{1}$ to $a_{K}$ to obtain the
+corresponding values of $b$.  Thus the Hough transform is linear in
+$N$, assuming that $K\ll n$.
