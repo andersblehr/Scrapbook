@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 22 05:48:13 1993
+%%% Last Modified On: Thu Mar 25 03:08:42 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -227,7 +227,7 @@ If we define
 \label{eq:fft:F_odd}
   F_{\odd}(u)=\frac{1}{M}\sum_{x=0}^{M-1}f(2x+1)W_{M}^{ux}
 \end{equation}
-for $u=0,1,2,\ldots,M-1$, Eq.~\ref{eq:fft:sep2} becomes
+for $u=0,1,2,\ldots,M-1$, Eq.~(\ref{eq:fft:sep2}) becomes
 \begin{equation}
 \label{eq:fft:Fevenodd}
   F(u)=\frac{1}{2}\{F_{\even}(u)+F_{\odd}(u)W_{2M}^{u}\}\mbox{.}
@@ -277,8 +277,8 @@ and~(\ref{eq:fourier:discrete:inverse}), which are repeated below:
   f(x)=\sum_{u=0}^{N-1}F(u)e^{\frac{j2\pi ux}{N}}\mbox{.}
 \end{equation}
 Taking the complex conjugate of
-Eq.~\ref{eq:fourier:discrete:inverse:2} and dividing both sides by $N$
-yields 
+Eq.~(\ref{eq:fourier:discrete:inverse:2}) and dividing both sides by
+$N$ yields
 \begin{equation}
 \label{eq:fft:inverse}
   \frac{1}{N}f^{\ast}(x)=\frac{1}{N}\sum_{u=0}^{N-1}F^{\ast}(u,v)
@@ -305,7 +305,7 @@ each operation involves the complex exponential function, which is
 normally implemented using the relation $e^{x+jy}=e^{x}\cos
 y+je^{x}\sin y$, it can be concluded that the {\fft}, although
 cheaper than the direct implementation of
-Eq.~\ref{eq:fourier:discrete}, still is comparably expensive.
+Eq.~(\ref{eq:fourier:discrete}), still is comparably expensive.
 
 \inserteps{convolut}{\label{fig:convolution}Graphical illustration of
   convolution.}
