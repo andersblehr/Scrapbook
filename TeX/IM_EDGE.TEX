@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Mar 20 05:10:19 1993
+%%% Last Modified On: Wed Mar 24 07:04:27 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,16 +81,19 @@ relation:
 As is the case with thresholding in general, care has to be taken when
 choosing the threshold $T$.  
 
-If the image has been subjected to additive noise, so that in regions
-with gray levels in the proximity of $T$, pixel values are randomly
-distributed on both sides of $T$, this method will detect an edge
-point each time a transition from one band to another occurs, thus
-making it difficult to distinguish between an actual edge, and edges
-detected due to noise.  This is less of a problem if the edges of
-interest are relatively sharp, that is, they approximate a step edge
-rather than a ramp edge.  Sharp edges are present in ``sharp'' images
-where the gray levels on the two sides of an edge differ by a
-relatively large amount.
+As is evident from its formulation, this procedure assumes that the
+edges in the given image are characterized by monotonously increasing
+or decreasing functions.  This is seldom the case in real
+applications.  If the image has been subjected to additive noise, so
+that in regions with gray levels in the proximity of $T$, pixel values
+are randomly distributed on both sides of $T$, which is normally the
+case, this method will detect an edge point each time a transition
+from one band to another occurs, thus making it difficult to
+distinguish between an actual edge, and edges detected due to noise.
+In the worst case an edge will be depicted as a ``bulb'' of layered
+edge fragments.  If the edges of interest are relatively sharp,
+however, that is, they approximate a step edge rather than a ramp
+edge, this problem is less dominant.
 
 \subsection{Gradient Operators}
 \label{image:edge:gradient}
@@ -178,25 +181,19 @@ the following definitions of $G_{x}$ and $G_{y}$:
   \end{array}
 \end{equation}
 
-\insertepswidth{sobelop}{\label{fig:sobel}Spatial masks used to
+\insertepswidth{sobelop}{\label{fig:sobelop}Spatial masks used to
   compute $G_{x}$ (a) and $G_{y}$ (b), as defined by
   Eqs.~(\protect\ref{eq:sobel:x})
   and~(\protect\ref{eq:sobel:y}).}{0.5}
 
-The spatial masks shown in Figs.~\ref{fig:sobel}(a) and (b) implement
-$G_{x}$ and $G_{y}$, respectively.  These two masks are commonly
-referred to as the {\em Sobel operators\/}.  The responses of these
-two operators at any point $(x,y)$ in an image are combined using
-Eq.~(\ref{eq:gradient:sqrt}) or Eq.~(\ref{eq:gradient:abs}) to obtain
-the gradient at that point.  Convolving these masks with an image
-yields the gradient at all points $(x,y)$ in the image, the result
-often being referred to as a {\em gradient image\/}.  An example of a
-gradient image based on Eq.~(\ref{eq:gradient:abs}) is shown in
-Fig.~\ref{fig:gradient}.
-
-\inserttwoeps{histbl05}{gradbl05}{\label{fig:gradient}An image of a
-  monkey's eye (a), and the result of applying the Sobel operators in
-  Fig.~\protect\ref{fig:sobel} on this image (b).}
+The spatial masks shown in Figs.~\ref{fig:sobelop}(a) and (b)
+implement $G_{x}$ and $G_{y}$, respectively.  These two masks are
+commonly referred to as the {\em Sobel operators\/}.  The responses of
+these two operators at any point $(x,y)$ in an image are combined
+using Eq.~(\ref{eq:gradient:sqrt}) or Eq.~(\ref{eq:gradient:abs}) to
+obtain the gradient at that point.  Convolving these masks with an
+image yields the gradient at all points $(x,y)$ in the image, the
+result often being referred to as a {\em gradient image\/}.
 
 \subsubsection{The Laplacian Operator}
 
@@ -253,7 +250,7 @@ demonstrated in Figs.~9 and~10 on pp.~281--283 in~\cite{digpic}.
 The last approach to edge detection discussed here, is the so-called
 {\em Hough transform\/}.  The discussion below is directed towards
 applying the Hough transform to detect straight lines and edges in an
-image, but the principle can be extended to detecting any line or
+image, but the principle can be extended to detecting any curve or
 edge that can be described by the equation $g(\vec{x},\vec{c})=0$,
 where $\vec{x}$ is a vector of coordinates, and $\vec{c}$ is a vector
 of coefficients.
@@ -292,15 +289,17 @@ constructing the set of accumulator cells, is that the intercepts in
 parameter space ($\rho\theta$ plane) are between sinusoidal curves
 instead of straight lines.
 
-As mentioned above, these principles can be applied to detect any line
-or edge which can be described by the relation $g(\vec{x},\vec{c})=0$.
-The equation $(x-c_{1})^{2}+(y-c_{2})^{2}=c_{3}^{2}$, for example,
-describes a circle, and can thus be used correspondingly to the above
-procedure to detect circles in an image.
+As mentioned above, these principles can be applied to detect any
+curve or edge which can be described by the relation
+$g(\vec{x},\vec{c})=0$.  The equation
+$(x-c_{1})^{2}+(y-c_{2})^{2}=c_{3}^{2}$, for example, describes a
+circle, and can thus be used correspondingly to the above procedure to
+detect circles in an image.
 
-If the number of points in the image equals $n$, and the $a$ axis is
-divided into $K$ equal increments, the number of computations needed
-for the above procedure is $nK$, since, for each image point
-$(x_{i},y_{i})$, $a$ is varied from $a_{1}$ to $a_{K}$ to obtain the
-corresponding values of $b$.  Thus the Hough transform is linear in
-$N$, assuming that $K\ll n$.
+If the number of points in the image equals $N^{2}$ (i.e., an image of
+size $N\times N$), and the $a$ axis is divided into $K$ equal
+increments, the number of computations needed for the above procedure
+is $N^{2}K$, since, for each image point $(x_{i},y_{i})$, $a$ is
+varied from $a_{1}$ to $a_{K}$ to obtain the corresponding values for
+$b$.  Thus the Hough transform performs in $O(N^{2})$ time, assuming
+that $K\ll N$.
