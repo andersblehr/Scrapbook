@@ -12,8 +12,9 @@ const maxSize                   = 512;
       north                     = -1;
       south                     = 1;
 
-      point                     = 0;
-      star                      = 1;
+      asPoint                   = 0;
+      asStar                    = 1;
+      asCircle                  = 2;
 
 type  variableRPtr              = ^variableR;
       variableR                 = record
@@ -68,7 +69,6 @@ var   image                     : pixelMatrixPtr;
       minSearchStep             : word;
 
       minPupilRadius            : word;
-      starRadius                : word;
 
 
 function applySobelMask(x,y                     : word;
@@ -80,7 +80,7 @@ procedure findPosition(pupilPoint,position : pointPtr);
 
 procedure initGlobals(xSize,ySize : word);
 
-procedure markPosition(x,y : word; pointOrStar : byte);
+procedure markPosition(x,y : word; asWhat : byte);
 
 
 IMPLEMENTATION
@@ -369,7 +369,7 @@ var   ascendingCenter           : pointPtr;
         inc(x,dX);
         inc(y,dY);
         if showSearch then
-          markPosition(x,y,point);
+          markPosition(x,y,asPoint);
         if ((x<=searchAreaLeft) or (x>=searchAreaLeft+xSizeSearchArea) or
             (y<=searchAreaTop ) or (y>=searchAreaTop +ySizeSearchArea)) then
           fatalError('searchEdge: No edge found!')
@@ -449,22 +449,24 @@ begin
   xSizeSearchArea:=round(xSize*searchAreaRightFraction/100)-searchAreaLeft;
   ySizeSearchArea:=round(ySize*searchAreaBottomFraction/100)-searchAreaTop;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
-  starRadius:=round(2.5*xSize*maxPupilRadiusFraction/100);
   minSearchStep:=round(minPupilRadius/8)
 end;
 
 
-procedure markPosition(x,y : word; pointOrStar : byte);
+procedure markPosition(x,y : word; asWhat : byte);
 
 begin
-  case pointOrStar of
-    point : putPixel(startX+x,startY+y,63);
-    star  :
+  setColor(63);
+  case asWhat of
+    asPoint :
+      putPixel(startX+x,startY+y,63);
+    asStar :
       begin
-        setColor(63);
         line(startX+x-3,startY+y,startX+x+3,startY+y);
         line(startX+x,startY+y-3,startX+x,startY+y+3)
-      end
+      end;
+    asCircle :
+      circle(startX+x,startY+y,2)
   end
 end;
 
