@@ -5,7 +5,6 @@ uses crt,graph,defs,auxil,ADT,SVGA;
 const maxSize                   = 512;
       defaultFilterRadius       = 0;
       defaultThreshold          = 1;
-      fileName                  = 'abeye02';
 
 type  bufferArray               = array[1..maxSize] of char;
 
@@ -26,6 +25,7 @@ var   xSize                     : word;
       ySize                     : word;
       startX                    : word;
       startY                    : word;
+      fileName                  : string;
       pictureMatrix             : pixelMatrixPtr;
       pointList                 : doubleListOPtr;
       filterRadius              : byte;
@@ -85,7 +85,6 @@ procedure init;
 var   parameter                 : string;
       radiusSet                 : boolean;
       thresholdSet              : boolean;
-      fileName                  : string;
       pictureFile               : file;
       buffer                    : bufferArray;
       i,j                       : word;
@@ -213,7 +212,7 @@ var   sum                       : longInt;
 begin
   setColor(60);
   outTextXY(startX,startY+ySize+30,
-            'Analyzing the picture '+fileName+'.PIC ....');
+            'Analyzing the picture '+fileName+'....');
   outTextXY(startX,startY+ySize+50,
             'Filter radius: '+intString(filterRadius));
   lowestFilterValue:=64;
@@ -227,10 +226,7 @@ begin
           filterValue:=getFilterValue;
           putPixel(startX+xPos-1,startY+yPos-1,63);
           if (filterValue<lowestFilterValue) then
-            begin
-              beep(600,10);
-              lowestFilterValue:=filterValue
-            end
+            lowestFilterValue:=filterValue
           else if (filterValue>highestFilterValue) then
             highestFilterValue:=filterValue;
           if (filterValue<=threshold) then
