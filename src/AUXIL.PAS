@@ -32,15 +32,17 @@ uses crt;
 function fileExists(pathToFile : string) : boolean;
 
 var   aFile			: file;
+      exists                    : boolean;
 
 begin
   assign(aFile,pathToFile);
   {$I-}
   reset(aFile,1);
   {$I+}
-  fileExists:=(IOResult=0);
-  if (IOResult=0) then
-    close(aFile)
+  exists:=(IOResult=0);
+  if exists then
+    close(aFile);
+  fileExists:=exists
 end;
 
 
