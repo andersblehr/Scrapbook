@@ -207,8 +207,8 @@ var   imageFile                 : file;
 
 
 begin
-  if fileExists(whatImage) then
-    assign(imageFile,whatImage)
+  if fileExists(appendExtension(whatImage,'.pic')) then
+    assign(imageFile,appendExtension(whatImage,'.pic'))
   else if fileExists(picturePath(whatImage)) then
     assign(imageFile,picturePath(whatImage))
   else
