@@ -1,13 +1,13 @@
 program showPicture;
 
-uses  crt,graph,auxil,paths,images,SVGA;
+uses  crt,graph,auxil,images,SVGA;
 
 var   eyeImage                  : imageOPtr;
 
 begin
   if (paramCount>0) then
     begin
-      SVGA_initGraphics(mode1024x768);
+      SVGA_initGraphics(mode800x600);
       SVGA_setBlackAndWhitePalette;
       new(eyeImage,initStoredImage(paramStr(1)));
       eyeImage^.setPixelSize(1);
