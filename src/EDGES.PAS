@@ -1,15 +1,16 @@
 program edges;
 
-uses crt,graph,paths,auxil,search,SVGA;
+uses crt,graph,auxil,search,SVGA;
 
 var   pupilPoint                : pointType;
+      outputFile                : file;
+      buffer                    : bufferType;
 
 
 procedure init;
 
 var   fileName                  : string;
       inputFile                 : file;
-      buffer                    : bufferType;
       i,j                       : word;
 
 
@@ -72,8 +73,15 @@ begin
           SVGA_setBlackAndWhitePalette;
           assign(inputFile,fileName);
           reset(inputFile,1);
+          assign(outputFile,'c:\user\blehr\fag\diplom\bilder\edges.pic');
+          rewrite(outputFile,1);
           initVariables;
           getMem(image,4*ySize);
+          buffer[1]:=hi(xSize-4);
+          buffer[2]:=lo(xSize-4);
+          buffer[3]:=hi(ySize-4);
+          buffer[4]:=lo(ySize-4);
+          blockWrite(outputFile,buffer,4);
           for i:=1 to ySize do
             begin
               blockRead(inputFile,buffer,xSize);
@@ -129,6 +137,16 @@ var   eastWestBorder            : word;
   end;
 
 
+  function doLimit(aValue : byte) : byte;
+
+  begin
+    case (aValue>63) of
+      true  : doLimit:=63;
+      false : doLimit:=aValue
+    end
+  end;
+
+
   procedure writeText;
 
   begin
@@ -147,8 +165,14 @@ begin
       eastWestBorder:=pupilPoint.x;
       northSouthBorder:=pupilPoint.y;
       for i:=3 to ySize-2 do
-        for j:=3 to xSize-2 do
-          putPixel(startX+j,i,getFilterValue(j,i));
+        begin
+          for j:=3 to xSize-2 do
+            begin
+              buffer[j-2]:=doLimit(2*getFilterValue(j,i));
+              putPixel(startX+j,i,buffer[j-2])
+            end;
+          blockWrite(outputFile,buffer,xSize-4)
+        end;
       markPosition(pupilPoint.x,pupilPoint.y,asCircle);
       writeText
     end
