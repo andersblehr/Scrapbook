@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Mon Jan 18 10:34:12 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Wed Mar  3 21:39:33 1993
+%%% Last Modified On: Fri Mar  5 05:35:33 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,23 +58,22 @@ direction.
 
 To gain absolute certainty about where the subject at a given time
 focuses, it is necessary to have a system which continuously tracks
-the movements of the subject's eyes, and which every $\sim 20 ms$
+the movements of the subject's eyes, and which every $\sim$20 ms.
 makes available a coordinate pair corresponding as closesly as
-possible to the actual gaze direction.  When the subject is {\em
-  drifting\/}, that is, it does not focus where it should, a warning
-signal has to be given.
+possible to the actual gaze direction.  The error in the position
+returned by the system should be less than or equal to $\pm
+0.25^{\circ}$.  When the subject is {\em drifting\/}, that is, it does
+not focus where it should, a warning signal has to be given.  A last
+requirement is that the system should be relatively cheap, its price
+not exceeding DM 12.000.
 
 There exist several commercially available eye tracking systems, some
-of which are described in Section~\ref{back:track}.  All of these
-systems are more expensive than what the financial means \typeout{-->
-  Hva er "bevilgning" paa engelsk?} of the project group allow, and in
-addition many of them require physical implantations in the eye, which
-is consider undesirable.  For these reasons it was decided to develop
-an entirely new eye tracking system, based on real-time image
-processing of video input.  And this is, in short, what has been the
-subject of my thesis; to develop, and, as far as possible, test a
-suitable {\em software platform\/} for a real-time eye position
-measuring system complying to the requirements of precision and speed
-mentioned above.
+of which are described in Chapter~\ref{track}.  For reasons elaborated
+upon in Section~\ref{track:summary}, it was decided to develop an
+entirely new eye tracking system, based on real-time image processing
+of video input.  And this is, in short, what has been the subject of
+my thesis; to develop, and, as far as possible, test a suitable {\em
+  software platform\/} for a real-time eye position measuring system
+complying to the requirements of precision and speed mentioned above.
 
 
