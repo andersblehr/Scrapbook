@@ -1,27 +1,39 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% im_eval.tex --- 
+%%% ev_eval.tex --- 
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 25 04:36:09 1993
+%%% Last Modified On: Fri Mar 26 22:01:02 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Evaluation}
-\label{image:eval}
+\label{eval:eval}
 
-As mentioned in Section~\ref{image:intro:structure}, the purpose of
-this section is to compare the different techniques discussed in this
-chapter as to their individual applicability to the problem at hand.
-The noise reduction schemes presented in Section~\ref{image:noise} are
-evaluated in Section~\ref{image:eval:noise}.  Two approaches to
-detecting the pupil in an image have been presented: Image
-segmentation, and edge detection.  In
-Section~\ref{image:eval:segment}, the image segmentation schemes are
-evaluated, and in Section~\ref{image:eval:edge}, the edge detection
-schemes.  Note that, when evaluating these schemes, it is assumed that
-the pupil is circular (see Section~\ref{back:eye}).
+As mentioned in Section~\ref{image:intro:categories}, the tecniques
+presented in Chapter~\ref{image} can be divided into two main
+categories: {\em Noise reduction\/} schemes and {\em image
+  segmentation\/} schemes.  With regard to the noise reduction schemes
+presented in Section~\ref{image:noise}, it was pointed out there that
+the presentation primarily was intended as an indicator towards some
+possible techniques for removing noise from an image if it at a later
+stage of the project should turn out that this would be necessary.
+With that in mind, the noise reduction schemes are evaluated in
+Section~\ref{eval:eval:noise}.
+
+For the sake of clarity, the presentation of general image
+segmentation schemes was divided in two: {\em Image segmentation\/} as
+a means of recognizing parts of an image as belonging to a continuous
+region with certain characteristics, elaborated upon in
+Section~\ref{image:segment}; and {\em edge detection\/}, which was
+given separate treatment in Section~\ref{image:edge}.  In
+Section~\ref{eval:eval:segment} below, the image segmentation schemes
+are evaluated, and in Section~\ref{eval:eval:edge}, the edge detection
+schemes.  Note that the schemes are evaluated with respect to their
+applicability fro detecting the pupil in an image, and that, when
+evaluating them, it is assumed that the pupil is circular (see
+Section~\ref{back:eye}).
 
 The key criterion for applicability is {\em low computational cost\/}.
 In the following, when comparing the computational cost of the
@@ -34,7 +46,7 @@ are more expensive than $O(N^{2})$.  Another obvious criterion is that
 the technique in question serves the purpose.
 
 \subsection{Noise Reduction Schemes}
-\label{image:eval:noise}
+\label{eval:eval:noise}
 
 The noise reduction schemes presented in this chapter belong to two
 different categories, which are treated separately below: Spatial
@@ -91,13 +103,13 @@ be discarded as an alternative in real-time applications (hardware
 implementations may be fast enough to be sustainable).
 
 \subsection{Pupil Detection Based on Image Segmentation}
-\label{image:eval:segment}
+\label{eval:eval:segment}
 
 The term {\em image segmentation\/} refers in this section, as in
 Section~\ref{image:segment}, to the problem of recognizing parts of an
 image as belonging to a continuous region with certain
 characteristics.  Edge detection schemes are treated separately in
-Section~\ref{image:eval:edge}.
+Section~\ref{eval:eval:edge}.
 
 \subsubsection{Thresholding}
 
@@ -167,7 +179,7 @@ rigid limit on the interval of gray levels accepted.
 Since the pupil is assumed to constitute the darkest region in the
 image, having a relatively well defined edge to the surrounding iris,
 a third approach would be to employ some sort of edge detecting scheme
-(see Section~\ref{image:edge}, and Section~\ref{image:eval:edge}
+(see Section~\ref{image:edge}, and Section~\ref{eval:eval:edge}
 below) as a criterion for inclusion.  That is, to use thresholding not
 on the image itself, but on some sort of operator aimed at detecting
 edges.  With this scheme, during the growing process, all pixels not
@@ -236,7 +248,7 @@ This yields a total number of operations of $\sim 0.1N^{4}$, which
 corresponds to template matching being $O(N^{4})$ in time!
 
 \subsection{Pupil Detection Based on Edge Detection}
-\label{image:eval:edge}
+\label{eval:eval:edge}
 
 All edge detection techniques presented in this chapter, except the
 Hough transform, deliver images where the edges stand out on a
@@ -246,7 +258,7 @@ emphasized.  For the latter two, gradient operators and highpass
 filtering, a binary image can be obtained by appropriately
 thresholding the returned image.  Thresholding and gradient operators
 perform in $O(N^{2})$ time, whereas highpass filtering, as pointed out
-in Section~\ref{image:eval:noise}, performs in $O(N^{2}\log_{2}N)$
+in Section~\ref{eval:eval:noise}, performs in $O(N^{2}\log_{2}N)$
 time.  The performance of the Hough transform is discussed below.
 
 The main problem with deciding the position of the pupil based on edge
