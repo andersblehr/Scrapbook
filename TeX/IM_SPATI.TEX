@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:24:49 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 02:36:18 1993
+%%% Last Modified On: Mon Mar 22 03:41:30 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,7 +37,9 @@ is to use an $n\times n$ subimage of $f$, centred at $(x,y)$, as shown
 in Fig.~\ref{fig:neighbour}.  Other shapes are also possible, but
 square arrays are by far the most predominant, due to their ease of
 implementation.  The centre of the subimage is moved from pixel to
-pixel, applying the operator at each location $(x,y)$ in $f$.
+pixel, applying the operator at each location $(x,y)$ in $f$.  Thus it
+is seen that applying a spatial operator on an $N\times N$ image
+generally requires $O(N^{2})$ operations.
 
 When the size $n$ of the square neighbourhood is 1, $T$ reduces to a
 gray-level {\em transformation function\/}, where the value of $g$ at
@@ -76,19 +78,26 @@ g(x,y)=T[f(x)]=w_{1}f(x-1,y-1)+w_{2}f(x,y-1)+\cdots+w_{9}f(x+1,y+1)\mbox{.}
 \end{equation}
 To compute the transformed image $g$, the mask is moved from pixel to
 pixel in the same manner as for the neighbourhood operator shown in
-Fig.~\ref{fig:neighbour}.  The coefficients $w_{i}$ of the mask are
-chosen to detect given properties in an image.  For example, if all
-$w_{i}$ are chosen to be 1/9, the gray level of each pixel of the
-resulting image $g$ would be the average of the the gray levels of the
-corresponding pixel in $f$ and its 8 immediate neighbours ({\em
-  8-neighbours\/}).  This is known as {\em neighbourhood averaging\/}
-(see Section~\ref{image:noise:averaging}), and the effect is one of
-{\em blurring\/} the original image.
+Fig.~\ref{fig:neighbour}.  As pointed out above, if $f$ is of size
+$N\times N$, the number of operations required to compute $g$ is
+$O(N^{2})$.  In addition, nine multiplications and eight additions
+have are required at each pixel location in the general case, as seen
+from Eq.~(\ref{eq:mask}), making the application of spatial masks
+rather expensive computationally.
+
+The coefficients $w_{i}$ of the mask are chosen to detect given
+properties in an image.  For example, if all $w_{i}$ are chosen to be
+1/9, the gray level of each pixel of the resulting image $g$ would be
+the average of the the gray levels of the corresponding pixel in $f$
+and its 8 immediate neighbours ({\em 8-neighbours\/}).  This is known
+as {\em neighbourhood averaging\/} (see
+Section~\ref{image:noise:averaging}), and the effect is one of {\em
+  blurring\/} the original image.
 
 Neighbourhood averaging is only one of several possible mask
 operations.  By properly selecting the coefficients, it is possible to
 perform a variety of useful image operations, among which are {\em
-  noise reduction\/} (Section~\ref{image:noise}) and {\em feature
+  noise reduction\/} (Section~\ref{image:noise}) and {\em edge
   detection\/} (Section~\ref{image:edge}).  It is worth noting,
 however, that applying a mask at each pixel location in an image is a
 computationally expensive task.  For example, applying the mask of

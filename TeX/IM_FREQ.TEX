@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 01:52:37 1993
+%%% Last Modified On: Mon Mar 22 05:48:13 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,7 +260,9 @@ computed are $1$-point transforms, which correspond to the samples
 themselves.  These are then promoted upwards to form intermediate
 results on all levels, until finally, on the top level, the overall
 transform has been computed.  This process is referred to as {\em
-  successive doubling\/}.
+  successive doubling\/}.  The name arises from the fact that a
+two-point transform is computed from two one-point transforms, a
+four-point transform from two two-point transforms, and so on.
 
 The inverse Fourier transform is easily implemented using the {\fft}
 algorithm described above.  To see this, consider
@@ -289,16 +291,24 @@ transform, the result will be the quantity $f^{\ast}(x)/N$.  Taking
 the complex conjugate and multiplying by $N$ yields the inverse
 Fourier transform $f(x)$.
 
-As mentioned above, this algorithm performs in $O(N\log_{2}N)$ time.
-For a proof of this result, see for instance~\cite{brigham}
-or~\cite{digim}.  Note also that this formulation is for the
-one-dimensional case.  The {\fft} in the two-dimensional case is
-computed by applying the above formulation on a line-to-line basis.
-The number of operations for applying the {\fft} on an $N\times N$
-image is then $O(N^{2}\log_{2}N)$.
+As mentioned above, this algorithm performs in $O(N\log_{2}N)$ time,
+the number of complex multiplications and additions being
+$\frac{1}{2}N\log_{2}N$ and $N\log_{2}N$, respectively.  For a proof
+of these results, see for instance~\cite{brigham} or~\cite{digim}.  
+
+Note that this formulation is for the one-dimensional case.  The
+{\fft} in the two-dimensional case is computed by applying the above
+formulation on a row-to-row or column-to-column basis.
+\label{pg:fft:O} The number of complex operations for applying the
+{\fft} on an $N\times N$ image is thus $O(N^{2}\log_{2}N)$.  Since
+each operation involves the complex exponential function, which is
+normally implemented using the relation $e^{x+jy}=e^{x}\cos
+y+je^{x}\sin y$, it can be concluded that the {\fft}, although
+cheaper than the direct implementation of
+Eq.~\ref{eq:fourier:discrete}, still is comparably expensive.
 
 \inserteps{convolut}{\label{fig:convolution}Graphical illustration of
-  convolution}
+  convolution.}
 
 \subsection{The Convolution Theorem}
 \label{image:frequency:convolution}

@@ -3,11 +3,81 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 11 06:12:18 1993
+%%% Last Modified On: Mon Mar 22 06:06:33 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusion}
 \label{image:concl}
+
+As mentioned in Section~\ref{image:intro:structure}, the purpose of
+this section is to compare the different techniques discussed in this
+chapter as to their individual applicability to the problem at hand.
+This comparison is found in Section~\ref{image:concl:comp} below.  The
+key criterion for applicability is {\em low computational cost\/}.  In
+Section~\ref{image:concl:approach}, a conclusion is drawn as to which
+approach to take in developing an algorithm to solve the problem,
+based on the foregoing comparison.
+
+\subsection{Applicability of the Presented Techniques}
+\label{image:concl:comp}
+
+In the following, when comparing the computational cost of the
+different techniques, it is assumed that the given image is of size
+$N\times N$, and that the technique in question is carried out on the
+{\em entire\/} image.  The cost is measured in terms of $N$.
+
+\subsubsection{Noise Reduction}
+
+As pointed out in Section~\ref{image:spatial}, applying spatial
+operators on an image generally requires $O(N^{2})$ operations.  Thus
+all the spatial noise reduction schemes presented in
+Section~\ref{image:noise}, neighbourhood averaging, averaging of
+multiple images, and median filtering, perform in $O(N^{2})$ time.
+
+Of the two averaging techniques, averaging of multiple images can be
+discarded without delay, owing to its requiring several input images
+of the same scene, a requirement which is unsustainable in our case.
+Neighbourhood averaging has the drawback of attenuating the edges in
+the image, thus making location of the pupil based on edge detecting
+schemes difficult.
+
+As pointed out in Section~\ref{image:noise:median}, median filtering
+turns out to be clearly superior to averaging techniques, both with
+respect to removing noise from an image, and to maintaining edges in
+the image.  In addition, median filtering is, when carefully
+implemented (e.g., by using binary trees to sort the values),
+computationally cheaper than averaging schemes, in that it requires
+mostly comparisons and no multiplications.
+
+From Section~\ref{image:frequency:fourier}, p.~\pageref{pg:fft:O}, we
+have that performing an {\fft} algorithm on an image requires
+$O(N^{2}\log_{2}N)$ complex operations.  Thus image processing
+techniques operating in the frequency plane generally perform in
+minimum $O(N^{2}\log_{2}N)$ time, assuming that the image first has to
+be Fourier transformed.  This pertains to both the highpass filtering
+noise reduction schemes described in
+Section~\ref{image:noise:frequency}, simple highpass filtering and
+selective filtering.
+
+Simple highpass filtering has a similar effect to neighbourhood
+averaging, namely blurring of the image, and consequently attenuating
+of edges.  The selective filtering scheme would be better suited, but
+then it is required to know the Fourier transform of the superimposed
+noise function aforehand.  This is seldom the case in real-time
+applications, where the noise normally has a random distribution.
+
+The main drawback of these frequency domain schemes (and of any
+frequency domain scheme), however, is their immense computational
+cost, eleborated upon in Section~\ref{image:frequency:fourier},
+p.~\pageref{pg:fft:O}.  Thus frequency domain noise reduction schemes
+implemented in software can be discarded as an alternative in
+real-time applications (hardware implementations may be fast enough
+to be sustainable).
+
+\subsubsection{Detecting the Pupil}
+
+\subsection{Chosen Approach}
+\label{image:concl:approach}
 
