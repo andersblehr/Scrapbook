@@ -4,6 +4,12 @@ unit SVGA;
 INTERFACE
 
 
+const mode640x350               = 21;
+      mode640x400               = 22;
+      mode640x480               = 24;
+      mode800x600               = 27;
+      mode1024x768              = 28;
+
 type  RGBRecord                 = record
         R                         : byte;
         G                         : byte;
@@ -19,7 +25,7 @@ var   VGA256DriverMode          : integer;
 
 function getVideoMode : byte;
 
-procedure initSVGAGraphics;
+procedure initSVGAGraphics(graphMode : integer);
 
 procedure setAllVGAPalette(var palette : VGAPaletteType);
 
@@ -60,7 +66,7 @@ begin
 end;
 
 
-procedure initSVGAGraphics;
+procedure initSVGAGraphics(graphMode : integer);
 
 var   driverNumber              : integer;
       errorCode                 : integer;
@@ -79,7 +85,7 @@ begin
       halt(1)
     end;
   graphDriver:=detect;
-  VGA256DriverMode:=28;
+  VGA256DriverMode:=graphMode;
   VGA16DriverMode:=grError;
   initGraph(graphDriver,graphMode,'c:\language\tp6\bgi');
   errorCode:=graphResult;
