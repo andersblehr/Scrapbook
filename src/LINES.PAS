@@ -7,6 +7,7 @@ const displayCenterPoint        : boolean = false;
 var   xSize                     : word;
       ySize                     : word;
 
+      aPupilPoint               : pointPtr;
       pointToDisplay            : pointPtr;
 
 
@@ -47,7 +48,8 @@ var   fileName                  : string;
             'c' : displayCenterPoint:=true;
             'r' : filterRadius:=getParameterValue(thisParameter);
             't' : filterThreshold:=getParameterValue(thisParameter);
-            's' : sobelThreshold:=getParameterValue(thisParameter)
+            's' : sobelThreshold:=getParameterValue(thisParameter);
+            'q' : nonSearchRadius:=getParameterValue(thisParameter)
           else
             fatalError('Illegal option: -'+thisParameter[2])
           end
@@ -114,12 +116,10 @@ var   ascendingLine             : sobelLine;
       ascendingLineSize         : word;
       descendingLineSize        : word;
 
-      minSobel                  : word;
       maxSobel                  : word;
-      sobelExtent               : word;
 
 
-  procedure applySobelMasks;
+  procedure initVariables;
 
   var   i                         : integer;
 
@@ -154,16 +154,42 @@ var   ascendingLine             : sobelLine;
     end;
 
 
-    function applySobelMaskAt(x,y : word; mask : shortInt) : word;
+  begin
+    maxSobel:=0;
+    ascendingLineLeftSize:=getLineSize(north,west);
+    ascendingLineRightSize:=getLineSize(south,east);
+    descendingLineLeftSize:=getLineSize(south,west);
+    descendingLineRightSize:=getLineSize(north,east);
+    ascendingLineSize:=ascendingLineLeftSize+ascendingLineRightSize-2;
+    descendingLineSize:=descendingLineLeftSize+descendingLineRightSize-2;
+    ascendingLine[1]:=0;
+    ascendingLine[ascendingLineSize]:=0;
+    descendingLine[1]:=0;
+    descendingLine[descendingLineSize]:=0;
+    for i:=-nonSearchRadius to nonSearchRadius do
+      begin
+        ascendingLine[ascendingLineLeftSize+i]:=0;
+        descendingLine[descendingLineLeftSize+i]:=0
+      end
+  end;
 
-    var   sobelValue                : word;
+
+  procedure applySobelMasks;
+
+  var   i                         : word;
+
+
+    function applySobelMaskAt(x,y                     : word;
+                              northOrSouth,eastOrWest : shortInt) : word;
+
+    var   sobelValue                : integer;
 
     begin
-      sobelValue:=applySobelMask(x,y,mask);
+      sobelValue:=applySobelMask(x,y,northOrSouth,eastOrWest);
       if (sobelValue>maxSobel) then
-        maxSobel:=sobelValue;
-      if (sobelValue<minSobel) then
-        minSobel:=sobelValue;
+        maxSobel:=sobelValue
+      else if (sobelValue<0) then
+        sobelValue:=0;
       applySobelMaskAt:=sobelValue
     end;
 
@@ -171,24 +197,19 @@ var   ascendingLine             : sobelLine;
   begin
     with pointToDisplay^ do
       begin
-        ascendingLineLeftSize:=getLineSize(north,west);
-        ascendingLineRightSize:=getLineSize(south,east);
-        descendingLineLeftSize:=getLineSize(south,west);
-        descendingLineRightSize:=getLineSize(north,east);
-        ascendingLineSize:=ascendingLineLeftSize+ascendingLineRightSize-2;
-        descendingLineSize:=descendingLineLeftSize+descendingLineRightSize-2;
-        minSobel:=255;
-        maxSobel:=0;
-        ascendingLine[1]:=1;
-        ascendingLine[ascendingLineSize]:=1;
-        descendingLine[1]:=1;
-        descendingLine[descendingLineSize]:=1;
-        for i:=-(ascendingLineLeftSize-2) to (ascendingLineRightSize-2) do
-          ascendingLine[ascendingLineLeftSize+i]:=applySobelMaskAt(x+i,y+i,ascendingMask);
-        for i:=-(descendingLineLeftSize-2) to (descendingLineRightSize-2) do
-          descendingLine[descendingLineLeftSize+i]:=applySobelMaskAt(x+i,y-i,descendingMask)
-      end;
-    sobelExtent:=maxSobel-minSobel
+        for i:=(ascendingLineLeftSize-2) downTo nonSearchRadius do
+          ascendingLine[ascendingLineLeftSize-i]:=
+              applySobelMaskAt(x-i,y-i,north,west);
+        for i:=nonSearchRadius to (ascendingLineRightSize-3) do
+          ascendingLine[ascendingLineLeftSize+i]:=
+              applySobelMaskAt(x+i,y+i,south,east);
+        for i:=(descendingLineLeftSize-2) downTo nonSearchRadius do
+          descendingLine[descendingLineLeftSize-i]:=
+              applySobelMaskAt(x-i,y+i,south,west);
+        for i:=nonSearchRadius to (descendingLineRightSize-3) do
+          descendingLine[descendingLineLeftSize+i]:=
+              applySobelMaskAt(x+i,y-i,north,east)
+      end
   end;
 
 
@@ -224,7 +245,7 @@ var   ascendingLine             : sobelLine;
       ascendingSpacing:=10*ascendingUnit;
       descendingSpacing:=10*descendingUnit;
       unitPixelAxis:=lengthOf2ndAxis/64;
-      unitSobelAxis:=lengthOf2ndAxis/sobelExtent;
+      unitSobelAxis:=lengthOf2ndAxis/maxSobel;
       pixelSpacing:=lengthOf2ndAxis/8;
       sobelSpacing:=5*unitSobelAxis;
       setColor(63)
@@ -258,9 +279,9 @@ var   ascendingLine             : sobelLine;
       drawSystem(rightStart,pixelLinesY,descendingLineSize div 10,8,
                  descendingSpacing,pixelSpacing);
       drawSystem(leftStart,sobelLinesY,ascendingLineSize div 10,
-                 sobelExtent div 5,ascendingSpacing,sobelSpacing);
+                 maxSobel div 5,ascendingSpacing,sobelSpacing);
       drawSystem(rightStart,sobelLinesY,descendingLineSize div 10,
-                 sobelExtent div 5,descendingSpacing,sobelSpacing)
+                 maxSobel div 5,descendingSpacing,sobelSpacing)
     end;
 
 
@@ -287,18 +308,14 @@ var   ascendingLine             : sobelLine;
         end;
       for i:=2 to ascendingLineSize do
         line(leftStart+round(ascendingUnit*(i-2)),
-             sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*ascendingLine[i-1]),
+             sobelLinesY-round(unitSobelAxis*ascendingLine[i-1]),
              leftStart+round(ascendingUnit*(i-1)),
-             sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*ascendingLine[i]));
+             sobelLinesY-round(unitSobelAxis*ascendingLine[i]));
       for i:=2 to descendingLineSize do
         line(rightStart+round(descendingUnit*(i-2)),
-             sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*descendingLine[i-1]),
+             sobelLinesY-round(unitSobelAxis*descendingLine[i-1]),
              rightStart+round(descendingUnit*(i-1)),
-             sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*descendingLine[i]))
+             sobelLinesY-round(unitSobelAxis*descendingLine[i]))
     end;
 
 
@@ -357,6 +374,7 @@ begin
         pointToDisplay:=findPosition(aPupilPoint)
       else
         pointToDisplay:=aPupilPoint;
+      initVariables;
       applySobelMasks;
       presentLines
     end
