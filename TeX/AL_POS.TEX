@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Apr  4 19:15:11 1993
+%%% Last Modified On: Mon Apr  5 15:17:03 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,6 +128,25 @@ operation between the above technique and this, assuming that the
 the origin of operation in the image, is that with the latter, the
 origin of operation has to be updated every second iteration.
 
+The process of iterating the above procedure until an overall position
+estimate has been found which does not change from on iteration to the
+next, may, if the intermediate estimates for some reason are
+distributed over a relatively large porion of the pupil, cause the
+available time interval of 20 ms to be exceeded without having arrived
+at a final overall position estimate.  To avoid this happening, an
+upper limit to the number of iterations can be determined.  This
+number has to determined on the basis of the time required to perform
+one iteration\footnote{In the current implementation, this number was
+  set to 15.  However, it never happened that the iteration process
+  had to be interrupted before a final position estimate had been
+  obtained}.  If it should happen that the allowed number of
+iterations has been carried out without having arrived at a final
+overall estimate, the current estimate has to be returned.  Clearly,
+the estimate thus returned would hardly satisfy the requirement of
+accuracy.  However, assuming a relatively good image quality and thus
+minimizing the spatial distribution of the intermediate estimates, the
+probability of this happening will practically be zero.
+
 Note that, when combining an intermediate position estimate with the
 current overall estimate to obtain an improved overall estimate, the
 current overall estimate has to be weighted according to the number of
@@ -211,6 +230,10 @@ pupil contour can be detected.
 
 \subsubsection{Characteristics of the Sobel Operators}
 
+\inserteps{profile}{\label{fig:profile}(a) The profile of a pixel row 
+  in an image. (b) The result of applying the mask in
+  Fig.~\protect\ref{fig:sobelop}(b) to this profile.}
+
 Before deciding to employ the Sobel operators directly as they are
 depicted in Fig.~\ref{fig:sobelop}, it is necessary to examine their
 characteristics and to determine if and how they can be tailored to
@@ -266,11 +289,12 @@ row/column of the masks lessen their sensitivity to spurious noise
 from neighbouring rows/columns which intercept the column/row along
 which the mask moves.
 
-\insertepswidth{profile}{\label{fig:profile}(a) The profile of a pixel
-  row in an image. (b) The result of applying the mask in
-  Fig.~\protect\ref{fig:sobelop}(b) to this profile.}{0.5}
-
 \subsubsection{Tailoring the Sobel Masks}
+
+\insertepswidth{masks}{\label{fig:masks}Eight masks that can be used 
+  to detect the pupil contour along the four detection lines in
+  Fig.~\protect\ref{fig:lines}.  The central point represents the
+  origin of operation.}{0.4}
 
 The primary difference between the usual manner in which the Sobel
 operators are applied, as described above, and the manner in which
@@ -307,12 +331,13 @@ western pupil edges, respectively.  The diagonal masks are obtained
 analogously, and the entire set of eight masks, two for each detection
 line, is shown in Fig.~\ref{fig:masks}.
 
-\insertepswidth{masks}{\label{fig:masks}Eight masks that can be used 
-  to detect the pupil contour along the four detection lines in
-  Fig.~\protect\ref{fig:lines}.  The central point represents the
-  origin of operation.}{0.4}
-
 \subsubsection{Reducing the Sensitivity to Noise}
+
+\inserttwoeps{dtctbl05}{soblbl05}{\label{fig:mysobel}(a) The result of
+  applying the extended versions of the diagonal masks in
+  Fig.~\protect\ref{fig:masks} to the image in
+  Fig.~\protect\ref{fig:testimages}(e). (b) The result of applying the
+  ``normal'' Sobel masks to the same image.}
 
 As has been stated earlier, the given test images have low contrast
 and are also infected with additive, spurious noise.  Particularly
@@ -349,7 +374,7 @@ most prominent of these.  Most importantly, the dark ``spots'' will
 also be ``filled'', and thus either form small, one-pixel ponds of
 their own, or be part of larger lakes.
 
-With the given test images, the number of islands in the pupil lake 
+With the given test images, the number of islands in the pupil lake
 was on the average relatively large, and on occasions fooled the edge
 detection operators into believing that the pupil edge had been
 detected.  A way of reducing the operators' sensitivity to this kind
@@ -362,24 +387,26 @@ contribute to the computation, doing this does not increase the number
 of operations needed to compute the gradient at a given location, but,
 since pixel values are gathered from a larger neighbourhood, it
 reduces the sensitivity of the masks to islands in the pupil lake, as
-well as to spurious noise in general.  The result of applying the
-``extended'' versions of the diagonal masks in Fig.~\ref{fig:masks} to
-the image in Fig.~\ref{fig:testimages}(e), applying each mask
-according to which quadrant of the image relative to the origin of
-operation the pixel in questions belongs to, is shown in
-Fig.~\ref{fig:mysobel}(a), together with the result of applying the
-standard Sobel masks of Fig.~\ref{fig:sobelop} to the same image (b).
-Note that the pupil contour is more predominant in (a) than in (b),
-and also that negative edges as seen from the origin of operation are
-not visible (note in particular the far side of the reflex).
-
-\inserttwoeps{dtctbl05}{soblbl05}{\label{fig:mysobel}(a) The result of
-  applying the ``extended'' versions of the diagonal masks in
-  Fig.~\protect\ref{fig:masks} to the image in
-  Fig.~\protect\ref{fig:testimages}(e). (b) The result of applying the
-  ``normal'' Sobel masks to the same image.}
+well as to spurious noise in general.  $5\times 5$ versions of
+$3\times 3$ masks will in the following be referred to as {\em
+  extended\/}.  The result of applying the extended versions of the
+diagonal masks in Fig.~\ref{fig:masks} to the image in
+Fig.~\ref{fig:testimages}(e), applying each mask according to which
+quadrant of the image relative to the origin of operation the pixel in
+questions belongs to, is shown in Fig.~\ref{fig:mysobel}(a), together
+with the result of applying the standard Sobel masks of
+Fig.~\ref{fig:sobelop} to the same image (b).  Note that the pupil
+contour is more predominant in (a) than in (b), and also that negative
+edges as seen from the origin of operation are not visible (note in
+particular the far side of the reflex).
 
 \subsubsection{Thresholding the Output from the Sobel Operators}
+
+\inserteps{myprofil}{\label{fig:myprofile}(a) The profile of the image 
+  in Fig.~\protect\ref{fig:testimages}(d) along a northeastwards
+  detection line passing through the pupil. (b) The result of applying
+  the SW and NE Sobel mask of Fig.~\protect\ref{fig:masks} to this
+  profile.  $O_{O}$ designates the origin of operation.}
 
 Evidently, the ability to differentiate between the pupil edge and
 spurious intensity variations in the proximity of the pupil edge
@@ -387,19 +414,64 @@ depends on how the output from the employed Sobel operators is
 thresholded.  With the given test images, the S/N ratio is so low that
 it often is difficult on the basis of an image profile visually to
 determine where the actual pupil contour is.  This is clearly
-demonstrated in Fig.~\ref{fig:myprofile}(a), which shows the profile 
-of the image in Fig.~\ref{fig:testimages}(d) along a southeastwards
+demonstrated in Fig.~\ref{fig:myprofile}(a), which shows the profile
+of the image in Fig.~\ref{fig:testimages}(d) along a northeastwards
 detection line passing through the pupil.  Although the pupil lake is
-clearly identifiable, it should be noted that the height above the
-lake level of the northwest shore of the lake is only 1 
+clearly identifiable, this is not the case for the southwestern pupil
+contour (left of the pupil lake).  Note the two islands in the pupil
+lake, and that the southwestern shore constitutes a {\em plain\/}
+whose height above the lake level is only 1.  Note also that this
+plain, apart from three {\em hills\/} of height 2, extends almost to
+the margin of the eye.  In Fig.~\ref{fig:myprofile}(b) is shown the
+result of applying the extended southwest and northeast masks of
+Fig.~\ref{fig:masks} to this profile.  $O_{O}$ designates the origin
+of operation.  Note that the processed profile also contains
+information about neighbouring lines to the actual detection line, as
+can be seen from the hill ``ranges'' on both sides of the pupil lake,
+as well as from the two ``extra'' islands by the norteastern shore.
 
-\insertepswidth{myprofil}{\label{fig:myprofile}(a) The profile of the
-  image in Fig.~\protect\ref{fig:testimages}(d) along a southeastwards
-  detection line passing through the pupil. (b) The result of applying
-  the NW (left) and SE (right) Sobel mask of
-  Fig.~\protect\ref{fig:masks} to this profile.  $O_{O}$ designates 
-  the origin of operation.}{0.5}
+Clearly, the detected extent of the pupil along this detection line
+depends heavily on the threshold value $T_{e}$.  Particularly,
+choosing $T_{e}$ too high would cause one or both of the actual pupil
+edges along the given detection line to remain undetected.  Moreover,
+the edges detected and assumed to represent to the pupil contour would
+actually represent the more prominent edges at the margins of the eye.
+Furthermore, choosing $T_{e}$ too low would cause the edges of the
+islands in the pupil lake to be recognized as representing the pupil
+contour.  As is seen from the figure, the interval of appropriate
+values for $T_{e}$ can be very narrow, depending on the image
+quality\footnote{With the given test images, it was impossible to
+  choose a value for $T_{e}$ which was appropriate for all images.
+  $T_{e}=5$ was found to be the best overall choice.  However, as is
+  seen from the Fig.~\ref{fig:myprofile}(b), this value caused
+  unwanted results in some images.}.  However, if the image quality
+and in particular the contrast is relatively high, so that the number
+of islands in the pupil lake is reduced to a minimum and the slope of
+the pupil contour is relatively steep, it ought to be possible to
+choose an overall satisfactory value for $T_{e}$.
+
+Note that the standard deviation of the error in the obtained position
+estimate caused by the given value for $T_{e}$ apparantly being
+inappropriate for the profile along a detection line in a given image
+will approach zero as the number of iterations increase.  When the
+estimate no longer changes from one iteration to the next, which is
+the stop criterion for iteration process, the error is less than one
+pixel with respect to the pupil contour as seen from the current
+origin of operation.  Thus it is of vital importance to ensure the
+highest possible image quality in the images fed to the {\octopus}
+eye-tracking algorithm.  The requirements the images have to satisfy
+in order to have {\octopus} return accurate position estimates are
+listed in Section~\ref{algo:eval:improve}.
 
 \subsection{Number of Operations}
 \label{algo:pos:O}
 
+The number of operations required to obtain one intermediate position
+estimate, that is, to perform line oriented edge detection four times
+along two perpendicular detection lines, is determined by the number
+of pixels from the origin of operation to the pupil contour, along the
+given detection line.  On the average, this number equals the radius
+of the pupil in pixels, which in turn depends on the horizontal and
+vertical resolution $N$ of the $N\times N$ image.  Consequently, the
+position determining part of the {\octopus} eye-tracking algorithm
+performs in $O(N)$ time.
