@@ -159,7 +159,7 @@ begin
         fatalError('Picture file not found!')
     end
   else
-    fatalError('Usage: filter [options] file (no extension)')
+    fatalError('Usage: filter [-r<filter radius>][-t<threshold>] file (no extension)')
 end;
 
 
