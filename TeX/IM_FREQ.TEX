@@ -1,0 +1,449 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% im_freq.tex --- 
+%%% Author          : blehr
+%%% Created On      : Sun Mar 14 01:27:54 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Mar 14 06:43:21 1993
+%%% RCS revision    : $Revision$ $Locker$
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The Frequency Domain}
+\label{image:frequency}
+
+Another approach to digital image processing is to manipulate the {\em
+  Fourier transform\/} of the image instead of the image itself.  This
+is commomly referred to as analyzing the image in the {\em frequency
+  plane\/}.  Below, a short introduction is given to the Fourier
+transforms of one- and two-dimensional functions, starting with the
+continuous case and then extending to the discrete case, which
+corresponds to digitized images.
+
+\subsection{The Fourier Transform}
+\label{image:frequency:fourier}
+
+The formulation of the Fourier transform of a function $f$ depends on
+whether the function is one- or two-dimensional, and on whether it is
+a continuous or discrete function.  Below, the Fourier transform is
+first defined for the one- and two-dimensional continuous cases.  This
+definition is then extended to include the corresponding discrete
+functions.
+
+\subsubsection{The Continuous Fourier Transform}
+
+The general definition of the Fourier transform is as follows.  Let
+$f(x)$ be a continuous function of a real (as opposed to complex)
+variable $x$.  The Fourier transform of $f(x)$, denoted ${\cal
+  F}\{f(x)\}$, is then defined by the equation
+\begin{equation}
+\label{eq:fourier:def}
+  {\cal F}\{f(x)\}=F(u)=\int_{-\infty}^{\infty}f(x)e^{-j2\pi
+    ux}dx\mbox{,} 
+\end{equation}
+where $j=\sqrt{-1}$.  When $F(u)$ is known, $f(x)$ can be obtained
+using the {\em inverse Fourier transform\/}, denoted ${\cal
+  F}^{-1}\{F(u)\}$, and defined by the equation
+\begin{equation}
+\label{eq:inverse_fourier:def}
+  {\cal F}^{-1}\{F(u)\}=f(x)=\int_{-\infty}^{\infty}F(u)e^{j2\pi
+    ux}du\mbox{.}
+\end{equation}
+Equations~\ref{eq:fourier:def} and~\ref{eq:inverse_fourier:def}, which
+are called the {\em Fourier transform pair\/}, can be shown to exist
+if $f(x)$ is continuous and integrable and $F(u)$ is integrable.
+
+The Fourier transform of a real function is generally complex:
+\begin{equation}
+\label{eq:fourier:R+I}
+  F(u)=R(u)+jI(u)\mbox{,}
+\end{equation}
+where $R(u)$ and $I(u)$ are the real and imaginary parts of $F(u)$,
+respectively.  It is often convenient to express
+Eq.~\ref{eq:fourier:R+I} in exponential form:
+\begin{equation}
+  F(u)=|F(u)|e^{j\phi(u)}\mbox{,}
+\end{equation}
+where
+\begin{equation}
+\label{eq:fourier:spectrum}
+  |F(u)|=\sqrt{R^{2}(u)+I^{2}(u)}
+\end{equation}
+and
+\begin{equation}
+\label{eq:fourier:phase}
+  \phi(u)=\tan^{-1}\left[\frac{I(u)}{R(u)}\right]\mbox{.}
+\end{equation}
+The magnitude function $|F(u)|$ is called the {\em Fourier spectrum\/}
+of $f(x)$, and $\phi(u)$ its {\em phase angle\/}.  The square of the
+Fourier spectrum,
+\begin{equation}
+\label{eq:fourier:power}
+  P(u)=|F(u)|^{2}=R^{2}(u)+I^{2}(u)
+\end{equation}
+is called the {\em power spectrum\/} of $f(x)$.
+
+The term {\em frequency plane\/} stems from the fact that the
+exponential term of Ec.~\ref{eq:fourier:def} can be expressed in the
+form
+\begin{equation}
+  e^{-j\pi ux}=\cos 2\pi ux-j\sin 2\pi ux\mbox{,}
+\end{equation}
+thus indicating that $F(u)$ is composed of an infinite sum of sine and
+cosine terms, the {\em frequency\/} of which being determinded by the
+value of $u$.
+
+The general two-dimensional Fourier transform pair is analogously
+defined:
+\begin{equation}
+  {\cal F}\{f(x,y)\}=F(u,v)=\int_{-\infty}^{\infty}
+  \int_{-\infty}^{\infty}f(x,y)e^{-j2\pi(ux+vy)}dxdy
+\end{equation}
+and
+\begin{equation}
+  {\cal F}^{-1}\{F(u,v)\}=f(x,y)=\int_{-\infty}^{\infty}
+  \int_{-\infty}^{\infty}F(u,v)e^{j2\pi(ux+vy)}dudv\mbox{,}
+\end{equation}
+$u$ and $v$ being the {\em frequency variables\/}.
+
+The Fourier spectrum, phase and power spectrum in the two-dimensional
+case are defined ana-logously to
+Eqs.~\ref{eq:fourier:spectrum},~\ref{eq:fourier:phase},
+and~\ref{eq:fourier:power}:
+\begin{equation}
+\label{eq:fourier:spectrum2}
+  |F(u,v)|=\sqrt{R^{2}(u,v)+I^{2}(u,v)}
+\end{equation}
+\begin{equation}
+\label{eq:fourier:phase2}
+  \phi(u,v)=\tan^{-1}\left[\frac{I(u,v)}{R(u,v)}\right]
+\end{equation}
+and
+\begin{equation}
+\label{eq:fourier:power2}
+  P(u,v)=|F(u,v)|^{2}=R^{2}(u,v)+I^{2}(u,v)\mbox{.}
+\end{equation}
+
+\subsubsection{The Discrete Fourier Transform}
+
+Since we are dealing with digitized images, consisting of $M\times N$
+pixels having discrete intensity (gray) levels, it is necessary to
+formulate the Fourier transform in the discrete case.  The principle
+is first introduced for the one-dimensional case, and thereafter
+extended to include the two-dimensional case.
+
+When a continuous function $f(x)$, is discretized into a sequence
+$\{f(x_{0}),f(x_{0}+\Delta x),f(x_{0}+2\Delta x),\ldots,
+f(x_{0}+(N-1)\Delta x)\}$ by taking $N$ samples $\Delta x$ units
+apart, its {\em discrete\/} Fourier transform is given by\footnote{For
+  a proof of these results, see for instance~\cite{brigham}}
+\begin{equation}
+\label{eq:fourier:discrete}
+  F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{\frac{-j2\pi ux}{N}}
+\end{equation}
+for $u=0,1,2,\ldots,N-1$, where the discrete meaning of $f(x)$ is
+given by
+\begin{equation}
+  f(x)=f(x_{0}+x\Delta x)\mbox{.}
+\end{equation}
+Analogously, the inverse discrete Fourier transform is given by
+\begin{equation}
+  f(x)=\sum_{u=0}^{N-1}F(u)e^{\frac{j2\pi ux}{N}}
+\end{equation}
+for $x=0,1,2,\ldots,N-1$.
+
+The discrete Fourier transform pair of a two-dimensional function
+$f(x,y)$, whose one variable $x$ has been discretized by taking $M$
+samples $\Delta x$ units apart, and whose second variable $y$ has been
+discretized taking $N$ samples $\Delta y$ units apart, is defined
+analogously to the one-dimensional case above:
+\begin{equation}
+  F(u,v)=\frac{1}{MN}\sum_{x=0}^{M-1}\sum_{y=0}^{N-1}f(x,y)e^{-j2\pi
+    (\frac{ux}{M}+\frac{vy}{N})} 
+\end{equation}
+for $u=0,1,2,\ldots,M-1$, $v=0,1,2,\ldots,N-1$, and
+\begin{equation}
+  f(x,y)=\sum_{u=0}^{M-1}\sum_{v=0}^{N-1}F(u,v)e^{j2\pi
+    (\frac{ux}{M}+\frac{vy}{N})} 
+\end{equation}
+for $x=0,1,2,\ldots,M-1$ and $y=0,1,2,\ldots,N-1$.
+
+The Fourier spectrum, phase and power spectrum of the two-dimensional
+discrete function are given by
+Eqs.~\ref{eq:fourier:spectrum2},~\ref{eq:fourier:phase2}
+and~\ref{eq:fourier:power2}, respectively.  The only difference is
+that the independent variables are discrete.
+
+\subsubsection{The Fast Fourier Transform}
+
+When implementing the discrete Fourier transform, it is important that
+the number of operations be as small as possible, in order to reduce
+computing time.  The formulation in Eq.~\ref{eq:fourier:discrete}
+requires $O(N^{2})$ operations, N being the number of samples used to
+discretize the original continuous function.  The {\em fast Fourier
+  transform\/} ({\fft}) is an algorithm which, by properly decomposing
+Eq.~\ref{eq:fourier:discrete}, reduces the number of operations needed
+to $O(N\log_{2}N)$.  The formulation given here is from~\cite{digim},
+and is by no means a unique formulation.  For a comprehensive
+discussion of a number of formulations for the {\fft}, including this
+one, see~\cite{brigham}.
+
+It will be convenient in the following discussion to express
+Eq.~\ref{eq:fourier:discrete} in the form
+\begin{equation}
+\label{eq:fft}
+  F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)W_{N}^{ux}\mbox{,}
+\end{equation}
+where
+\begin{equation}
+\label{eq:fft:W_N}
+  W_{N}=e^{\frac{-j2\pi}{N}}\mbox{,}
+\end{equation}
+and $N=2^{n}$, $n>0$.  Based on this, $N$ can be expressed as
+\begin{equation}
+\label{eq:fft:N=2M}
+  N=2M\mbox{, $M>0$.}
+\end{equation}
+Substitution of Eq.~\ref{eq:fft:N=2M} into Eq.~\ref{eq:fft}
+yields 
+\begin{eqnarray}
+\label{eq:fft:sep1}
+  F(u) & = & \frac{1}{2M}\sum_{x=0}^{2M-1}f(x)W_{2M}^{ux}\nonumber\\
+       & = & \frac{1}{2}\left\{\frac{1}{M}\sum_{x=0}^{M-1}
+             f(2x)W_{2M}^{u(2x)}+
+             \frac{1}{M}\sum_{x=0}^{M-1}
+             f(2x+1)W_{2M}^{u(2x+1)}\right\}\mbox{.}
+\end{eqnarray}
+From Eq.~\ref{eq:fft:W_N} we have that $W_{2M}^{2ux}=W_{M}^{ux}$.
+Eq.~\ref{eq:fft:sep1} may then be expressed as
+\begin{equation}
+\label{eq:fft:sep2}
+  F(u)=\frac{1}{2}\left\{\frac{1}{M}\sum_{x=0}^{M-1}f(2x)W_{M}^{ux}+
+  \frac{1}{M}\sum_{x=0}^{M-1}f(2x+1)W_{M}^{ux}W_{2M}^{u}\right\}\mbox{.}
+\end{equation}
+If we define
+\begin{equation}
+\label{eq:fft:F_even}
+  F_{\even}(u)=\frac{1}{M}\sum_{x=0}^{M-1}f(2x)W_{M}^{ux}
+\end{equation}
+\begin{equation}
+\label{eq:fft:F_odd}
+  F_{\odd}(u)=\frac{1}{M}\sum_{x=0}^{M-1}f(2x+1)W_{M}^{ux}
+\end{equation}
+for $u=0,1,2,\ldots,M-1$, Eq.~\ref{eq:fft:sep2} becomes
+\begin{equation}
+\label{eq:fft:Fevenodd}
+  F(u)=\frac{1}{2}\{F_{\even}(u)+F_{\odd}(u)W_{2M}^{u}\}\mbox{.}
+\end{equation}
+Also, since $W_{M}^{u+M}=W_{M}^{u}$ and $W_{2M}^{u+M}=-W_{2M}^{u}$, it
+follows from Eqs.~\ref{eq:fft:F_even} through~\ref{eq:fft:Fevenodd}
+that
+\begin{equation}
+\label{eq:fft:doubling}
+  F(u+M)=\frac{1}{2}\{F_{\even}(u)-F_{\odd}(u)W_{2M}^{u}\}\mbox{.}
+\end{equation}
+
+The essence of the {\fft} algorithm lies in the observation that the
+transform of an $N$-point function can be computed by dividing the
+original expression into two parts, as done in Eqs.~\ref{eq:fft:sep1}
+and~\ref{eq:fft:sep2}.  Note that the interval of $u$ for which these
+equations are defined, $[0,M-1]$, corresponds to the first half of the
+original interval $[0,N-1]$.  Computation of $F(u)$ within this
+interval is thus performed by computing the two $N/2$-point transforms
+$F_{\even}(u)$ and $F_{\odd}(u)$, as defined in
+Eqs.~\ref{eq:fft:F_even} and~\ref{eq:fft:F_odd}, and then applying
+Eq.~\ref{eq:fft:Fevenodd} to the results to form $F(u)$ for $u$ in
+$[0,M-1]$.  The values of $F(u)$ for $u$ in $[M,N-1]$ then follows
+directly from Eq.~\ref{eq:fft:doubling}.  Computation of
+$F_{\even}(u)$ and $F_{\odd}(u)$ is carried out in the exact same
+manner, by dividing each of them into two, and proceeding as described
+above.  This process is carried on recursively downwards until the
+transforms to be computed are $1$-point transforms, which correspond
+to the samples themselves.  These are then promoted upwards to form
+intermediate results on all levels, until finally, on the top level,
+the overall transform has been computed.  This process is referred to
+as {\em successive doubling\/}.
+
+As mentioned above, this algorithm performs in $O(N\log_{2}N)$ time.
+For a proof of this result, see for instance~\cite{brigham}
+or~\cite{digim}.
+
+Note that this formulation is for the one-dimensional case.  The
+{\fft} in the two-dimensional case is computed by applying the above
+formulation on a line-to-line basis.  It is also worth noting then,
+that the number of operations for applying the {\fft} on an $N\times
+N$ image is $O(N^{2}\log_{2}N)$.
+
+\insertepswidth{convolut}{\label{fig:convolution}Graphical
+  illustration of convolution}{0.7}
+
+\subsection{The Convolution Theorem}
+\label{image:frequency:convolution}
+
+The foundation of frequency domain image processing techniques is the
+{\em convolution theorem\/}.  As was the case for the Fourier
+transformation, this theorem is presented in two steps.  First, the
+general formulation of the theorem is stated for one- and
+two-dimensional continuous functions, then this formulation is
+extended to also include the discrete case.
+
+\subsubsection{Convolution in the Continuous Case}
+
+The {\em convolution\/} of two continuous one-dimensional functions
+$f(x)$ and $g(x)$, denoted $f(x)\ast g(x)$, is defined by the integral
+\begin{equation}
+\label{eq:convolution:def}
+  f(x)\ast g(x)=\int_{-\infty}^{\infty}f(\alpha)g(x-\alpha)d\alpha\mbox{,}
+\end{equation}
+where $\alpha$ is a dummy variable of integration.  The mechanics of
+the convolution integral is not easy to visualize, so the best way is
+to illustrate it graphically with a simple example
+(from~\cite{digim}):
+
+\paragraph{Example:} Consider Eq.~\ref{eq:convolution:def} as applied
+to the two functions $f(x)$ and $g(x)$, shown in
+Figs.~\ref{fig:convolution}(a) and (b), respectively.  Before the
+integration can be carried out, it is necessary to form the function
+$g(x-\alpha)$.  This is accomplished by mirroring $g(\alpha)$ about
+the vertical axis to give $g(-\alpha)$, and then displacing this
+function by $x$, as shown in Figs.~\ref{fig:convolution}(c) and (d).
+Then, for all values of $x$, $f(x)$ is multiplied with $g(x-\alpha)$,
+and the result (the shaded portion of Fig.~\ref{fig:convolution}(e))
+is integrated from $-\infty$ to $\infty$.  Since the product is $0$
+for values of $\alpha$ outside the interval $[0,x]$, $f(x)\ast g(x)$
+is found to be $x/2$ for $0\leq x\leq 1$.  This corresponds to the
+shaded region of Fig.~\ref{fig:convolution}(e).
+Fig.~\ref{fig:convolution}(f) illustrates the same process for $1\leq
+x\leq 2$.  In this case, $f(x)\ast g(x)=(1-x/2)$.  As
+$f(\alpha)g(x-\alpha)$ is zero for $x<0$ and $x>2$, we have that the
+convolution of $f(x)$ with $g(x)$ is given by
+\begin{equation}
+  f(x)\ast g(x)=\left\{\begin{array}{ll}
+                         x/2   & 0\leq x\leq 1 \\
+                         1-x/2 & 1\leq x\leq 2 \\
+                         0     & \mbox{elsewhere,}
+                       \end{array}\right.
+\end{equation}
+as shown in Fig.~\ref{fig:convolution}(g).\hfill$\Box$
+\vspace*{0.5cm}
+
+The importance of convolution in frequency domain analysis stems from
+the fact that $f(x)\ast g(x)$ and $F(u)G(u)$ form a Fourier transform
+pair.  In other words, if $f(x)$ has the Fourier transform $F(u)$ and
+$g(x)$ has the Fourier transform $G(u)$, then the following relations
+hold:
+\begin{equation}
+  {\cal F}\{f(x)\ast g(x)\}=F(u)G(u)
+\end{equation}
+\begin{equation}
+  {\cal F}^{-1}\{F(u)G(u)\}=f(x)\ast g(x)\mbox{.}
+\end{equation}
+An analogous result is that convolution in the frequency domain
+reduces to multiplication in the spatial domain:
+\begin{equation}
+  {\cal F}\{F(x)\ast G(x)\}=f(u)g(u)
+\end{equation}
+\begin{equation}
+  {\cal F}^{-1}\{f(u)g(u)\}=F(x)\ast G(x)\mbox{.}
+\end{equation}
+These to results, formally stated as
+\begin{equation}
+  f(x)\ast g(x)\Leftrightarrow F(u)G(u)
+\end{equation}
+\begin{equation}
+  f(x)g(x)\Leftrightarrow F(u)\ast G(u)\mbox{,}
+\end{equation}
+are commonly referred to as the {\em convolution theorem\/}.
+
+The convolution of two two-dimensional functions $f(x,y)$ and $g(x,y)$
+is defined analogously to Eq.~\ref{eq:convolution:def}:
+\begin{equation}
+  f(x,y)\ast g(x,y)=\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
+  f(\alpha,\beta)g(x-\alpha,y-\beta)d\alpha d\beta\mbox{.}
+\end{equation}
+The two-dimensional convolution theorem is given by the relations
+\begin{equation}
+\label{eq:convolution:2Da}
+  f(x,y)\ast g(x,y)\Leftrightarrow F(u,v)G(u,v)
+\end{equation}
+\begin{equation}
+\label{eq:convolution:2Db}
+  f(x,y)g(x,y)\Leftrightarrow F(u,v)\ast G(u,v)\mbox{.}
+\end{equation}
+For a graphical illustration of the two-dimensional convolution, see
+for example~\cite{digim}, p.\ 88.
+
+\subsubsection{Convolution in the Discrete Case}
+
+The two-dimensional {\em discrete\/} convolution is formulated by
+letting $f(x,y)$ and $g(x,y)$ be discrete arrays of size $A\times B$
+and $C\times D$.  For reasons elaborated upon in~\cite{brigham}, these
+arrays must be assumed to be periodic with some period $M$ and $N$ in
+the $x$- and $y$-directions, respectively.  It can be
+shown~(\cite{brigham}) that unless
+\begin{equation}
+  M\geq A+C-1
+\end{equation}
+\begin{equation}
+  N\geq B+D-1\mbox{,}
+\end{equation}
+the individual periods of the convolution will overlap.  This overlap
+is commonly referred to as {\em wraparound error\/}.  The periodic
+sequences are formed by extending $f(x,y)$ and $g(x,y)$ as follows:
+\begin{equation}
+  f_{e}(x,y)=\left\{
+    \begin{array}{llll}
+      f(x,y) & 0\leq x\leq A-1 & \mbox{and} & 0\leq y\leq B-1 \\
+      0      & A\leq x\leq M-1 & \mbox{or}  & B\leq y\leq N-1
+    \end{array} \right.
+\end{equation}
+\begin{equation}
+  g_{e}(x,y)=\left\{
+    \begin{array}{llll}
+      g(x,y) & 0\leq x\leq C-1 & \mbox{and} & 0\leq y\leq D-1 \\
+      0      & C\leq x\leq M-1 & \mbox{or}  & D\leq y\leq N-1\mbox{.}
+    \end{array} \right.
+\end{equation}
+With these definitions in mind, the discrete two-dimensional
+convolution of $f(x,y)$ and $g(x,y)$ is expressed in terms of
+$f_{e}(x,y)$ and $g_{e}(x,y)$:
+\begin{equation}
+  f_{e}(x,y)\ast g_{e}(x,y)=\sum_{m=0}^{M-1}\sum_{n=0}^{N-1}
+  f_{e}(m,n)g_{e}(x-m,y-n)
+\end{equation}
+for $x=0,1,2,\ldots,M-1$ and $y=0,1,2,\ldots,N-1$.
+
+The continuous two-dimensional convolution theorem stated in
+Eqs.~\ref{eq:convolution:2Da} and~\ref{eq:convolution:2Db} also apply
+to the discrete case with $u=0,1,2,\ldots,M-1$ and
+$v=0,1,2,\ldots,n-1$.  All computations involve, as indicated above,
+the extended functions $f_{e}(x,y)$ and $h_{e}(x,y)$.
+
+\subsection{Image Processing in the Frequency Domain}
+\label{image:frequency:image}
+
+The foundation of frequency-domain techniques is the convolution
+theorem described in the previous section.  Let $g(x,y)$ be an image
+that is the result of convolving an image $f(x,y)$ with a
+position-invariant operator $h(x,y)$\footnote{A position-invariant
+  operator is an operator whose result depends only on the value of
+  $f(x,y)$ at a given point in the image, not on the location of the
+  point.}:
+\begin{equation}
+  g(x,y)=h(x,y)\ast f(x,y)\mbox{.}
+\end{equation}
+From the convolution theorem (Eq.~\ref{eq:convolution:2Da}), we then
+have that the following relation holds in the frequency domain:
+\begin{equation}
+  G(u,v)=H(u,v)F(u,v)\mbox{,}
+\end{equation}
+where $G$, $H$ and $F$ are the Fourier transforms of $g$, $h$ and $f$,
+respectively.  The function $H(u,v)$ is often referred to as the {\em
+  transfer function\/} of the process.
+
+A typical image-processing problem can be stated as
+Fourier-transforming the original image $f$, yielding $F$, and then
+trying to choose a transfer function $H$ such that the resulting image
+\begin{equation}
+  g(x,y)={\cal F}^{-1}\{H(u,v)F(u,v)\}
+\end{equation}
+exhibits some desired property.
