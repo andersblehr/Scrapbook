@@ -2,10 +2,7 @@ program edges;
 
 uses crt,graph,paths,auxil,search,SVGA;
 
-var   xSize                     : word;
-      ySize                     : word;
-
-      pupilPoint                : pointPtr;
+var   pupilPoint                : pointType;
 
 
 procedure init;
@@ -22,9 +19,9 @@ var   fileName                  : string;
         thisParameter             : string;
 
 
-    function getParameterValue(parameterString : string) : word;
+    function getParameterValue(parameterString : string) : real;
 
-    var   value                     : word;
+    var   value                     : real;
           result                    : integer;
 
     begin
@@ -42,8 +39,8 @@ var   fileName                  : string;
         thisParameter:=paramStr(i);
         if (thisParameter[1]='-') then
           case thisParameter[2] of
-            'r' : filterRadius:=getParameterValue(thisParameter);
-            't' : filterThreshold:=getParameterValue(thisParameter)
+            'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
+            'l' : lakeLevel:=trunc(getParameterValue(thisParameter))
           else
             fatalError('Illegal option: -'+thisParameter[2])
           end
@@ -57,14 +54,11 @@ var   fileName                  : string;
   procedure initVariables;
 
   begin
-    new(pupilPoint);
-    assign(inputFile,fileName);
-    reset(inputFile,1);
     blockRead(inputFile,buffer,4);
     xSize:=(word(buffer[1]) shl 8)+buffer[2];
     ySize:=(word(buffer[3]) shl 8)+buffer[4];
-    startX:=getMaxX-xSize-2;
-    initGlobals(xSize,ySize)
+    startX:=getMaxX div 2;
+    initGlobals
   end;
 
 
@@ -74,8 +68,10 @@ begin
       getParameters(paramCount);
       if fileExists(fileName) then
         begin
-          initSVGAGraphics(mode800x600);
-          setBlackAndWhitePalette;
+          SVGA_initGraphics(mode800x600);
+          SVGA_setBlackAndWhitePalette;
+          assign(inputFile,fileName);
+          reset(inputFile,1);
           initVariables;
           getMem(image,4*ySize);
           for i:=1 to ySize do
@@ -148,12 +144,12 @@ var   eastWestBorder            : word;
 begin
   if findPupilPoint(pupilPoint) then
     begin
-      eastWestBorder:=pupilPoint^.x;
-      northSouthBorder:=pupilPoint^.y;
+      eastWestBorder:=pupilPoint.x;
+      northSouthBorder:=pupilPoint.y;
       for i:=3 to ySize-2 do
         for j:=3 to xSize-2 do
           putPixel(startX+j,i,getFilterValue(j,i));
-      markPosition(pupilPoint^.x,pupilPoint^.y,asCircle);
+      markPosition(pupilPoint.x,pupilPoint.y,asCircle);
       writeText
     end
 end;
@@ -165,11 +161,8 @@ var   i                         : word;
 
 begin
   readKey;
-  closeGraph;
-  dispose(pupilPoint);
-  for i:=1 to ySize do
-    freeMem(image^[i],xSize);
-  freeMem(image,4*ySize)
+  closeSearch;
+  closeGraph
 end;
 
 
