@@ -3,19 +3,13 @@ unit auxil;
 
 INTERFACE
 
-uses dos;
+uses dos,graph;
 
 const BackSp                    = #8;
       CR                        = #13;
       Esc                       = #27;
 
-type  pointPtr                  = ^point;
-      point                     = record
-        x                         : word;
-        y                         : word
-      end;
-
-      charSet                   = set of char;
+type  charSet                   = set of char;
 
 const specialKey                : boolean = false;
 
@@ -50,7 +44,7 @@ procedure grClear(x1,y1,x2,y2 : word);
 
 procedure grWriteChar(x,y : word; aChar : char);
 
-procedure makePoint(anX,anY : word; aPoint : pointPtr);
+procedure makePoint(anX,anY : word; aPoint : pointType);
 
 procedure beep(frequency,time : word);
 
@@ -59,7 +53,7 @@ procedure fatalError(errorMessage : string);
 
 IMPLEMENTATION
 
-uses crt,graph;
+uses crt;
 
 
 const picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
@@ -325,11 +319,11 @@ begin
 end;
 
 
-procedure makePoint(anX,anY : word; aPoint : pointPtr);
+procedure makePoint(anX,anY : word; aPoint : pointType);
 
 begin
-  aPoint^.x:=anX;
-  aPoint^.y:=anY
+  aPoint.x:=anX;
+  aPoint.y:=anY
 end;
 
 
