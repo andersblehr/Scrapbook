@@ -60,7 +60,7 @@ type  bufferType                = array[1..512] of char;
         procedure   prepareFFT;
         procedure   addImage(anImage : imageOPtr);
         procedure   setPixelSize(aSize : byte);
-        procedure   drawImage(whereVertical,whereHorizontal : byte);
+        procedure   drawImage(whereVer,whereHor : byte; aText : string);
         procedure   saveImage(imageName : string);
         procedure   disposeImage;
       end;
@@ -207,12 +207,17 @@ var   imageFile                 : file;
 
 
 begin
+  setTextStyle(defaultFont,horizDir,1);
+  setTextJustify(leftText,topText);
   if fileExists(appendExtension(whatImage,'.pic')) then
     assign(imageFile,appendExtension(whatImage,'.pic'))
   else if fileExists(picturePath(whatImage)) then
     assign(imageFile,picturePath(whatImage))
   else
-    fatalError(whatImage+': Image not found!');
+    begin
+      closeGraph;
+      fatalError(whatImage+': Image not found!')
+    end;
   reset(imageFile,1);
   if (IOResult<>0) then
     image:=nil
@@ -243,6 +248,8 @@ constructor imageO.initEmptyImage(xExtent,yExtent : word);
 var   i                         : word;
 
 begin
+  setTextStyle(defaultFont,horizDir,1);
+  setTextJustify(leftText,topText);
   xSize:=xExtent;
   ySize:=yExtent;
   setPixelSize(1);
@@ -386,7 +393,7 @@ begin
 end;
 
 
-procedure imageO.drawImage(whereVertical,whereHorizontal : byte);
+procedure imageO.drawImage(whereVer,whereHor : byte; aText : string);
 
 var   x,y                       : word;
       i,j                       : word;
@@ -408,8 +415,8 @@ var   x,y                       : word;
   begin
     case where of
       top    : yPosition:=1;
-      center : yPosition:=(getMaxY div 2)-(ySize div 2)*pixelSize;
-      bottom : yPosition:=getMaxY-ySize*pixelSize
+      center : yPosition:=(getMaxY div 2)-(ySize div 2)*pixelSize-10;
+      bottom : yPosition:=getMaxY-ySize*pixelSize-20
     end
   end;
 
@@ -427,11 +434,15 @@ var   x,y                       : word;
 
 
 begin
-  x:=xPosition(whereHorizontal);
-  y:=yPosition(whereVertical);
+  x:=xPosition(whereHor);
+  y:=yPosition(whereVer);
   for i:=0 to ySize-1 do
     for j:=0 to xSize-1 do
-      drawPixel(j,i,image^[i]^[j])
+      if (pixelSize=1) then
+        putPixel(x+j,y+i,image^[i]^[j])
+      else
+        drawPixel(j,i,image^[i]^[j]);
+  outTextXY(x,y+ySize+10,aText)
 end;
 
 
