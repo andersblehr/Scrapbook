@@ -16,14 +16,8 @@ var   xSize                     : word;
       endSeconds                : word;
       end100thSeconds           : word;
 
-
-procedure markPosition(x,y : word);
-
-begin
-  setColor(63);
-  line(startX+x-3,startY+y,startX+x+3,startY+y);
-  line(startX+x,startY+y-3,startX+x,startY+y+3)
-end;
+      aPupilPoint               : pointPtr;
+      pupilPosition             : pointPtr;
 
 
 procedure init;
@@ -60,9 +54,11 @@ var   fileName                  : string;
 	thisParameter:=paramStr(i);
 	if (thisParameter[1]='-') then
 	  case thisParameter[2] of
+	    'd' : showSearch:=true;
 	    'r' : filterRadius:=getParameterValue(thisParameter);
 	    't' : filterThreshold:=getParameterValue(thisParameter);
 	    's' : sobelThreshold:=getParameterValue(thisParameter);
+	    'q' : nonSearchRadius:=getParameterValue(thisParameter);
 	    'n' : numberOfIterations:=getParameterValue(thisParameter)
 	  else
 	    fatalError('Illegal option: -'+thisParameter[2])
@@ -141,7 +137,7 @@ begin
 	dispose(pupilPosition)
     end;
   getTime(endHours,endMinutes,endSeconds,end100thSeconds);
-  markPosition(pupilPosition^.x,pupilPosition^.y)
+  markPosition(pupilPosition^.x,pupilPosition^.y,asStar)
 end;
 
 
