@@ -5,6 +5,9 @@ INTERFACE
 
 uses dos;
 
+const BackSp                    = #8;
+      CR                        = #13;
+      Esc                       = #27;
 
 type  pointPtr                  = ^point;
       point                     = record
@@ -14,6 +17,10 @@ type  pointPtr                  = ^point;
 
       charSet                   = set of char;
 
+const specialKey                : boolean = false;
+
+
+function readKey : char;
 
 function picturePath(fileName : string) : string;
 
@@ -33,8 +40,6 @@ function intString(aNumber : word) : string;
 
 function realString(aNumber : real) : string;
 
-function makePoint(anX,anY : word) : pointPtr;
-
 function grConfirm(x,y : word; question : string) : boolean;
 
 function grRead(x,y : word) : string;
@@ -45,6 +50,8 @@ procedure grClear(x1,y1,x2,y2 : word);
 
 procedure grWriteChar(x,y : word; aChar : char);
 
+procedure makePoint(anX,anY : word; aPoint : pointPtr);
+
 procedure beep(frequency,time : word);
 
 procedure fatalError(errorMessage : string);
@@ -52,7 +59,7 @@ procedure fatalError(errorMessage : string);
 
 IMPLEMENTATION
 
-uses crt,graph,keys;
+uses crt,graph;
 
 
 const picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
@@ -68,7 +75,7 @@ const picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
 
 
 function possibleLackingExtension(path             : pathStr;
-                                  correctExtension : extStr  ) : extStr;
+                                  correctExtension : extStr) : extStr;
 
 var   ignoreDirectory           : dirStr;
       ignoreFileName            : nameStr;
@@ -88,6 +95,20 @@ end;
  *    Implementation                                                      *
  *                                                                        *
  **************************************************************************)
+
+
+function readKey : char;
+
+var   aKey                      : char;
+
+begin
+  aKey:=crt.readKey;
+  specialKey:=(aKey=#0);
+  if specialKey then
+    readKey:=crt.readKey
+  else
+    readKey:=aKey
+end;
 
 
 function picturePath(fileName : string) : string;
@@ -200,18 +221,6 @@ begin
 end;
 
 
-function makePoint(anX,anY : word) : pointPtr;
-
-var   aPoint                    : pointPtr;
-
-begin
-  new(aPoint);
-  aPoint^.x:=anX;
-  aPoint^.y:=anY;
-  makePoint:=aPoint
-end;
-
-
 function grConfirm(x,y : word; question : string) : boolean;
 
 var   answer                    : char;
@@ -313,6 +322,14 @@ begin
   grClear(x,y,x+textWidth(' '),y-textHeight(' '));
   outTextXY(x,y,aChar);
   setTextJustify(oldTextSettings.horiz,oldTextSettings.vert)
+end;
+
+
+procedure makePoint(anX,anY : word; aPoint : pointPtr);
+
+begin
+  aPoint^.x:=anX;
+  aPoint^.y:=anY
 end;
 
 
