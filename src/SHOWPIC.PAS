@@ -7,8 +7,8 @@ var   eyeImage                  : imageOPtr;
 begin
   if (paramCount>0) then
     begin
-      initSVGAGraphics(mode800x600);
-      setBlackAndWhitePalette;
+      SVGA_initGraphics(mode1024x768);
+      SVGA_setBlackAndWhitePalette;
       new(eyeImage,initStoredImage(paramStr(1)));
       eyeImage^.setPixelSize(1);
       eyeImage^.drawImage(center,center,paramStr(1));

@@ -8,8 +8,8 @@ var   i                         : byte;
 begin
   if (paramCount>0) then
     begin
-      initSVGAGraphics(mode1024x768);
-      setBlackAndWhitePalette;
+      SVGA_initGraphics(mode1024x768);
+      SVGA_setBlackAndWhitePalette;
       for i:=0 to paramCount-1 do
         begin
           new(eyeImage,initStoredImage(paramStr(i+1)));
