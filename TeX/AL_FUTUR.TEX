@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:32:42 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Apr 11 18:17:30 1993
+%%% Last Modified On: Mon Apr 12 13:10:33 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,8 +126,9 @@ different parameters it employs.  These are:
 \item $r_{p_{min}}$: The fraction of the image resolution $N$ to which
   the minimum pupil radius corresponds.  With the given test images,
   $r_{p_{min}}$ was estimated to be 10\% of the images' size in the
-  $x$ direction\footnote{Recall that the given test images are not
-    square, i.e., they are of size $M\times N$, $M\neq N$.}.
+  $x$ direction\footnote{\label{pg:notsquare}Recall that the given
+    test images are not square, i.e., they are of size $M\times N$,
+    $M\neq N$.}.
 \item $r_{o}$: The fraction of the image resolution $N$ to which the
   radius of the octopus pixel filter corresponds.  In the current
   implementation, this fraction was set to $0.8r_{p_{min}}$.  Two
@@ -156,7 +157,10 @@ used each time.  Otherwise, a somewhat cumbersome process of
 determining an apparently optimal set of values has to be carried out.
 How cumbersome this process would be depends on its
 implementation\footnote{In the current implementation, the parameters
-  are assigned values through constants and command-line parameters.}.
+  are assigned values through typed constants which may be overridden
+  by values defined in the initialization file {\tt \_search.rc\/}, 
+  which in turn may be overridden by command line parameters (cf.\ 
+  Section~\ref{implem:details:param}).}.
 
 \subsubsection{Initializing the Mapping Array}
 
