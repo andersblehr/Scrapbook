@@ -23,17 +23,17 @@ var   VGA256DriverMode          : integer;
       graphMode                 : integer;
 
 
-function getVideoMode : byte;
+function SVGA_getVideoMode : byte;
 
-procedure initSVGAGraphics(graphMode : integer);
+procedure SVGA_initGraphics(graphMode : integer);
 
-procedure setAllVGAPalette(var palette : VGAPaletteType);
+procedure SVGA_setAllVGAPalette(var palette : VGAPaletteType);
 
-procedure setOverScanColour(colour : integer);
+procedure SVGA_setOverscanColour(colour : integer);
 
-procedure setBlackAndWhitePalette;
+procedure SVGA_setBlackAndWhitePalette;
 
-procedure setPaletteFromFile(fullPath : string);
+procedure SVGA_setPaletteFromFile(fullPath : string);
 
 
 IMPLEMENTATION
@@ -41,14 +41,14 @@ IMPLEMENTATION
 uses graph,dos;
 
 
-function getVideoMode : byte;
+function SVGA_getVideoMode : byte;
 
 var regs                        : registers;
 
 begin
-  regs.ah:=$0F;            (* Video BIOS Funktion $0F *)
-  intr($10,regs);          (* Video BIOS aufrufen *)
-  getVideoMode:=regs.al    (* AL enth„lt jetzt den aktuellen Videomodus *)
+  regs.ah:=$0F;               (* Video BIOS Funktion $0F *)
+  intr($10,regs);             (* Video BIOS aufrufen *)
+  SVGA_getVideoMode:=regs.al  (* AL enth„lt jetzt den aktuellen Videomodus *)
 end;
 
 
@@ -66,7 +66,7 @@ begin
 end;
 
 
-procedure initSVGAGraphics(graphMode : integer);
+procedure SVGA_initGraphics(graphMode : integer);
 
 var   driverNumber              : integer;
       errorCode                 : integer;
@@ -97,7 +97,7 @@ begin
 end;
 
 
-procedure setAllVGAPalette(var palette : VGAPaletteType);
+procedure SVGA_setAllVGAPalette(var palette : VGAPaletteType);
 
 var   regs                      : registers;
 
@@ -111,7 +111,7 @@ begin
 end;
 
 
-procedure setOverScanColour(colour : integer);
+procedure SVGA_setOverscanColour(colour : integer);
 
 var   regs                      : registers;
 
@@ -122,7 +122,7 @@ begin
 end;
 
 
-procedure setBlackAndWhitePalette;
+procedure SVGA_setBlackAndWhitePalette;
 
 var   i                         : byte;
       aPalette                  : VGAPaletteType;
@@ -134,11 +134,11 @@ begin
       aPalette[i].G:=i;
       aPalette[i].B:=i
     end;
-  setAllVGAPalette(aPalette)
+  SVGA_setAllVGAPalette(aPalette)
 end;
 
 
-procedure setPaletteFromFile(fullPath : string);
+procedure SVGA_setPaletteFromFile(fullPath : string);
 
 type  paletteArray              = array[1..768] of char;
 
@@ -168,7 +168,7 @@ begin
           aPalette[i].G:=ord(paletteBuffer[3*i+2]);
           aPalette[i].B:=ord(paletteBuffer[3*i+3])
         end;
-      setAllVGAPalette(aPalette)
+      SVGA_setAllVGAPalette(aPalette)
     end
 end;
 
