@@ -1,6 +1,6 @@
 program PCXView;
 
-uses crt,graph,defs,auxil,SVGA;
+uses crt,graph,auxil,SVGA;
 
 const bufferSize                = 4096;
       headerSize                = 128;
@@ -28,7 +28,7 @@ begin
         assign(inputFile,PCXPath(fileName));
         reset(inputFile,1);
         blockRead(inputFile,thisBuffer,headerSize);
-        initSVGAGraphics;
+        SVGA_initGraphics(mode800x600);
         xSize:=thisBuffer[12]+256*thisBuffer[13];
         ySize:=thisBuffer[14]+256*thisBuffer[15];
         startX:=(getMaxX-xSize) div 2;
@@ -65,7 +65,7 @@ begin
       thePalette[i].G:=buffer[3*i+2];
       thePalette[i].B:=buffer[3*i+3]
     end;
-  setAllVGAPalette(thePalette)
+  SVGA_setAllVGAPalette(thePalette)
 end;
 
 
