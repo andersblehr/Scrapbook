@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 06:45:29 1993
+%%% Last Modified On: Thu Mar 18 06:47:56 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,55 +81,10 @@ spectrum (the background).
 By choosing the threshold value $T$ as indicated in the figure, the
 object of interest is easily separated from its background.
 
-\subsubsection{A Global Thresholding Technique}
-
 By applying Eq.~(\ref{eq:threshold:2}) on the image, the resulting
 image will be a binary one, the object being black and its background
 white (assuming that 0 in the equation is chosen to correspond to
-black, and 1 to correspond to white).  Often one is interested in
-detecting the {\em boundary\/} between the object and the background
-instead of merely having the object stand out from the background.
-This can be done by employing a technique described in~\cite{digim}.
-The idea is to scan the image in the $x$- and $y$-directions
-separately, and each time a change in gray level from one band to the
-other indicates the presence of a boundary point.  The procedure
-performs in two passes as follows:
-
-\paragraph{Pass 1:} For each row in $f(x,y)$, create a corresponding
-row in an intermediate image $g_{1}(x,y)$, using the following
-relation: 
-\begin{equation}
-  g_{1}(x,y)=\left\{
-    \begin{array}{ll}
-      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x,y-1)$ are in} \\
-            & \mbox{different bands of the gray scale,} \\
-      L_{B} & \mbox{otherwise,}
-    \end{array}\right.
-\end{equation}
-where $L_{E}$ and $L_{B}$ are specified boundary and background
-levels, respectively.
-
-\paragraph{Pass 2:} For each column in $f(x,y)$, create a
-corresponding column in an intermediate image $g_{2}(x,y)$ using the
-following relation:
-\begin{equation}
-  g_{2}(x,y)=\left\{
-    \begin{array}{ll}
-      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x-1,y)$ are in} \\
-            & \mbox{different bands of the gray scale,} \\
-      L_{B} & \mbox{otherwise.}
-    \end{array}\right.
-\end{equation}
-
-The desired image, consisting of the boundary points of the object of
-interest on a uniform background, is then given by the relation:
-\begin{equation}
-  g(x,y)=\left\{
-    \begin{array}{ll}
-      L_{E} & \mbox{if $(g_{1}(x,y)=L_{E}\vee g_{2}(x,y)=L_{E})$,} \\
-      L_{B} & \mbox{otherwise.}
-    \end{array}\right.
-\end{equation}
+black, and 1 to correspond to white).
 
 The problem with thresholding is to choose a value for $T$ which
 separates the object of interest from other parts of the image well
@@ -194,3 +149,83 @@ start pouring: The seed point.
 \subsection{Template Matching}
 \label{image:segment:template}
 
+So far, the focus has been on methods for segmenting out objects in an
+image based on a set of characteristics that differentiates the
+objects from their background.  These characteristics, however,
+include neither {\em geometrical\/} (e.g., shape) nor {\em textural
+  properties\/} (e.g., dark and bright regions) of the objects to be
+segmented out.  Thus, if one wants to be able to recognize an object
+in an image, having an arbitrary pattern of gray levels, other
+techniques have to be found.
+
+{\em Template matching\/} is, perhaps, one of the most straightforward
+methods for locating the presence of an object in an image, based on
+specific geometrical and textural properties.  The idea is that an
+object with given properties can be detected in an image by matching
+the image at different locations against a {\em template\/}, having
+the sought properties, as illustrated in Fig.~\ref{fig:template}.
+This must be done at every pixel location in the image, and, if the
+sought object is allowed to rotate, at every possible orientation.
+
+%\inserteps{template}{\label{fig:template}An image (a), and a template
+%  designed to locate the bull's head.}
+
+Matching of this kind would be a trivial task if an exact copy of the
+template could be expected to be present in the image.  A match would
+then be detected when each pixel in the template has the same gray
+level as the one it is matched against.  In practice, however, the
+image is normally noisy, and thus the sought object has to be found by
+maximizing some measure of the degree of match between the template
+and the picture.  Some standard measures of the degree of match
+between an image $f(x,y)$ and a template $T$ whose gray level at
+$(x,y)$ is $t(x,y)$ are (for the sake of generality, integrals are
+used; in the digital case these are replaced by summations):
+\begin{equation}
+\label{eq:max}
+  \max_{(x,y)\in T}|f(x,y)-t(x,y)|
+\end{equation}
+\begin{equation}
+\label{eq:savd}
+  {\int\int}_{T}|f(x,y)-t(x,y)|dxdy
+\end{equation}
+\begin{equation}
+\label{eq:correlation}
+  {\int\int}_{T}[f(x,y)-t(x,y)]^{2}dxdy\mbox{.}
+\end{equation}
+These measures are all zero for a perfect match, and have high values
+for poor matches.  They differ, however, in the type of errors to
+which they are sensitive (to see how they differ, see~\cite{digpat}).
+
+A useful and popular match measure that can be derived from
+Eq.~(\ref{eq:correlation}) is the {\em correlation coefficient\/}
+$\rho$, defined by
+\begin{equation}
+\label{eq:correlation:coefficient}
+  \rho(x,y)=\frac{{\int\int}_{T}f(x,y)t(x,y)dxdy}
+  {\sqrt{{\int\int}_{T}f^{2}(x,y)dxdy{\int\int}_{T}t^{2}(x,y)dxdy}}\mbox{.}
+\end{equation}
+It can be shown that $0\leq \rho(x,y)\leq 1$ for all (x,y) in the
+image, with value $1$ being achieved if and only if $f(x,y)\equiv
+ct(x,y)$ for some positive constant $c$.  Also, $\rho$ is unaffected
+if the gray scale of $f$ is multiplied by a constant, unlike the
+measures in Eqs.~(\ref{eq:max}) through~(\ref{eq:correlation}).
+
+As is evident from the above, template matching is rather expensive
+computationally.  Correlation may be carried out more efficiently in
+the frequency domain, but only if the image and the template are of
+the same size, which is seldom the case.  The results obtained also
+vary depending on the similarity measure employed.
+In~\cite{template}, three measures of match are evaluated as to their
+performance in measuring eye position.  The measures evaluated are the
+correlation coefficient (Eq.~(\ref{eq:correlation:coefficient})), the
+{\em sum of absolute valued differences\/} (SAVD,
+Eq.~(\ref{eq:savd})), and a relatively new technique called the {\em
+  stochastic sign change criterion\/} (SSC).  In this paper it is
+concluded that, due to ``gross misregistrations'', the correlation
+coefficient $\rho$ is ``inapplicable as a similarity measure''.  For
+the SAVD and SSC measures, the results as to their accuracy are
+approximately equal.
+
+At any rate, due to its being too computational expensive, template
+matching can be excluded as a technique on which to base real-time eye
+tracking.

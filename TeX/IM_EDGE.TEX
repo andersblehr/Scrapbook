@@ -3,11 +3,116 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 11 06:12:00 1993
+%%% Last Modified On: Thu Mar 18 08:41:32 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Edge Detection}
 \label{image:edge}
+
+As mentioned in the previous section, {\em discontinuty detection\/}
+is a branch of image segmentation.  To the area of discontinuty
+detection belong the fields of {\em point detection\/}, {\em line
+  detection\/}, and {\em edge detection\/}.  In this section, the
+focus is on edge detection, as it constitutes by far the most common
+approach for detecting discontinuties in gray level.  An {\em edge\/}
+is defined as the boundary between two regions characterized by having
+relatively distinct gray levels.
+
+\subsection{Thresholding}
+\label{image:edge:threshold}
+
+The tresholding technique introduced in
+Section~\ref{image:segment:threshold} can, with slight modifications,
+be applied to detect edges in an image, as described in~\cite{digim}.
+The idea is to choose a threshold $T$, based on some criteria,
+dividing the gray scale of the image into two distinct bands.  Then
+the image is scanned in the $x$- and $y$-directions separately.  Each
+time a change in gray level from one band to the other occurs, this
+indicates the presence of a boundary point.  The procedure performs in
+two passes as follows:
+
+\paragraph{Pass 1:} For each row in $f(x,y)$, create a corresponding
+row in an intermediate image $g_{1}(x,y)$, using the following
+relation: 
+\begin{equation}
+  g_{1}(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x,y-1)$ are in} \\
+            & \mbox{different bands of the gray scale,} \\
+      L_{B} & \mbox{otherwise,}
+    \end{array}\right.
+\end{equation}
+where $L_{E}$ and $L_{B}$ are specified boundary and background
+levels, respectively.
+
+\paragraph{Pass 2:} For each column in $f(x,y)$, create a
+corresponding column in an intermediate image $g_{2}(x,y)$ using the
+following relation:
+\begin{equation}
+  g_{2}(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x-1,y)$ are in} \\
+            & \mbox{different bands of the gray scale,} \\
+      L_{B} & \mbox{otherwise.}
+    \end{array}\right.
+\end{equation}
+The desired image, consisting of the boundary points of the object of
+interest on a uniform background, is then given by the relation:
+\begin{equation}
+  g(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if $(g_{1}(x,y)=L_{E}\vee g_{2}(x,y)=L_{E})$,} \\
+      L_{B} & \mbox{otherwise.}
+    \end{array}\right.
+\end{equation}
+As is the case with thresholding in general, care has to be taken when
+choosing the threshold $T$.  
+
+If the image has been subjected to additive noise, so that in regions
+with gray levels in the proximity of $T$, pixel values are randomly
+distributed on both sides of $T$, this method will detect an edge
+point each time a transition from one band to another occurs, thus
+making it difficult to distinguish between the actual edge, and edges
+detected due to noise.  This is less of a problem if the edges of
+interest are relatively sharp, that is, they approximate a step edge
+rather than a ramp edge.  Sharp edges are present in ``sharp'' images
+where the gray levels on the two sides of an edge differ by a
+relatively large amount.
+
+\subsection{Gradient Operators}
+\label{image:edge:gradient}
+
+As edge points in an image are characterized as points where the gray
+level of the image changes rapidly, an obvious approach to edge
+detection is to apply some kind of {\em differentiation\/} on the
+image.  The most common approach to differentiation in image
+processing applications is the {\em gradient\/}.  The gradient of a
+two-dimensional function $f(x,y)$ is defined as the vector
+\begin{equation}
+  \vec{G}[f(x,y)]=\left[
+    \begin{array}{c}
+      \underline{\partial f} \\
+      \partial x \\ \\
+      \underline{\partial f} \\
+      \partial y
+    \end{array}\right]\mbox{.}
+\end{equation}
+$\vec{G}[f(x,y)]$ always points in the direction of the maximum rate
+of increase of $f(x,y)$ at $(x,y)$, and the rate of increase per unit
+distance in this direction, denoted $G[f(x,y)]$, is given by
+\begin{equation}
+  G[f(x,y)]=|\vec{G}|=\sqrt{(\frac{\partial f}{\partial x})^{2}+
+    (\frac{\partial f}{\partial y})^{2}}\mbox{.}
+\end{equation}
+The magnitude function $G[f(x,y)]$ is generally referred to as the
+{\em gradient\/} of $f$, to avoid constantly having to refer to it as
+``the magnitude of the gradient''.
+
+\subsection{The Hough Transform}
+\label{image:edge:hough}
+
+\subsection{Highpass Filtering}
+\label{image:edge:highpass}
 
