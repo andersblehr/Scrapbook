@@ -2,7 +2,7 @@ program pic2eps;
 
 uses crt,auxil;
 
-const maxSize                   = 1024;
+const maxSize                   = 2048;
       LF                        = #10;
       CR                        = #13;
 
