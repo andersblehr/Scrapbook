@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Apr  2 06:04:47 1993
+%%% Last Modified On: Sat Apr  3 19:32:36 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +94,7 @@ being cumbersome to handle, decrease the computational accuracy.  Thus
 it would be desirable with a technique having all the advantages of
 the above approach, but without the drawbacks.
 
-\subsubsection{An Improved Approach}
+\subsubsection{Repositioning the Origin of Operation}
 
 \insertepswidth{lines}{\label{fig:lines}Detection lines along which
   positions do not need be computed.}{0.35}
@@ -140,13 +140,88 @@ situation could occur in which the origin of operation is moved around
 in the pupil without ever settling at a final position.  This also
 applies to the direct approach above.
 
-Consider Fig.~\ref{fig:dead} and recollect how the first origin of
-operation is supplied.  Evidently, if $T_{s}\approx 1$, a point cannot
-be supplied that lies closer to the shore of the pupil lake than
-$r_{o}/\sqrt{2}$ (cf.\ Section~\ref{algo:seek:octopus}).
+\subsubsection{Skipping the ``Dead Region'' about the Origin of
+  Operation}
 
-\subsection{Operators Employed}
+If the image quality is relatively good, that is, when choosing a
+reasonable value for $T_{l}$, the extent of the pupil lake corresponds
+fairly close to the actual extent of the pupil and does not extend
+beyond the actual pupil contour, there is a way of reducing the time
+needed for one iteration of the above procedure.  Recall how the
+initial origin of operation is supplied by the swimming octopus search
+algorithm.  Evidently, if $T_{s}\approx 1$ and the above requirement
+of the pupil lake not extending beyond the actual pupil contour is
+satisfied, an origin of operation cannot be supplied that lies closer
+to the pupil contour than $r_{d}=r_{o}/\sqrt{2}$.  This is illustrated
+in Fig.~\ref{fig:dead}.  The shaded region designates a fraction of
+the (idealized) pupil lake, and the white circle designates a ``dead
+region'' about the origin of operation inside which the probability of
+locating the pupil contour is zero.  Thus, when moving outwards along
+the detection lines, looking for the pupil contour, the initial
+$r_{d}$ pixels of the horizontal and vertical detection lines, and the
+initial $r_{d}/\sqrt{2}$ pixels along the diagonal detection lines can
+be skipped, reducing the overall number of locations at which to apply
+the edge detection operators.
+
+With low-contrast images, however, like the given test images, the
+``dead region'' may not be entirely ``dead''.  In other words, the
+initial origin of operation may lie closer to the actual pupil contour
+than $r_{d}$.  This can be attributed to the fact that $T_{s}$ has to
+be chosen relatively low to ensure that some actual pupil point are
+recognized as such.  Since the pupil lakes in low-contrasted images
+tend to have ponds dispersed around them, some of which may lie on the
+outside of the pupil boundary (cf.\ Section~\ref{algo:seek:octopus}),
+there is a probability that the octopus will settle at a location at
+which it has one or even two of its arms crossing the pupil boundary.
+This happens when it jumps to a location at which the first
+swim-criterion is satisfied by its having one (or two) of its hands in
+a non-pupil pond.  Consequently, by skipping the assumed ``dead
+region'', one may happen to start looking for the pupil boundary after
+actually having crossed it, thus never finding it.  One solution to
+this problem would be to try and choose a smaller value for $r_{d}$.
+It is, however, not clear which criteria to use when choosing this
+smaller value, since nothing is known about the distribution of the
+non-pupil ponds surrounding the pupil lake.  Consequently, the
+recommended solution, and the one I chose, since the probability of
+this happening was relatively high with the given test images, is to
+set $r_{d}=0$.
+
+\insertepswidth{dead}{\label{fig:dead}The shaded region designates a
+  portion of the pupil lake, and the white circle designates the
+  ``dead region'' about the origin of operation, inside which the
+  sought pupil contour will not be found.}{0.3}
+
+\subsection{Edge Detection Operators}
 \label{algo:pos:operators}
+
+In the basic algorithm formulation in
+Section~\ref{eval:approach:algo}, it was said that, based on the
+comparison of different spatial edge detection schemes in
+Fig.~\ref{fig:compare}, some sort of first-order derivative operator
+would be best suited for the task of detecting the pupil contour.  Two
+obvious candidates are the Sobel operators described in
+Section~\ref{image:edge:gradient} and shown in Fig.~\ref{fig:sobelop}.
+The result of applying these to Fig.~\ref{fig:testimages}(e) is shown
+in Fig.~\ref{fig:compare}(c).  Although the pupil contour is hardly
+discernable in the original image, it is clearly visible in the
+processed image.  Thus, by moving along the detection lines
+originating at the current origin of operation and at each pixel
+appropriately thresholding the output from the Sobel operators, the
+pupil contour can be detected.
+
+\subsubsection{Characteristics of the Sobel Operators}
+
+Before deciding to employ the Sobel operators directly as they are
+depicted in Fig.~\ref{fig:sobelop}, it is necessary to examine their
+characteristics and to determine if and how they can be tailored to
+suit the task they are to perform.
+
+Normally, assuming the image origin to be the upper left corner of the
+image, the Sobel operators are applied to an image in two passes, one
+vertical, applying the mask Fig.~\ref{fig:sobelop}(a) column by column
+to every pixel in a top-down manner, and one horizontal, applying the
+mask in Fig.~\ref{fig:sobelop}(b) row by row to every pixel in a left
+to right manner.
 
 \subsection{Number of Operations}
 \label{algo:pos:O}

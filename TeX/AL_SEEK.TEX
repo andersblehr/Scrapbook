@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Apr  2 05:26:37 1993
+%%% Last Modified On: Sat Apr  3 13:31:30 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,20 +80,21 @@ the pupil contour.
 
 With images having as low contrast as the given test images,
 particular care has to be taken when choosing $T_{l}$.  For the images
-I have used during my thesis work, I found that $T=18$ ensures
+I have used during my thesis work, I found that $T_{l}=18$ ensures
 ``optimal'' pupil lakes and sufficiently small non-pupil lakes.
 However, due to the low contrast, the probability of encountering
-islands in the pupil lake is by no means ignorable.  $T=17$ tends to
-make the image completely dry, whereas $T=19$ tends to ``drown'' large
-portions of it.  It is evident that, if the final system were to
-employ equally low-contrasted images, only a small change in light
-conditions would destroy this extremely frail balance.  However,
-employing a frame grabber supplying images whose gray levels occupy a
-large portion of the desired gray level range (256) would by and large
-eliminate this problem.
+islands in the pupil lake is by no means ignorable.  $T_{l}=17$ tends
+to make the image completely dry, whereas $T_{l}=19$ tends to
+``drown'' large portions of it.  It is evident that, if the final
+system were to employ equally low-contrasted images, only a small
+change in light conditions would destroy this extremely frail balance.
+However, employing a frame grabber supplying images whose gray levels
+occupy a large portion of the desired gray level range (256) would by
+and large eliminate this problem.
 
 \inserteps{lake18}{\label{fig:lake}The image in
-  Fig.~\protect\ref{fig:landscape} after thresholding with $T=18$.}
+  Fig.~\protect\ref{fig:landscape} after thresholding with
+  $T_{l}=18$.}
 
 \subsection{Introducing the Octopus}
 \label{algo:seek:octopus}
@@ -153,15 +154,23 @@ last requirement will be referred to as the {\em second
 
 The probability that the point which the octopus reports to be a pupil
 point actually is a non-pupil point depends on the threshold value
-$T_{s}$.  With the current test images, which contain large and dark
-non-pupil regions, and where the pupil is hardly discernable, I found
-that the octopus returned no non-pupil points if $T_{s}$ was set to
-0.8.  With better images, having higher contrast and not so large and
-dark non-pupil regions, it ought to be possible to choose a lower
-value for $T_{s}$ and still have the octopus return only pupil points,
-particularly since it then would be hard finding a non-pupil point
-satisfying the first swim-criterion, that the centre and extremities
-of the octopus report wetness.
+$T_{s}$.  With low contrast images like the given test images, it is
+often impossible to choose a value for $T_{l}$ which eliminates all
+non-pupil lakes in the images.  Also, some of the non-pupil lakes may
+be relatively large in comparison with the pupil lake, and have small
+``ponds'' dispersed around them.  Thus there is a relatively large
+probability of having the first swim-criterion satisfied outside the
+pupil lake.  As a consequence, $T_{s}$ has to be chosen as high as
+possible in order to minimize the probability of recognizing the
+corresponding point as a pupil point.  Preferrably, $T_{s}$ should be
+chosen near 1.  However, in such low-contrasted images, the number of
+islands in the lakes, including the pupil lake, tends to be relatively
+high, and thus choosing $T_{s}=1$ may cause no actual pupil points to
+be recognized as such.  Accordingly, a balance has to be found.  With
+the given test images, I found that $T_{s}=0.8$ caused no non-pupil
+points to be returned, whereas lower values for some images caused the
+recognition of non-pupil points as pupil points.  Values of 0.9 or
+higher caused no pupil points to be recognized in some of the images.
 
 A point which requires some elaboration is that, with the given test
 images, lower values for $T_{s}$ made the search algorithm run faster.
