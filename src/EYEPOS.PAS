@@ -58,7 +58,6 @@ var   fileName                  : string;
             'l' : lakeLevel:=trunc(getParameterValue(thisParameter));
 	    'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
 	    's' : sobelThreshold:=trunc(getParameterValue(thisParameter));
-	    'q' : nonSearchRadius:=trunc(getParameterValue(thisParameter));
             'w' : wetFraction:=getParameterValue(thisParameter);
             'a' : nAdjustments:=trunc(getParameterValue(thisParameter));
 	    'n' : nIterations:=trunc(getParameterValue(thisParameter))
@@ -142,7 +141,8 @@ begin
       pupilSearchTime:=sec100ths;
       getTime(startHours,startMinutes,startSeconds,start100thSeconds);
       for i:=1 to nIterations do
-	findPosition(pupilPoint,pupilPosition);
+        if (not	findPosition(pupilPoint,pupilPosition)) then
+          fatalError('Too few iterations!');
       getTime(endHours,endMinutes,endSeconds,end100thSeconds);
       edgeSearchTime:=sec100ths
     end
