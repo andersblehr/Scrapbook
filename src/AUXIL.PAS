@@ -34,7 +34,7 @@ procedure fatalError(errorMessage : string);
 
 IMPLEMENTATION
 
-uses crt;
+uses crt,graph;
 
 
 function nextWord(var aLine : string; whiteSpace : charSet) : string;
@@ -133,6 +133,8 @@ end;
 procedure fatalError(errorMessage : string);
 
 begin
+  if (getGraphMode>=0) then
+    closeGraph;
   writeLn(errorMessage);
   beep(600,100);
   halt(1)
