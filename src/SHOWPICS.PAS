@@ -8,7 +8,7 @@ var   i                         : byte;
 begin
   if (paramCount>0) then
     begin
-      initSVGAGraphics;
+      initSVGAGraphics(mode1024x768);
       setBlackAndWhitePalette;
       for i:=0 to paramCount-1 do
         begin
