@@ -1,0 +1,39 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% diplom.tex --- 
+%%% Author          : blehr
+%%% Created On      : Fri Jan 15 16:10:06 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Tue Mar  2 04:17:45 1993
+%%% RCS revision    : $Revision$ $Locker$
+%%% Status          : OK, except for stuff commented out
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentstyle[a4,ab10pt,logo,twoside]{report} % tgrind hoerer egentlig med
+
+\pagestyle{headings}
+\raggedbottom
+\input{kommando.tex}
+\pagenumbering{roman}
+\begin{document}
+
+\input{forside}
+\cleardoublepage
+%\include{abstract}
+\cleardoublepage
+\tableofcontents
+
+\include{preface}
+\include{intro}
+\include{backgrnd}
+\include{algo}
+\include{complsys}
+\include{concl}
+
+\cleardoublepage
+\appendix
+
+\cleardoublepage
+
+\include{bib}
+
+\end{document}

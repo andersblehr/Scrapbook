@@ -1,0 +1,92 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% intro.tex --- 
+%%% Author          : blehr
+%%% Created On      : Mon Jan 18 10:34:12 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Tue Mar  2 05:18:03 1993
+%%% RCS revision    : $Revision$ $Locker$
+%%% Status          : In writing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\label{intro}
+
+In the following a brief overview is given of the project within whose
+framework my thesis took place.  In Section~\ref{intro:synch}, the
+need of having an eye position measuring system as part of the
+experimental setup of the work group is stated, and in
+Section~\ref{intro:motivation}, the reason why it was decided to
+develop an entirely new system instead of investing in an already
+existing one is touched upon.
+
+In experiments, registration of brain activity in human subjects is
+done through EEG-recordings, whereas recordings from cats and monkeys
+are performed with microelectrodes being inserted into the brain
+tissue.
+
+\section{Synchronization and Cognition}
+\label{intro:synch}
+
+{\em Synchronization and Cognition\/} ({\em SC\/}) is a project
+initiated by R.\ Eckhorn, R.\ Bauer (Biophysics Group) and F.\
+R\"{o}sler (\typeout{--> Roeslers gruppe?}Psychology Group) at the
+Philipps-Universit\"{a}t Marburg, Germany.
+
+The basis of the current work is observations done by R.\ Eckhorn and
+R.\ Bauer~(\cite{cat1}), as well as by the group of W.\ Singer
+(e.g.,~\cite{cat3} and~\cite{cat2}), that in drugged cats,
+retinally\typeout{--> retinotop = retinal??} distributed and
+rhythmically correlated neural assemblies organize in peripheral
+visual areas of the brain.  The spacial distribution of these
+assemblies, but not their frequencies, depend on the supplied visual
+stimulation.
+
+The goal of the {\em SC\/} project is to show that coherent
+neurological activations ({\em synchronizations\/}) in the visual
+cortex of monkeys and humans, relating to coherent visual stimulation,
+is a requirement for the coherent perception of this stimulation.  In
+addition, the time-space {\em synchronization dynamics\/} in
+peripheral and central, as well as in intermediate cortex areas, are
+to be investigated as to how they relate to the cognitive tasks being
+performed.
+
+Since the direction of gaze and the orientation of the visual
+stimulation have to correspond as exactly as possible, in order to be
+certain that exactly those neural assemblies are stimulated whose
+activity is being registered, it is of vital importance for the
+validity of the experimental results that the exact eye position of
+the subject be known at a given time.  Otherwise the danger would
+exist of registering neurological responses whose variations are not
+the result of the assigned cognitive task, but of the subject's
+incorrect gaze direction.  For a further description of the {\em SC\/}
+project, see~\cite{antrag}.
+
+To gain absolute certainty about where the subject at a given time
+directs its gaze, it is necessary to have a system which continuously
+and in real-time ($\sim$50 Hz) tracks the movements of the subject's
+eyes, returning the coordinate pair corresponding to the momentary 
+gaze direction, and giving a warning when the subject is {\em
+  drifting\/}, i.e., does not focus where it should.
+
+\section{Thesis Motivation}
+\label{intro:motivation}
+
+The task of my thesis has, in short, been to develop, and, as far as
+possible, test a suitable software platform for a real-time eye
+position measuring system complying to the requirements of precision
+and speed mentioned above.
+
+One of the main reasons for choosing to develop an entirely new eye
+tracking system instead of investing in an already existing one, has
+simply to do with most of the existing systems being too expensive for
+the work group to be considered as alternatives.  Another reason is
+that many systems, like the {\em search coil\/}~(\cite{coil}) system,
+for example, require physical implantations (i.e., the search coil)
+into the eye of the subject, what makes the system not suited for
+human subjects.  The {\em infrared oculometer\/}~(\cite{infrared})
+does not require implantations of any kind, but requires very precise
+and time consuming calibration, and in addition it is realized
+entirely in hardware, which makes it impossible to configure it for
+specific needs.
+
+
