@@ -207,7 +207,7 @@ var   imageFile                 : file;
 
 
 begin
-  assign(imageFile,'c:\user\blehr\diplom\bilder\'+whatImage+'.pic');
+  assign(imageFile,'c:\user\blehr\fag\diplom\bilder\'+whatImage+'.pic');
   {$I-}
   reset(imageFile,1);
   {$I+}
