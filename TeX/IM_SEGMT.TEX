@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Mar 20 01:17:07 1993
+%%% Last Modified On: Tue Mar 23 04:48:33 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,8 +119,8 @@ multiple region growing.
 
 Two immediate problems with region growing are the selection of a seed
 point which properly represents the region of interest, and the
-selection of suitable properties for including new points during the
-growing process.  
+selection of a suitable set of criteria for including new points
+during the growing process.
 
 If one has {\em a priori\/} knowledge of the properties of the region
 of interest, one approach in selecting the seed point is to apply a
@@ -131,12 +131,14 @@ does not belong to the region of interest, since single pixels outside
 the region of interest may share properties with it.  Thus it is
 important to equip the search strategy with a very tight stop
 criterion, in order to minimize the chance of erroneously choosing a
-non-region seed point.  A usual similarity criterion for the inclusion
-of new points during the growing process is that the gray level of a
-pixel to be included does not differ from that of the seed point by
-more than a specified amount.  The obvious stop criterion for the
-region growing procedure is to stop when no more pixels satisfy the
-criteria for inclusion in the region.
+non-region seed point.  
+
+A usual similarity criterion for the inclusion of new points during
+the growing process is that the gray level of a pixel to be included
+not differ from that of the seed point by more than a specified
+amount.  The obvious stop criterion for the region growing procedure
+is to stop when no more pixels satisfy the criteria for inclusion in
+the region.
 
 The advantage of region growing is its degree of automation.  It can
 be compared to filling an unevenly shaped pool with water: Once you
@@ -225,4 +227,4 @@ Eq.~(\ref{eq:savd})), and a relatively new technique called the {\em
 concluded that, due to ``gross misregistrations'', the correlation
 coefficient $\rho$ is ``inapplicable as a similarity measure''.  For
 the SAVD and SSC measures, the results as to their accuracy are
-approximately equal.
+satisfactory.

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 22 06:06:33 1993
+%%% Last Modified On: Tue Mar 23 06:59:28 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -14,27 +14,38 @@
 As mentioned in Section~\ref{image:intro:structure}, the purpose of
 this section is to compare the different techniques discussed in this
 chapter as to their individual applicability to the problem at hand.
-This comparison is found in Section~\ref{image:concl:comp} below.  The
-key criterion for applicability is {\em low computational cost\/}.  In
-Section~\ref{image:concl:approach}, a conclusion is drawn as to which
-approach to take in developing an algorithm to solve the problem,
-based on the foregoing comparison.
+The noise reduction schemes presented in Section~\ref{image:noise} are
+evaluated in Section~\ref{image:concl:noise}.  Two approaches to
+detecting the pupil in an image have been presented: Image
+segmentation, and edge detection.  In
+Section~\ref{image:concl:segment}, the image segmentation schemes are
+evaluated, and in Section~\ref{image:concl:edge}, the edge detection
+schemes.  In Section~\ref{image:concl:approach}, a conclusion is drawn
+as to which approach to take in developing an algorithm to solve the
+problem, based on the foregoing comparisons.
 
-\subsection{Applicability of the Presented Techniques}
-\label{image:concl:comp}
-
+The key criterion for applicability is {\em low computational cost\/}.
 In the following, when comparing the computational cost of the
 different techniques, it is assumed that the given image is of size
 $N\times N$, and that the technique in question is carried out on the
-{\em entire\/} image.  The cost is measured in terms of $N$.
+{\em entire\/} image.  The cost is measured in terms of $N$.  Another
+obvious criterion is that the technique in question serve the purpose.
 
-\subsubsection{Noise Reduction}
+\subsection{Noise Reduction Schemes}
+\label{image:concl:noise}
+
+The noise reduction schemes presented in this chapter belong to two
+different categories, which are treated separately below: Spatial
+domain and frequency domain schemes.
+
+\subsubsection{Spatial Domain Approaches}
 
 As pointed out in Section~\ref{image:spatial}, applying spatial
 operators on an image generally requires $O(N^{2})$ operations.  Thus
 all the spatial noise reduction schemes presented in
-Section~\ref{image:noise}, neighbourhood averaging, averaging of
-multiple images, and median filtering, perform in $O(N^{2})$ time.
+Sections~\ref{image:noise:averaging} and~\ref{image:noise:median},
+neighbourhood averaging, averaging of multiple images, and median
+filtering, perform in $O(N^{2})$ time.
 
 Of the two averaging techniques, averaging of multiple images can be
 discarded without delay, owing to its requiring several input images
@@ -50,6 +61,8 @@ the image.  In addition, median filtering is, when carefully
 implemented (e.g., by using binary trees to sort the values),
 computationally cheaper than averaging schemes, in that it requires
 mostly comparisons and no multiplications.
+
+\subsubsection{Frequency Domain Approaches}
 
 From Section~\ref{image:frequency:fourier}, p.~\pageref{pg:fft:O}, we
 have that performing an {\fft} algorithm on an image requires
@@ -69,14 +82,220 @@ noise function aforehand.  This is seldom the case in real-time
 applications, where the noise normally has a random distribution.
 
 The main drawback of these frequency domain schemes (and of any
-frequency domain scheme), however, is their immense computational
-cost, eleborated upon in Section~\ref{image:frequency:fourier},
+frequency domain scheme), however, is their computational cost,
+eleborated upon in Section~\ref{image:frequency:fourier},
 p.~\pageref{pg:fft:O}.  Thus frequency domain noise reduction schemes
 implemented in software can be discarded as an alternative in
-real-time applications (hardware implementations may be fast enough
-to be sustainable).
+real-time applications (hardware implementations may be fast enough to
+be sustainable).
 
-\subsubsection{Detecting the Pupil}
+\subsection{Pupil Detection Based on Image Segmentation}
+\label{image:concl:segment}
+
+The term {\em image segmentation\/} refers in this section, as in
+Section~\ref{image:segment}, to the problem of recognizing parts of an
+image as belonging to a continuous region with certain
+characteristics.  Edge detection schemes are treated separately in
+Section~\ref{image:concl:edge}.
+
+\subsubsection{Thresholding}
+
+As pointed out in Section~\ref{back:eye:visual}, the pupil constitutes
+the darkest portion of the eye, and can thus be assumed to correspond
+to the darkest region in an image of the eye.  Ideally, the
+characteristics of a cross section of an image of the eye are as
+depicted in Fig~\ref{fig:eye:cross:ideal}.  From this figure it is
+evident that pixels belonging to the pupil by and large can be
+recognized as such by deciding on a threshold value $T$ and
+thresholding the image with respect to $T$.  
+
+\inserteps{crsideal}{\label{fig:eye:cross:ideal}An ideal cross
+  section along the $x$ axis of an image of the eye.}
+
+However, as pointed out in Section~\ref{image:segment:threshold}, the
+problem with thresholding is, when applied to real images, to decide
+on a value for $T$ which unambiguously differentiates between actual
+pupil points and points not belonging to the pupil.  The probablility
+that all pixels in the pupil have values below $T$ and all pixels
+outside of it have values above $T$ is for real images practically
+zero.  Thus, in the most cases, applying a pure pixel-by-pixel
+thresholding technique to obtain a binary image will on the one hand
+result in an image where the pupil will form the largest recognizable
+object; on the other hand, this object will have holes in it, and its
+boundary will hardly form a perfect circle.
+
+A better approach would be to apply some averaging technique in the
+neighbourhood about the pixel to be thresholded, and then compare the
+value returned to the threshold value $T$.  By carefully choosing the
+averaging technique and equally carefully choosing $T$, it is possible
+to design a {\em pixel filter\/} which only lets points through that
+belong to the pupil.  Note, however, that it would only be possible to
+design this filter so that no non-pupil point is let through; to
+design it so that {\em all\/} actual pupil points are let through, is
+for all practical purposes impossible.
+
+From the above it can be concluded that thresholding is a technique
+which enables the unambiguous recognition of a pupil point, although
+as a means of reliably deciding the {\em centre\/} of the pupil, it is
+not particularly suited.  Lastly, since thresholding is a spatial
+technique, it performs in $O(N^{2})$ time.
+
+\subsubsection{Region Growing}
+
+Region growing is a technique which would seem well suited for
+detecting the area and the extent of the pupil.  One problem, however,
+is the requirement of a positive pupil point as seed point.  A search
+algorithm operating on the image, and employing a carefully designed
+pixel filter of the kind depicted above as stop criterion, could be
+expected to return such a point.
+
+Another problem is to chose the similarity criteria such that as many
+actual pupil points as possible and as few non-pupil points as
+possible be included.  A possible similarity criterion would be to
+include those pixels whose values are below a given threshold value
+$T$, assuming that the value of the seed point also is below $T$.
+This would, however, result in exactly the same unsuitable pupil
+region as the one depicted for the pixel-by-pixel thresholding scheme
+above, given that the image and $T$ are the same.  A usual, and
+better, similarity criterion is that the gray level of a pixel to be
+included not differ from that of the seed point by more than a
+specified amount.  This is, however, also a form of thresholding (ref.
+Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1}), and puts a
+rigid limit on the interval of gray levels accepted.
+
+Since the pupil is characterized as constituting the darkest region in
+the image, having a relatively well defined edge to the surrounding
+iris, a third approach would be to employ some sort of edge detecting
+scheme (see Section~\ref{image:edge}, and
+Section~\ref{image:concl:edge} below) as a criterion for inclusion.
+That is, to use thresholding not on the image itself, but on some sort
+of operator aimed at detecting edges.  With this scheme, during the
+growing process, all pixels not recognized as edge points are
+included.  
+
+The problems with this approach are to choose an optimal edge
+detecting operator, and, again, to choose an apropriate threshold
+value $T$.  Also, the danger exists of the pupil having a boundary
+with ``holes'' in it; that is, actual edge points that are not
+recognized as such by the edge detecting operator.  In that case, the
+region being grown will ``overflow'', i.e., it will cross the actual
+boundaries of the pupil and possibly extend to include the entire
+image.  By ensuring optimal illumination of the eye, in addition to
+the care taken when choosing the edge detecting operator and the
+threshold value $T$, it ought to be possible to reduce the probability
+of this happening to a minimum.
+
+After a region has been grown that corresponds as closely to the pupil
+as possible, the problem remains of deciding the position of the {\em
+  centre\/} of the pupil.  This can be done by, by means of some data
+structure, registering the coordinates of the end points of the rows
+and columns in the region being grown.  When the region is complete,
+the $x$-position of its centre (and thus of the pupil's, assuming that
+the correspondance between the region and the pupil is approximately
+1:1) is computed by taking the average of the centre points of all
+rows (using the relation $x_{\mbox{\scriptsize centre}}=\frac{1}{2}
+(x_{\mbox{\scriptsize left}}+x_{\mbox{\scriptsize right}}$).  The
+$y$-position is computed analogously.
+
+As mentioned above, region growing seems to suggest a reasonable
+approach to the given problem.  It remains to be seen, however, if it
+is computationally affordable in real-time applications.  In the
+general case, that is, when the entire image is considered to consist
+of contiguous regions that all are to be grown, region growing
+performs in $O(N^{2})$ time.  In our case, however, we are only
+interested in growing {\em one\/} region, namely the pupil, and thus
+the number of operations depends on the fraction of the image occupied
+by the pupil.  This fraction is assumed to be between 10\% and 20\%,
+thus reducing the number of operations by between 80\% and 90\%.  But,
+of course, the algorithm described above is still $O(N^{2})$ in time.
+The number of operations required by the algorithm searching for the
+seed point depends on the search strategy employed.
+
+\subsubsection{Template Matching}
+
+As mentioned in Section~\ref{image:segment:template},~\cite{template}
+offers an evaluation of three template metching algorithms for
+detecting and locating the pupil in an image of the eye.  Of the three
+match measures employed, the SAVD and the SSC are characterized as
+satisfactory, whereas the correlation coefficient $\rho$ is judged to
+be ``inapplicable as a similarity measure''.
+
+At any rate, due to immense computational cost, software implemented
+template matching can be discarded as an algorithm on which to base
+the needed eye-tracking system.  To see why template matching is so
+computationally expensive, consider once again Fig.~\ref{fig:template}
+on p.~\pageref{fig:template}.  It is evident that the template has to
+be moved to every pixel location in the image in order to obtain the
+best match.  There are $N^{2}$ pixels in the image.  Assuming that the
+template is of size $M\times M$, the number of operations required to
+compute the match at any location is $O(M^{2})$.  Thus the total
+number of operations is $O(M^{2}N^{2})$.  The diameter of the pupil in
+a typical image of the eye is $\sim 0.3N$, yielding $M\approx 0.3N$.
+This yields a total number of operations of $\sim 0.1N^{4}$, which
+corresponds to template matching being $O(N^{4})$ in time!
+
+\subsection{Pupil Detection Based on Edge Detection}
+\label{image:concl:edge}
+
+All edge detection techniques presented in this chapter return images
+where the edges stand out on a relatively uniform background.  The
+first technique described, thresholding, returns a binary image where
+the edges detected are emphasized.  For the latter two, gradient
+operators and highpass filtering, a binary image can be obtained by
+appropriately thresholding the returned image.  Thresholding and
+gradient operators perform in $O(N^{2})$ time, whereas highpass
+filtering, as pointed out in Section~\ref{image:concl:noise}, performs
+in $O(N^{2}\log_{2}N)$ time.
+
+The main problem with deciding the position of the pupil based on edge
+detection, is that you have to know whether or not a given edge
+corresponds to the contour between the pupil and the iris.  As can be
+seen from the image in Fig~\ref{fig:gradient}(b),
+p.~\pageref{fig:gradient}, the response given to the pupil-iris edge
+is rather weak, and the number of more prominent edges is large.  The
+contour of the pupil {\em can\/}, however, be unambigously recognized,
+by making this the first edge that the edge detecting algorithm
+encounters.  A method for doing this was described with respect to
+region growing in the previous section, where the criterion for {\em
+  not\/} including a pixel in the growing region is that it be an edge
+point.
+
+The approach taken to compute the centre point of the pupil on the
+basis of an edge known to represent the contour of the pupil is in
+principle the same as the one described for region growing in the
+previous section.  The key point is to compute the coordinates of the
+two points where a row, repectively a column in the image intercepts
+the pupil contour.  When these two pairs of coordinates are known, an
+estimate of the centre of the pupil is computed by applying the same
+relation as given for region growing in the previous section.  By
+increasing the number of rows and columns for which this procedure is
+carried out and averaging the estimates for the centre position given
+by the row-column pairs, the accuracy of the final position returned
+increases.
+
+Below, the responses the three described edge detecting techniques
+give to edges of varying strengths are evaluated, each technique being
+given separate treatment.
+
+\subsubsection{Thresholding}
+
+The problem with the procedure described in
+Section~\ref{image:edge:threshold} is its supposition of edges forming
+either monotonously increasing or decreasing functions.  Normally, the
+profile of an edge constitutes a curve with spurious increases and
+decreases, but with an overall tendency either to increase or
+decrease.  The ideal step edges are seldom found in real applications.
+Thus, the given procedure will, when applied to a ``real'' image,
+depict the detected edges as ``layers'' of line segments, merely
+indicating the contour of the object whose edges have been detected.
+Accordingly, this procedure is hardly suitable as a basis on which to
+perform the above position computation.
+
+\subsubsection{Gradient Operators}
+
+
+
+\subsubsection{Highpass Filtering}
 
 \subsection{Chosen Approach}
 \label{image:concl:approach}
