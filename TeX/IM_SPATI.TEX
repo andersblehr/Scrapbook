@@ -3,9 +3,9 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:24:49 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 06:52:24 1993
+%%% Last Modified On: Tue Mar 16 02:36:18 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{The Spatial Domain}
@@ -16,7 +16,7 @@ pixels making up an image.  Spatial domain methods are methods that
 operate directly on these pixels.
 
 An image in the spatial domain can be described by the two-dimensional
-light-intensity function $f(x,y)$, where the value at location $(x,y)$
+light-intensity function $f(x,y)$, whose the value at location $(x,y)$
 refers to the intensity (or {\em gray level\/}) of the image at that
 point.  Image-processing functions in the spatial domain may be
 expressed as
@@ -37,15 +37,14 @@ is to use an $n\times n$ subimage of $f$, centred at $(x,y)$, as shown
 in Fig.~\ref{fig:neighbour}.  Other shapes are also possible, but
 square arrays are by far the most predominant, due to their ease of
 implementation.  The centre of the subimage is moved from pixel to
-pixel, applying the operator at each location $(x,y)$ in $f$ to yield
-the value of $g$ at that location.
+pixel, applying the operator at each location $(x,y)$ in $f$.
 
 When the size $n$ of the square neighbourhood is 1, $T$ reduces to a
 gray-level {\em transformation function\/}, where the value of $g$ at
 $(x,y)$ only depends on the value of $f$ at this location.  One widely
 used gray-level transformation function is
 \begin{equation}
-\label{eq:threshold}
+\label{eq:threshold:1}
   g(x,y)=\left\{ \begin{array}{ll} 
                    1 & \mbox{if $f(x,y)\in Z$} \\ 
                    0 & \mbox{otherwise,}
@@ -54,9 +53,8 @@ used gray-level transformation function is
 where $Z$ is a defined set of distinct gray levels, and 0 and 1
 represent the darkest and brightest allowed gray levels, respectively
 (typically 0 and 255).  This is a general formulation of what is
-called {\em thresholding\/}, elaborated further upon in connection
-with {\em pattern recognition\/} issues in
-Section~\ref{image:pattern}.
+called {\em thresholding\/}, elaborated further upon in
+Section~\ref{image:segment:threshold}.
 
 \insertepswidth{mask}{\label{fig:mask}(a) Sub-area of image. (b) A
   $3\times 3$ mask with general coefficients.}{0.8}
@@ -65,13 +63,13 @@ Section~\ref{image:pattern}.
 \label{pg:image:spatial:mask}
 
 One of the principle approaches to the formulation in
-Eq.~\ref{eq:spatial_operator} is the use of so-called {\em masks\/}.
-A mask is a small two-dimensional array ($m\times n$ or, more
-commonly, $n\times n$) whose elements $w_{i}$ are coefficients used to
-compute $g$ at $(x,y)$.  In Fig.~\ref{fig:mask}, a $3\times 3$
-sub-image centred at $(x,y)$ is shown, together with a $3\times 3$
-mask with general coefficients $w_{i}$.  The value of $g$ at this
-location is given by the relation
+Eq.~\ref{eq:spatial_operator} is the use of so-called {\em spatial
+  masks\/}.  A spatial mask, or just mask, is a small two-dimensional
+array ($m\times n$ or, more commonly, $n\times n$) whose elements
+$w_{i}$ are coefficients used to compute $g$ at $(x,y)$.  In
+Fig.~\ref{fig:mask}, a $3\times 3$ sub-image centred at $(x,y)$ is
+shown, together with a $3\times 3$ mask with general coefficients
+$w_{i}$.  The value of $g$ at this location is given by the relation
 \begin{equation}
 \label{eq:mask}
 g(x,y)=T[f(x)]=w_{1}f(x-1,y-1)+w_{2}f(x,y-1)+\cdots+w_{9}f(x+1,y+1)\mbox{.}
@@ -83,13 +81,14 @@ chosen to detect given properties in an image.  For example, if all
 $w_{i}$ are chosen to be 1/9, the gray level of each pixel of the
 resulting image $g$ would be the average of the the gray levels of the
 corresponding pixel in $f$ and its 8 immediate neighbours ({\em
-  8-neighbours\/}).  This is known as {\em averaging\/}, and the
-effect is one of {\em blurring\/} the original image.
+  8-neighbours\/}).  This is known as {\em neighbourhood averaging\/}
+(see Section~\ref{image:noise:averaging}), and the effect is one of
+{\em blurring\/} the original image.
 
-Averaging is only one of several possible mask operations.  By
-properly selecting the coefficients, it is possible to perform a
-variety of useful image operations, among which are {\em noise
-  reduction\/} (Section~\ref{image:noise}) and {\em feature
+Neighbourhood averaging is only one of several possible mask
+operations.  By properly selecting the coefficients, it is possible to
+perform a variety of useful image operations, among which are {\em
+  noise reduction\/} (Section~\ref{image:noise}) and {\em feature
   detection\/} (Section~\ref{image:edge}).  It is worth noting,
 however, that applying a mask at each pixel location in an image is a
 computationally expensive task.  For example, applying the mask of

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:38:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 06:48:28 1993
+%%% Last Modified On: Tue Mar 16 23:17:31 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,6 +154,13 @@ through.  In addition, an ideal lowpass filter tends to introduce what
 is commonly referred to as {\em ringing\/} into the processed image,
 thus further reducing its quality (for an explanation of ringing, see
 for instance~\cite{digim}).
+
+An approach equivalent to lowpass filtering is {\em low frequency
+  emphasis\/}, emphasizing low frequencies without filtering out the
+high frequency end of the Fourier spectrum completely (compare {\em
+  high frequency emphasis\/}, Section~\ref{image:frequency:image}).
+This technique also tends to blur the image, but the blurring is not
+so predominant as for pure lowpass filtering.
 
 \subsubsection{Selective Filtering}
 

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:37:29 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Mar 16 01:56:20 1993
+%%% Last Modified On: Tue Mar 16 01:34:16 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,16 +21,15 @@ four main categories~(\cite{digim}):
   noisy) images.
 \item[Image encoding:] Techniques for representing an image, or the
   information contained in the image, with fewer bits than was needed
-  for the ``raw'' image.
+  for the ``raw'' digitized image.
 \item[Image segmentation, representation, and description:] Image
-  segmentation is the process that subdivides an image into its
-  constituents regions or objects.  To this field belong the areas of
-  pattern recognition and edge detection.
+  segmentation is the process of subdividing an image into its
+  constituents regions or objects.
 \end{description}
 
 {\em Digital\/} image processing deals with the latter three of these
-categories, in that it requires already digitized images as input.  In
-this chapter, an introduction is given to the fields of {\em noise
+categories, in that it already digitized images are required as input.
+In this chapter, an introduction is given to the fields of {\em noise
   reduction\/}, and {\em image segmentation\/}, with an inclination
 towards the problem at hand, namely recognition and location of the
 pupil within a digital image of the eye.  For a thorough problem
@@ -38,10 +37,11 @@ definition, see Section~\ref{algo:problem}.
 
 The structure of the chapter is as follows:
 Sections~\ref{image:spatial} and~\ref{image:frequency} give an
-introduction to the two main categories of image processing methods:
-spatial domain methods and frequency domain methods;
-Section~\ref{image:noise} addresses the problem of noise reduction; in
-Section~\ref{image:pattern}, the problem of pattern recognition is
-presented, and in Section~\ref{image:edge}, some edge detection
-approaches are discussed.  In Section~\ref{image:concl}, a conclusion
-is drawn as to which technique to choose for the problem at hand.
+introduction to the two main categories of image processing
+techniques: {\em spatial domain\/} techniques and {\em frequency
+  domain\/} techniques; Section~\ref{image:noise} addresses the
+problem of noise reduction; in Section~\ref{image:segment}, some
+approaches to image segmentation are discussed, and in
+Section~\ref{image:edge}, some edge detection approaches are
+presented.  In Section~\ref{image:concl}, a conclusion is drawn as to
+which technique to choose for the problem at hand.

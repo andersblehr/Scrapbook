@@ -1,13 +1,196 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% im_pattn.tex --- 
+%%% im_segmt.tex --- 
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 11 06:11:43 1993
+%%% Last Modified On: Tue Mar 16 06:45:29 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Pattern Recognition}
-\label{image:pattern}
+\section{Image Segmentation}
+\label{image:segment}
+
+Image segmentation is the process of dividing an image into its
+constituent parts or objects.  One may be interested just in dividing
+the image into contiguous {\em regions\/}, without paying attention to
+what sort of objects the individual regions represent, or one may want
+to be able to identify and classify one or several parts of the image
+as belonging to specific classes of objects.  This section is only
+concerned with the problem of recognizing parts of images as belonging
+to continuous regions with certain characteristics.  A branch of image
+segmentation which is not touched upon here, is {\em discontinuty
+  detection\/}, which aims at detecting points, lines and edges in an
+image.  However, in Section~\ref{image:edge}, the problem of {\em edge
+  detection\/} is given separate treatment.
+
+\subsection{Thresholding}
+\label{image:segment:threshold}
+
+The foundation of the segmentation technique known as {\em
+  thresholding\/} is the presupposition that objects in an image can
+be segmented out on the basis of their gray levels.  For example, if
+the image consists of a bright object on a dark background, the
+foreground object may be segmented out by classifying all pixels in
+the image whose gray levels are above a certain {\em threshold
+  value\/} $T$ as belonging to it, and all other pixels (i.e., those
+whose gray levels are below the threshold) as belonging to the
+background.  The threshold is said to divide the gray scale into two
+{\em bands\/}.
+
+Generally, thresholding may be viewed as an image operation that
+involves tests against a {\em thresholding function\/} $T$ of the form
+\begin{equation}
+\label{eq:threshold:operator}
+  T=T[x,y,p(x,y),f(x,y)]\mbox{,}
+\end{equation}
+where $f(x,y)$ is the gray level at point $(x,y)$, and $p(x,y)$
+denotes some local property of this point.  A thresholded image
+$g(x,y)$ is then created by defining (compare
+Eq.~(\ref{eq:threshold:1}) on page~\pageref{eq:threshold:1})
+\begin{equation}
+\label{eq:threshold:2}
+  g(x,y)=\left\{
+    \begin{array}{ll}
+      1 & \mbox{if $f(x,y)>T$} \\
+      0 & \mbox{if $f(x,y)\leq T$.}
+    \end{array}\right.
+\end{equation}
+
+When $T$ depends only on $f(x,y)$, the threshold is called {\em
+  global\/}; if it depends on both $f(x,y)$ and $p(x,y)$, it is called
+{\em local\/}; and if it, in addition, depends on the spatial
+coordinates $x$ and $y$, it is called {\em dynamic\/}.  In this
+section, only global thresholding is considered.  That is,
+Eq.~(\ref{eq:threshold:operator}) is in the form
+\begin{equation}
+  T=T[f(x,y)]\mbox{.}
+\end{equation}
+
+If a given image $f$ consists of objects that are, say, darker than
+their background, global thresholding is a natural approach to
+extracting them.  In this case, the gray-level histogram of the image
+would have characteristics similar to the one given in
+Fig.~\ref{fig:threshold:histogram}.  In the figure, the object and
+background pixels are grouped into two dominant modes, one at the dark
+end of the spectrum (the object), and one on the bright end of the
+spectrum (the background).
+\insertepswidth{treshist}{\label{fig:threshold:histogram}Gray-level
+  histogram of an image containing a dark object on a bright
+  background.}{0.5}
+By choosing the threshold value $T$ as indicated in the figure, the
+object of interest is easily separated from its background.
+
+\subsubsection{A Global Thresholding Technique}
+
+By applying Eq.~(\ref{eq:threshold:2}) on the image, the resulting
+image will be a binary one, the object being black and its background
+white (assuming that 0 in the equation is chosen to correspond to
+black, and 1 to correspond to white).  Often one is interested in
+detecting the {\em boundary\/} between the object and the background
+instead of merely having the object stand out from the background.
+This can be done by employing a technique described in~\cite{digim}.
+The idea is to scan the image in the $x$- and $y$-directions
+separately, and each time a change in gray level from one band to the
+other indicates the presence of a boundary point.  The procedure
+performs in two passes as follows:
+
+\paragraph{Pass 1:} For each row in $f(x,y)$, create a corresponding
+row in an intermediate image $g_{1}(x,y)$, using the following
+relation: 
+\begin{equation}
+  g_{1}(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x,y-1)$ are in} \\
+            & \mbox{different bands of the gray scale,} \\
+      L_{B} & \mbox{otherwise,}
+    \end{array}\right.
+\end{equation}
+where $L_{E}$ and $L_{B}$ are specified boundary and background
+levels, respectively.
+
+\paragraph{Pass 2:} For each column in $f(x,y)$, create a
+corresponding column in an intermediate image $g_{2}(x,y)$ using the
+following relation:
+\begin{equation}
+  g_{2}(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if the levels of $f(x,y)$ and $f(x-1,y)$ are in} \\
+            & \mbox{different bands of the gray scale,} \\
+      L_{B} & \mbox{otherwise.}
+    \end{array}\right.
+\end{equation}
+
+The desired image, consisting of the boundary points of the object of
+interest on a uniform background, is then given by the relation:
+\begin{equation}
+  g(x,y)=\left\{
+    \begin{array}{ll}
+      L_{E} & \mbox{if $(g_{1}(x,y)=L_{E}\vee g_{2}(x,y)=L_{E})$,} \\
+      L_{B} & \mbox{otherwise.}
+    \end{array}\right.
+\end{equation}
+
+The problem with thresholding is to choose a value for $T$ which
+separates the object of interest from other parts of the image well
+enough; only in ideal cases are the histogram characteristics of the
+image similar to those of Fig.~\ref{fig:threshold:histogram}.
+Normally, the gray levels of the image assemble in lumps whose dual
+characteristics are hardly discernable.  Consequenctly, care has to be
+taken when choosing the threshold level $T$.
+
+\subsection{Region Growing}
+\label{image:segment:region}
+
+{\em Region growing\/} is an algorithm which groups pixels or
+subregions into larger regions according to criteria of {\em
+  similarity\/} and {\em connectivity\/}.  The criterion of similarity
+says that only pixels or subregions having a specific set of
+properties can be added to the growing region, and the criterion of
+connectivity says that only pixels or subregions that constitute
+immediate neighbours of the growing region can be added to it.
+
+The simplest approach to region growing is called {\em pixel
+  aggregation\/}, where the starting point is a so-called {\em seed
+  point\/} from which a region is grown by appending to the seed point
+neighbouring pixels having similar properties to it.  It is of course
+also possible to apply more than one seed point, each at a different
+location in the image, thus having several regions grow
+simultaneously.  This is referred to as {\em multiple\/} region
+growing, as opposed to {\em single\/} region growing, applying only
+one seed point.  In the following, only single region growing is
+discussed.  The principles presented are, however, easily extended to
+multiple region growing.
+
+Two immediate problems with region growing are the selection of a seed
+point which properly represents the region of interest, and the
+selection of suitable properties for including new points during the
+growing process.  
+
+If one has {\em a priori\/} knowledge of the properties of the region
+of interest, one approach in selecting the seed point is to apply a
+search strategy on the image, searching for the first pixel which
+satisfies these properties, and then using this pixel as seed point.
+With this approach there is of course the danger that the pixel found
+does not belong to the region of interest, since single pixels outside
+the region of interest may share properties with it.  Thus it is
+important to equip the search strategy with a very tight stop
+criterion, in order to minimize the chance of erroneously choosing a
+non-region seed point.  A usual similarity criterion for the inclusion
+of new points during the growing process is that the gray level of a
+pixel to be included does not differ from that of the seed point by
+more than a specified amount.  The obvious stop criterion for the
+region growing procedure is to stop when no more pixels satisfy the
+criteria for inclusion in the region.
+
+The advantage of region growing is its degree of automation.  It can
+be compared to filling an unevenly shaped pool with water: Once you
+start pouring water into it, you can be certain that the water will
+protrude into every far off corner of the pool, thus defining a
+continuous surface entirely covering the ``region of interest'', the
+floor of the pool.  The problem is that you have to know where to
+start pouring: The seed point.
+
+\subsection{Template Matching}
+\label{image:segment:template}
 
