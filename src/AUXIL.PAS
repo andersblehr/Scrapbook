@@ -16,6 +16,8 @@ const specialKey                : boolean = false;
 
 function readKey : char;
 
+function homePath(fileName : string) : string;
+
 function picturePath(fileName : string) : string;
 
 function pcxPath(fileName : string) : string;
@@ -55,8 +57,8 @@ IMPLEMENTATION
 
 uses crt;
 
-
-const picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
+const homeDirectory             = 'c:\user\blehr\';
+      picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
       pcxDirectory              = 'c:\user\blehr\fag\diplom\bilder\pcx\';
       palDirectory              = 'c:\user\blehr\fag\diplom\bilder\pal\';
 
@@ -102,6 +104,13 @@ begin
     readKey:=crt.readKey
   else
     readKey:=aKey
+end;
+
+
+function homePath(fileName : string) : string;
+
+begin
+  homePath:=homeDirectory+fileName
 end;
 
 
