@@ -82,57 +82,65 @@ end;
 
 procedure init;
 
-var   parameter                 : string;
-      radiusSet                 : boolean;
-      thresholdSet              : boolean;
-      pictureFile               : file;
+var   pictureFile               : file;
       buffer                    : bufferArray;
       i,j                       : word;
 
 
-  function getParameterValue(parameterString : string;
-                         var flag            : boolean) : byte;
+  procedure getParameters(numberOfParameters : word);
 
-  var   value                     : byte;
-        result                    : integer;
+  var   i                         : byte;
+        thisParameter             : string;
+        radiusSet                 : boolean;
+        thresholdSet              : boolean;
+
+
+    function getParameterValue(parameterString : string;
+                           var flag            : boolean) : byte;
+
+    var   value                     : byte;
+          result                    : integer;
+
+    begin
+      val(copy(parameterString,3,length(parameterString)-2),value,result);
+      if (result=0) then
+        begin
+          flag:=true;
+          getParameterValue:=value
+        end
+      else
+        fatalError('Illegal parameter value, must be a number!')
+    end;
+
 
   begin
-    val(copy(parameterString,3,length(parameterString)-2),value,result);
-    if (result=0) then
+    radiusSet:=false;
+    thresholdSet:=false;
+    for i:=1 to numberOfParameters-1 do
       begin
-        flag:=true;
-        getParameterValue:=value
-      end
-    else
-      fatalError('Illegal parameter value!')
+        thisParameter:=paramStr(i);
+        if (thisParameter[1]='-') then
+          case thisParameter[2] of
+            'r' : filterRadius:=getParameterValue(thisParameter,radiusSet);
+            't' : threshold:=getParameterValue(thisParameter,thresholdSet)
+          else
+            fatalError('Illegal option: -'+thisParameter[2])
+          end
+        else
+          fatalError('Cannot specify more than one file: '+thisParameter)
+      end;
+    if (not radiusSet) then
+      filterRadius:=defaultFilterRadius;
+    if (not thresholdSet) then
+      threshold:=defaultThreshold;
+    fileName:=picturePath(paramStr(numberOfParameters));
   end;
 
 
 begin
-  radiusSet:=false;
-  thresholdSet:=false;
   if (paramCount<>0) then
     begin
-      for i:=1 to paramCount do
-        begin
-          parameter:=paramStr(i);
-          if (parameter[1]='-') then
-            case parameter[2] of
-              'r' : filterRadius:=getParameterValue(parameter,radiusSet);
-              't' : threshold:=getParameterValue(parameter,thresholdSet)
-            else
-              fatalError('Illegal option: -'+parameter[2])
-            end
-          else
-            begin
-              fileName:=picturePath(paramStr(i));
-              i:=paramCount
-            end
-        end;
-      if (not radiusSet) then
-        filterRadius:=defaultFilterRadius;
-      if (not thresholdSet) then
-        threshold:=defaultThreshold;
+      getParameters(paramCount);
       if (fileExists(fileName)) then
         begin
           initSVGAGraphics;
@@ -158,7 +166,7 @@ begin
         fatalError('Picture file not found!')
     end
   else
-    fatalError('Usage: filter [-r<filter radius>][-t<threshold>] file (no extension)')
+    fatalError('Usage: filter [-r<filter radius>][-t<threshold>] file[.pic]')
 end;
 
 
