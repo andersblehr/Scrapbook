@@ -48,7 +48,7 @@ procedure grClear(x1,y1,x2,y2 : word);
 
 procedure grWriteChar(x,y : word; aChar : char);
 
-procedure makePoint(anX,anY : word; aPoint : pointType);
+procedure makePoint(anX,anY : word; var aPoint : pointType);
 
 procedure beep(frequency,time : word);
 
@@ -338,7 +338,7 @@ begin
 end;
 
 
-procedure makePoint(anX,anY : word; aPoint : pointType);
+procedure makePoint(anX,anY : word; var aPoint : pointType);
 
 begin
   aPoint.x:=anX;
