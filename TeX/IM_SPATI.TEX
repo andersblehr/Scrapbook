@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:24:49 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Mar 27 20:26:19 1993
+%%% Last Modified On: Fri Apr  9 11:28:17 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -14,6 +14,9 @@
 The term {\em spatial domain\/} refers to the entire aggregate of
 pixels making up an image.  Spatial domain methods are methods that
 operate directly on these pixels.
+
+\subsection{General Overview}
+\label{image:spatial:overview}
 
 An image in the spatial domain can be described by the two-dimensional
 light-intensity function $f(x,y)$, whose the value at location $(x,y)$
@@ -58,11 +61,8 @@ represent the darkest and brightest allowed gray levels, respectively
 called {\em thresholding\/}, elaborated further upon in
 Section~\ref{image:segment:threshold}.
 
-\insertepswidth{mask}{\label{fig:mask}(a) Sub-area of image. (b) A
-  $3\times 3$ mask with general coefficients.}{0.8}
-
-\subsubsection{Spatial Masks}
-\label{pg:image:spatial:mask}
+\subsection{Spatial Masks}
+\label{image:spatial:mask}
 
 One of the principle approaches to the formulation in
 Eq.~(\ref{eq:spatial_operator}) is the use of so-called {\em spatial
@@ -105,3 +105,7 @@ are required to compute $g(x,y)$ at a given location $(x,y)$.  Thus,
 convolving a $512\times 512$ image with a $3\times 3$ mask like the
 one in Fig.~\ref{fig:mask}(b), requires a total of 2,359,296
 multiplications and 2,097,152 additions.
+
+\insertepswidth{mask}{\label{fig:mask}(a) Sub-area of image. (b) A
+  $3\times 3$ mask with general coefficients.
+  (From~\protect\cite{digim})}{0.8}
