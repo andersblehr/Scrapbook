@@ -1,4 +1,4 @@
-program readPCX;
+program PCXView;
 
 uses crt,graph,defs,auxil,SVGA;
 
