@@ -11,7 +11,7 @@ begin
       setBlackAndWhitePalette;
       new(eyeImage,initStoredImage(paramStr(1)));
       eyeImage^.setPixelSize(1);
-      eyeImage^.drawImage(center,center);
+      eyeImage^.drawImage(center,center,paramStr(1));
       readKey;
       dispose(eyeImage,done);
       closeGraph
