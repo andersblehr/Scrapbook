@@ -7,7 +7,7 @@ const displayCenterPoint        : boolean = false;
 var   xSize                     : word;
       ySize                     : word;
 
-      aPupilPoint               : pointPtr;
+      pupilPoint                : pointPtr;
       pointToDisplay            : pointPtr;
 
 
@@ -63,6 +63,8 @@ var   fileName                  : string;
   procedure initVariables;
 
   begin
+    new(pupilPoint);
+    new(pointToDisplay);
     assign(inputFile,fileName);
     reset(inputFile,1);
     blockRead(inputFile,buffer,4);
@@ -78,7 +80,7 @@ begin
       getParameters(paramCount);
       if fileExists(fileName) then
         begin
-          initSVGAGraphics;
+          initSVGAGraphics(mode1024x768);
           setBlackAndWhitePalette;
           initVariables;
           getMem(image,4*ySize);
@@ -367,13 +369,12 @@ var   ascendingLine             : sobelLine;
 
 
 begin
-  aPupilPoint:=findPupilPoint;
-  if (aPupilPoint<>nil) then
+  if findPupilPoint(pupilPoint) then
     begin
       if displayCenterPoint then
-        pointToDisplay:=findPosition(aPupilPoint)
+        findPosition(pupilPoint,pointToDisplay)
       else
-        pointToDisplay:=aPupilPoint;
+        pointToDisplay:=pupilPoint;
       initVariables;
       applySobelMasks;
       presentLines
@@ -394,7 +395,7 @@ begin
   setTextStyle(defaultFont,horizDir,1);
   setTextJustify(leftText,topText);
   setColor(63);
-  if (pointToDisplay=aPupilPoint) then
+  if (pointToDisplay=pupilPoint) then
     positionMessage:='Position of pupil point'
   else
     positionMessage:='Center position found';
@@ -411,6 +412,13 @@ var   i                         : word;
 begin
   readKey;
   closeGraph;
+  if (pointToDisplay=pupilPoint) then
+    dispose(pointToDisplay)
+  else
+    begin
+      dispose(pupilPoint);
+      dispose(pointToDisplay)
+    end;
   for i:=1 to ySize do
     freeMem(image^[i],xSize);
   freeMem(image,4*ySize)
