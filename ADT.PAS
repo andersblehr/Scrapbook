@@ -21,8 +21,7 @@ type  basisOPtr                 = ^basisO;
         destructor   done; virtual;
         procedure    setKey(aString : string);
         procedure    getData; virtual;
-        function     key        : string;
-        function     vKey       : string; virtual;
+        function     key        : string; virtual;
         function     leftChild  : stringNodeOPtr;
         function     rightChild : stringNodeOPtr;
       end;
@@ -225,13 +224,6 @@ begin
 end;
 
 
-function stringNodeO.vKey : string;
-
-begin
-  vKey:=keyValue^
-end;
-
-
 function stringNodeO.leftChild : stringNodeOPtr;
 
 begin
@@ -274,7 +266,7 @@ procedure stringTreeO.addNode(aNode : stringNodeOPtr);
 
   begin
     if (aPtr<>nil) then
-      if aNode^.vKey<=aPtr^.vKey then
+      if aNode^.key<=aPtr^.key then
         traverse(aPtr^.left)
       else
         traverse(aPtr^.right)
@@ -300,7 +292,7 @@ procedure stringTreeO.dump;
     if aPtr<>nil then
       begin
         traverse(aPtr^.left);
-        writeLn(aPtr^.vKey);
+        writeLn(aPtr^.key);
         traverse(aPtr^.right)
       end
   end;
