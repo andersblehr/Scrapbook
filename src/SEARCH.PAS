@@ -9,7 +9,9 @@ const maxSize                   = 512;
       nGrayLevels               = 64;
 
       nLeapsMax                 = 10;
+      nEstimatesMax             = 55;
 
+      null                      = 0;
       west                      = -1;
       east                      = 1;
       north                     = -1;
@@ -42,7 +44,6 @@ type  bufferType                = array[1..maxSize] of byte;
 
 const lakeLevel                 : byte = 1;   { -l option }
       sobelThreshold            : byte = 5;   { -s option }
-      nonSearchRadius           : byte = 1;   { -q option }
 
       minPupilRadiusFraction    : real = 10;  { Per cent  }
       maxPupilRadiusFraction    : real = 20;  { Per cent  }
@@ -68,6 +69,8 @@ var   image                     : pixelMatrixPtr;
 
       minPupilRadius            : word;
       octopusRadius             : word;
+      nonSearchRadius           : word;
+      diagonalNonSearchRadius   : word;
       inSeaThreshold            : word;
 
       startingPoints            : pointArrayPtr;
@@ -224,8 +227,6 @@ begin
             lakeLevel:=trunc(variable^.value)
           else if (variable^.name='sobelThreshold') then
             sobelThreshold:=trunc(variable^.value)
-          else if (variable^.name='nonSearchRadius') then
-            nonSearchRadius:=trunc(variable^.value)-1
           else if (variable^.name='minPupilRadiusFraction') then
             minPupilRadiusFraction:=variable^.value
           else if (variable^.name='maxPupilRadiusFraction') then
@@ -390,15 +391,121 @@ end;
 function findPosition(pupilPoint : pointType;
                   var position   : pointType) : boolean;
 
+var   nEstimates                : word;
+      previousEstimate          : pointType;
+      break                     : boolean;
 
-  function findPosFromPoint(aPoint       : pointType;
-                        var thisPosition : pointType;
-                            nToGo        : byte) : boolean;
 
-  var   failure                   : boolean;
-        NWSECentre                : pointType;
+  procedure iterateOnce(origin   : pointType;
+                    var estimate : pointType);
+
+  var   NSCentre                  : word;
+        WECentre                  : word;
+
+
+    procedure NS_getMiddlePoint(x,y : word);
+
+    var   NPoint                    : word;
+          SPoint                    : word;
+
+
+      procedure N_searchEdge(x,y : word);
+
+      begin
+        y:=y-nonSearchRadius;
+        while wet[image^[y-2]^[x]] do
+          y:=y-1;
+        repeat
+          y:=y-1;
+          if showSearch then
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,north,null)>=sobelThreshold);
+        NPoint:=y
+      end;
+
+
+      procedure S_searchEdge(x,y : word);
+
+      begin
+        y:=y+nonSearchRadius;
+        while wet[image^[y+2]^[x]] do
+          y:=y+1;
+        repeat
+          y:=y+1;
+          if showSearch then
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,south,null)>=sobelThreshold);
+        SPoint:=y
+      end;
+
+
+    begin
+      N_searchEdge(x,y);
+      S_searchEdge(x,y);
+      NSCentre:=NPoint+((SPoint-NPoint) div 2)
+    end;
+
+
+    procedure WE_getMiddlePoint(x,y : word);
+
+    var   WPoint                    : word;
+          EPoint                    : word;
+
+
+      procedure W_searchEdge(x,y : word);
+
+      begin
+        x:=x-nonSearchRadius;
+        while wet[image^[y]^[x-2]] do
+          x:=x-1;
+        repeat
+          x:=x-1;
+          if showSearch then
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,null,west)>=sobelThreshold);
+        WPoint:=x
+      end;
+
+
+      procedure E_searchEdge(x,y : word);
+
+      begin
+        x:=x+nonSearchRadius;
+        while wet[image^[y]^[x+2]] do
+          x:=x+1;
+        repeat
+          x:=x+1;
+          if showSearch then
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,null,east)>=sobelThreshold);
+        EPoint:=x
+      end;
+
+
+    begin
+      W_searchEdge(x,y);
+      E_searchEdge(x,y);
+      WECentre:=WPoint+((EPoint-WPoint) div 2);
+    end;
+
+
+  begin
+    with origin do
+      begin
+        NS_getMiddlePoint(x,y);
+        WE_getMiddlePoint(x,y);
+        estimate.x:=(nEstimates*estimate.x+WECentre) div (nEstimates+1);
+        estimate.y:=(nEstimates*estimate.y+NSCentre) div (nEstimates+1);
+        nEstimates:=nEstimates+1
+      end
+  end;
+
+
+  procedure iterateTwice(origin   : pointType;
+                     var estimate : pointType);
+
+  var   NWSECentre                : pointType;
         SWNECentre                : pointType;
-        nextPosition              : pointType;
 
 
     procedure NWSE_getMiddlePoint(x,y : word);
@@ -410,15 +517,19 @@ function findPosition(pupilPoint : pointType;
       procedure NW_searchEdge(x,y : word);
 
       begin
-        x:=x-nonSearchRadius;
-        y:=y-nonSearchRadius;
+        x:=x-diagonalNonSearchRadius;
+        y:=y-diagonalNonSearchRadius;
+        while wet[image^[y-2]^[x-2]] do
+          begin
+            x:=x-1;
+            y:=y-1
+          end;
         repeat
           x:=x-1;
           y:=y-1;
           if showSearch then
-            markPosition(x,y,asPoint);
-          failure:=((x<1) or (y<1))
-        until (failure or (applySobelMask(x,y,north,west)>=sobelThreshold));
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,north,west)>=sobelThreshold);
         NWPoint.x:=x;
         NWPoint.y:=y
       end;
@@ -427,15 +538,19 @@ function findPosition(pupilPoint : pointType;
       procedure SE_searchEdge(x,y : word);
 
       begin
-        x:=x+nonSearchRadius;
-        y:=y+nonSearchRadius;
+        x:=x+diagonalNonSearchRadius;
+        y:=y+diagonalNonSearchRadius;
+        while wet[image^[y+2]^[x+2]] do
+          begin
+            x:=x+1;
+            y:=y+1
+          end;
         repeat
           x:=x+1;
           y:=y+1;
           if showSearch then
-            markPosition(x,y,asPoint);
-          failure:=((x>xSize) or (y>ySize))
-        until (failure or (applySobelMask(x,y,south,east)>=sobelThreshold));
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,south,east)>=sobelThreshold);
         SEPoint.x:=x;
         SEPoint.y:=y
       end;
@@ -443,15 +558,9 @@ function findPosition(pupilPoint : pointType;
 
     begin
       NW_searchEdge(x,y);
-      if (not failure) then
-        begin
-          SE_searchEdge(x,y);
-          if (not failure) then
-            begin
-              NWSECentre.x:=NWPoint.x+((SEPoint.x-NWPoint.x) div 2);
-              NWSECentre.y:=NWPoint.y+((SEPoint.y-NWPoint.y) div 2)
-            end
-        end
+      SE_searchEdge(x,y);
+      NWSECentre.x:=NWPoint.x+((SEPoint.x-NWPoint.x) div 2);
+      NWSECentre.y:=NWPoint.y+((SEPoint.y-NWPoint.y) div 2)
     end;
 
 
@@ -464,15 +573,19 @@ function findPosition(pupilPoint : pointType;
       procedure SW_searchEdge(x,y : word);
 
       begin
-        x:=x-nonSearchRadius;
-        y:=y+nonSearchRadius;
+        x:=x-diagonalNonSearchRadius;
+        y:=y+diagonalNonSearchRadius;
+        while wet[image^[y+2]^[x-2]] do
+          begin
+            x:=x-1;
+            y:=y+1
+          end;
         repeat
           x:=x-1;
           y:=y+1;
           if showSearch then
-            markPosition(x,y,asPoint);
-          failure:=((x<1) or (y>ySize))
-        until (failure or (applySobelMask(x,y,south,west)>=sobelThreshold));
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,south,west)>=sobelThreshold);
         SWPoint.x:=x;
         SWPoint.y:=y
       end;
@@ -481,15 +594,19 @@ function findPosition(pupilPoint : pointType;
       procedure NE_searchEdge(x,y : word);
 
       begin
-        x:=x+nonSearchRadius;
-        y:=y-nonSearchRadius;
+        x:=x+diagonalNonSearchRadius;
+        y:=y-diagonalNonSearchRadius;
+        while wet[image^[y-2]^[x+2]] do
+          begin
+            x:=x+1;
+            y:=y-1
+          end;
         repeat
           x:=x+1;
           y:=y-1;
           if showSearch then
-            markPosition(x,y,asPoint);
-          failure:=((x>xSize) or (y<1))
-        until (failure or (applySobelMask(x,y,north,east)>=sobelThreshold));
+            markPosition(x,y,asPoint)
+        until (applySobelMask(x,y,north,east)>=sobelThreshold);
         NEPoint.x:=x;
         NEPoint.y:=y
       end;
@@ -497,49 +614,46 @@ function findPosition(pupilPoint : pointType;
 
     begin
       SW_searchEdge(x,y);
-      if (not failure) then
-        begin
-          NE_searchEdge(x,y);
-          if (not failure) then
-            begin
-              SWNECentre.x:=SWPoint.x+((NEPoint.x-SWPoint.x) div 2);
-              SWNECentre.y:=SWPoint.y+((NEPoint.y-SWPoint.y) div 2)
-            end
-        end
+      NE_searchEdge(x,y);
+      SWNECentre.x:=SWPoint.x+((NEPoint.x-SWPoint.x) div 2);
+      SWNECentre.y:=SWPoint.y+((NEPoint.y-SWPoint.y) div 2)
     end;
 
 
   begin
-    failure:=false;
-    with aPoint do
+    with origin do
       begin
         NWSE_getMiddlePoint(x,y);
-        if (not failure) then
-          SWNE_getMiddlePoint(x,y);
-        if (not failure) then
-          begin
-            thisPosition.x:=NWSECentre.x+SWNECentre.x-x;
-            thisPosition.y:=NWSECentre.y+SWNECentre.y-y;
-            findPosFromPoint:=true;
-            if ((nToGo>0) and
-                findPosFromPoint(thisPosition,nextPosition,nToGo-1)) then
-              begin
-                thisPosition.x:=(thisPosition.x+nextPosition.x) div 2;
-                thisPosition.y:=(thisPosition.y+nextPosition.y) div 2
-              end
-          end
-        else
-          begin
-            thisPosition.x:=0;
-            thisPosition.y:=0;
-            findPosFromPoint:=false
-          end
+        SWNE_getMiddlePoint(x,y);
+        estimate.x:=(nEstimates*estimate.x+
+                     (NWSECentre.x+SWNECentre.x-x)) div (nEstimates+1);
+        estimate.y:=(nEstimates*estimate.y+
+                     (NWSECentre.y+SWNECentre.y-y)) div (nEstimates+1);
+        nEstimates:=nEstimates+1
       end
   end;
 
 
 begin
-  findPosition:=findPosFromPoint(pupilPoint,position,nAdjustments)
+  nEstimates:=0;
+  position.x:=0;
+  position.y:=0;
+  repeat
+    previousEstimate:=position;
+    iterateOnce(pupilPoint,position);
+    break:=((nEstimates>nEstimatesMax) or
+            ((position.x=previousEstimate.x) and
+             (position.y=previousEstimate.y)));
+    if (not break) then
+      begin
+        iterateTwice(pupilPoint,position);
+        break:=((nEstimates>nEstimatesMax) or
+                ((position.x=previousEstimate.x) and
+                 (position.y=previousEstimate.y)));
+        pupilPoint:=position
+      end
+  until break;
+  findPosition:=(nEstimates<=nEstimatesMax)
 end;
 
 
@@ -548,8 +662,30 @@ function applySobelMask(x,y                     : word;
 
 begin
   case northOrSouth of
+    null :
+      case eastOrWest of
+        null : applySobelMask:=0;
+        west : applySobelMask:=   map[image^[y-2]^[x-2]]-
+                                  map[image^[y-2]^[x+2]]+
+                                2*map[image^[y  ]^[x-2]]-
+                                2*map[image^[y  ]^[x+2]]+
+                                  map[image^[y+2]^[x-2]]-
+                                  map[image^[y+2]^[x+2]];
+        east : applySobelMask:=  -map[image^[y-2]^[x-2]]+
+                                  map[image^[y-2]^[x+2]]-
+                                2*map[image^[y  ]^[x-2]]+
+                                2*map[image^[y  ]^[x+2]]-
+                                  map[image^[y+2]^[x-2]]+
+                                  map[image^[y+2]^[x+2]]
+      end;
     north :
       case eastOrWest of
+        null : applySobelMask:=   map[image^[y-2]^[x-2]]+
+                                2*map[image^[y-2]^[x  ]]+
+                                  map[image^[y-2]^[x+2]]-
+                                  map[image^[y+2]^[x-2]]-
+                                2*map[image^[y+2]^[x  ]]-
+                                  map[image^[y+2]^[x+2]];
         west : applySobelMask:= 2*map[image^[y-2]^[x-2]]+
                                   map[image^[y-2]^[x  ]]+
                                   map[image^[y  ]^[x-2]]-
@@ -565,6 +701,12 @@ begin
       end;
     south :
       case eastOrWest of
+        null : applySobelMask:=  -map[image^[y-2]^[x-2]]-
+                                2*map[image^[y-2]^[x  ]]-
+                                  map[image^[y-2]^[x+2]]+
+                                  map[image^[y+2]^[x-2]]+
+                                2*map[image^[y+2]^[x  ]]+
+                                  map[image^[y+2]^[x+2]];
         west : applySobelMask:=  -map[image^[y-2]^[x  ]]-
                                 2*map[image^[y-2]^[x+2]]+
                                   map[image^[y  ]^[x-2]]-
@@ -721,6 +863,12 @@ begin
   randomize;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
   octopusRadius:=round(xSize*octopusRadiusFraction/100);
+{
+  nonSearchRadius:=trunc(octopusRadius/sqrt(2));
+  diagonalNonSearchRadius:=trunc(nonSearchRadius/sqrt(2));
+}
+  nonSearchRadius:=1;
+  diagonalNonSearchRadius:=1;
   inSeaThreshold:=round(4*wetFraction*pred(octopusRadius))+2;
   initPointMatrix;
   for i:=0 to lakeLevel do
