@@ -15,6 +15,12 @@ type  pointPtr                  = ^point;
       charSet                   = set of char;
 
 
+function picturePath(fileName : string) : string;
+
+function pcxPath(fileName : string) : string;
+
+function palettePath(fileName : string) : string;
+
 function nextWord(var aLine : string; whiteSpace : charSet) : string;
 
 function appendExtension(path : pathStr; wantedExtension : extStr) : pathStr;
@@ -47,6 +53,62 @@ procedure fatalError(errorMessage : string);
 IMPLEMENTATION
 
 uses crt,graph,keys;
+
+
+const picDirectory              = 'c:\user\blehr\fag\diplom\bilder\';
+      pcxDirectory              = 'c:\user\blehr\fag\diplom\bilder\pcx\';
+      palDirectory              = 'c:\user\blehr\fag\diplom\bilder\pal\';
+
+
+(**************************************************************************
+ *                                                                        *
+ *    Internals                                                           *
+ *                                                                        *
+ **************************************************************************)
+
+
+function possibleLackingExtension(path             : pathStr;
+                                  correctExtension : extStr  ) : extStr;
+
+var   ignoreDirectory           : dirStr;
+      ignoreFileName            : nameStr;
+      extension                 : extStr;
+
+begin
+  fSplit(path,ignoreDirectory,ignoreFileName,extension);
+  if ((extension='') or (extension<>correctExtension)) then
+    possibleLackingExtension:=correctExtension
+  else
+    possibleLackingExtension:=''
+end;
+
+
+(**************************************************************************
+ *                                                                        *
+ *    Implementation                                                      *
+ *                                                                        *
+ **************************************************************************)
+
+
+function picturePath(fileName : string) : string;
+
+begin
+  picturePath:=picDirectory+fileName+possibleLackingExtension(fileName,'.pic')
+end;
+
+
+function pcxPath(fileName : string) : string;
+
+begin
+  pcxPath:=pcxDirectory+fileName+possibleLackingExtension(fileName,'.pcx')
+end;
+
+
+function palettePath(fileName : string) : string;
+
+begin
+  palettePath:=palDirectory+fileName+possibleLackingExtension(fileName,'.pal')
+end;
 
 
 function nextWord(var aLine : string; whiteSpace : charSet) : string;
