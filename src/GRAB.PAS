@@ -17,8 +17,8 @@ const
   delay2    = 124; {Verzoegerung bis Bildanfang in Zeile 1}
   delay3    = 248; {Verz. zum Ausblenden der Synchronbalken}
 
-  inport    = $310;   {Adresse des c't-Mini-Frame-Grabbers}
-  outport   = $310;
+  inport    = $320;   {Adresse des c't-Mini-Frame-Grabbers}
+  outport   = $320;
 
   text1 : string =
 'ESC = Stop, S = Save, H/D = heller/dunkler, +/- = Synch-Justage.';
@@ -48,6 +48,8 @@ var
   oldmode, outdat, hori, verti_pixels,
   horiz_pixels, hell_offset, x, y, c,
   h_adr, v_adr, wert                  : integer;
+
+  picturesSaved                       : word;
 
 procedure grafic_on;
 var x : integer;
@@ -163,6 +165,21 @@ begin
   intr($10,regs); getpix:=regs.al and $3f;
 end;
 
+
+function imageNumber : string;
+
+var   numberAsString            : string;
+      i                         : byte;
+
+begin
+  str(picturesSaved,numberAsString);
+  for i:=1 to 3-length(numberAsString) do
+    numberAsString:='0'+numberAsString;
+  inc(picturesSaved);
+  imageNumber:=numberAsString
+end;
+
+
 procedure save_pcx;
 var
   x, y, z     : integer;
@@ -170,7 +187,7 @@ var
   label pcx1, pcx2, pcx3, pcx4, pcx5, pcx8, pcx9, pcx10, savepal;
 begin
 
-  filename:='PBAS2PCX.PCX';
+  filename:='c:\user\blehr\fag\diplom\bilder\pcx\image'+imageNumber+'.pcx';
   assign (fi,filename);
   rewrite(fi,1);
 
@@ -263,6 +280,8 @@ begin
   hell_offset:=0;           {keine Manipulation der Grauwerte}
 
   for c:=0 to sizeof(pal)-1 do pal[c]:=$c7;  {Palette fuellen}
+
+  picturesSaved:=0;
 
   grafic_on;
 
