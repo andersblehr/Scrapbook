@@ -2,15 +2,10 @@ program lines;
 
 uses crt,graph,paths,auxil,search,SVGA;
 
-type  sobelLinePtr              = ^sobelLine;
-      sobelLine                 = array[1..maxSize] of shortInt;
-
 const displayCenterPoint        : boolean = false;
 
 var   xSize                     : word;
       ySize                     : word;
-      sobelXLine                : sobelLinePtr;
-      sobelYLine                : sobelLinePtr;
 
       pointToDisplay            : pointPtr;
 
@@ -95,9 +90,7 @@ begin
                   putPixel(j,i,buffer[j])
                 end
             end;
-          close(inputFile);
-          getMem(sobelXLine,xSize);
-          getMem(sobelYLine,ySize)
+          close(inputFile)
         end
       else
         fatalError('Image file not found!')
@@ -109,31 +102,65 @@ end;
 
 procedure treatLines;
 
-var   minSobel                  : word;
+type  sobelLinePtr              = ^sobelLine;
+      sobelLine                 = array[1..maxSize] of word;
+
+var   ascendingLine             : sobelLinePtr;
+      descendingLine            : sobelLinePtr;
+
+      ascendingLineLeftSize     : word;
+      ascendingLineRightSize    : word;
+      descendingLineLeftSize    : word;
+      descendingLineRightSize   : word;
+      ascendingLineSize         : word;
+      descendingLineSize        : word;
+
+      minSobel                  : word;
       maxSobel                  : word;
       sobelExtent               : word;
 
 
   procedure applySobelMasks;
 
-  const horizontal                = 0;
-        vertical                  = 1;
-
-  var   pos                       : word;
+  var   i                         : integer;
 
 
-    function applySobelMaskAt(x,y : word; direction : byte) : byte;
+    function getLineSize(northOrSouth,eastOrWest : shortInt) : word;
 
-    const xSobelMask                = 0;
-          ySobelMask                = 1;
 
-    var   sobelValue                : shortInt;
+      function min(x1,x2 : integer) : integer;
+
+      begin
+        if (x1<x2) then
+          min:=x1
+        else
+          min:=x2
+      end;
+
 
     begin
-      case direction of
-        horizontal : sobelValue:=applySobelMask(x,y,ySobelMask);
-        vertical   : sobelValue:=applySobelMask(x,y,xSobelMask)
-      end;
+      with pointToDisplay^ do
+        case northOrSouth of
+          north :
+            case eastOrWest of
+              east : getLineSize:=min(xSize-x,y);
+              west : getLineSize:=min(x,y)
+            end;
+          south :
+            case eastOrWest of
+              east : getLineSize:=min(xSize-x,ySize-y);
+              west : getLineSize:=min(x,ySize-y)
+            end
+        end
+    end;
+
+
+    function applySobelMaskAt(x,y : word; mask : shortInt) : word;
+
+    var   sobelValue                : word;
+
+    begin
+      sobelValue:=applySobelMask(x,y,mask);
       if (sobelValue>maxSobel) then
         maxSobel:=sobelValue;
       if (sobelValue<minSobel) then
@@ -143,18 +170,26 @@ var   minSobel                  : word;
 
 
   begin
-    minSobel:=255;
-    maxSobel:=0;
-    sobelXLine^[1]:=1;
-    sobelYLine^[1]:=1;
-    sobelXLine^[xSize]:=1;
-    sobelYLine^[ySize]:=1;
     with pointToDisplay^ do
       begin
-        for pos:=2 to xSize-1 do
-          sobelXLine^[pos]:=applySobelMaskAt(pos,y,horizontal);
-        for pos:=2 to ySize-1 do
-          sobelYLine^[pos]:=applySobelMaskAt(x,pos,vertical)
+        ascendingLineLeftSize:=getLineSize(north,west);
+        ascendingLineRightSize:=getLineSize(south,east);
+        descendingLineLeftSize:=getLineSize(south,west);
+        descendingLineRightSize:=getLineSize(north,east);
+        ascendingLineSize:=ascendingLineLeftSize+ascendingLineRightSize-2;
+        descendingLineSize:=descendingLineLeftSize+descendingLineRightSize-2;
+        getMem(ascendingLine,ascendingLineSize);
+        getMem(descendingLine,descendingLineSize);
+        minSobel:=255;
+        maxSobel:=0;
+        ascendingLine^[1]:=1;
+        ascendingLine^[ascendingLineSize]:=1;
+        descendingLine^[1]:=1;
+        descendingLine^[descendingLineSize]:=1;
+        for i:=-(ascendingLineLeftSize-2) to (ascendingLineRightSize-2) do
+          ascendingLine^[ascendingLineLeftSize+i]:=applySobelMaskAt(x+i,y+i,ascendingMask);
+        for i:=-(descendingLineLeftSize-2) to (descendingLineRightSize-2) do
+          descendingLine^[descendingLineLeftSize+i]:=applySobelMaskAt(x+i,y-i,descendingMask)
       end;
     sobelExtent:=maxSobel-minSobel
   end;
@@ -172,10 +207,10 @@ var   minSobel                  : word;
         unitSobelAxis             : real;
         pixelSpacing              : real;
         sobelSpacing              : real;
-        xUnit                     : real;
-        yUnit                     : real;
-        xSpacing                  : real;
-        ySpacing                  : real;
+        ascendingUnit             : real;
+        descendingUnit            : real;
+        ascendingSpacing          : real;
+        descendingSpacing         : real;
 
 
     procedure initVariables;
@@ -187,10 +222,10 @@ var   minSobel                  : word;
       lengthOf2ndAxis:=round((getMaxY-ySize)/2)-20;
       leftStart:=5;
       rightStart:=round(getMaxX/2)+5;
-      xUnit:=lengthOf1stAxis/xSize;
-      yUnit:=lengthOf1stAxis/ySize;
-      xSpacing:=10*xUnit;
-      ySpacing:=10*yUnit;
+      ascendingUnit:=lengthOf1stAxis/ascendingLineSize;
+      descendingUnit:=lengthOf1stAxis/descendingLineSize;
+      ascendingSpacing:=10*ascendingUnit;
+      descendingSpacing:=10*descendingUnit;
       unitPixelAxis:=lengthOf2ndAxis/64;
       unitSobelAxis:=lengthOf2ndAxis/sobelExtent;
       pixelSpacing:=lengthOf2ndAxis/8;
@@ -221,85 +256,99 @@ var   minSobel                  : word;
 
 
     begin
-      drawSystem(leftStart,pixelLinesY,
-                 xSize div 10,8,xSpacing,pixelSpacing);
-      drawSystem(rightStart,pixelLinesY,
-                 ySize div 10,8,ySpacing,pixelSpacing);
-      drawSystem(leftStart,sobelLinesY,
-                 xSize div 10,sobelExtent div 5,xSpacing,sobelSpacing);
-      drawSystem(rightStart,sobelLinesY,
-                 ySize div 10,sobelExtent div 5,ySpacing,sobelSpacing)
+      drawSystem(leftStart,pixelLinesY,ascendingLineSize div 10,8,
+                 ascendingSpacing,pixelSpacing);
+      drawSystem(rightStart,pixelLinesY,descendingLineSize div 10,8,
+                 descendingSpacing,pixelSpacing);
+      drawSystem(leftStart,sobelLinesY,ascendingLineSize div 10,
+                 sobelExtent div 5,ascendingSpacing,sobelSpacing);
+      drawSystem(rightStart,sobelLinesY,descendingLineSize div 10,
+                 sobelExtent div 5,descendingSpacing,sobelSpacing)
     end;
 
 
     procedure drawCharacteristics(x,y : word);
 
-    var   xPos                      : word;
-          yPos                      : word;
+    var   i                         : integer;
 
     begin
-      for xPos:=2 to xSize do
+      for i:=-(ascendingLineLeftSize-2) to ascendingLineRightSize do
         begin
-          line(leftStart+round(xUnit*(xPos-2)),
-               pixelLinesY-round(unitPixelAxis*image^[y]^[xPos-1]),
-               leftStart+round(xUnit*(xPos-1)),
-               pixelLinesY-round(unitPixelAxis*image^[y]^[xPos]));
-          line(leftStart+round(xUnit*(xPos-2)),
-               sobelLinesY+round(minSobel*unitSobelAxis)-
-                   round(unitSobelAxis*sobelXLine^[xPos-1]),
-               leftStart+round(xUnit*(xPos-1)),
-               sobelLinesY+round(minSobel*unitSobelAxis)-
-                   round(unitSobelAxis*sobelXLine^[xPos]))
+          line(leftStart+round(ascendingUnit*(ascendingLineLeftSize+i-2)),
+               pixelLinesY-round(unitPixelAxis*image^[y+i-1]^[x+i-1]),
+               leftStart+round(ascendingUnit*(ascendingLineLeftSize+i-1)),
+               pixelLinesY-round(unitPixelAxis*image^[y+i]^[x+i]));
+          line(x+i-1,y+i-1,x+i,y+i)
         end;
-      for yPos:=2 to ySize do
+      for i:=-(descendingLineLeftSize-2) to descendingLineRightSize do
         begin
-          line(rightStart+round(yUnit*(yPos-2)),
-               pixelLinesY-round(unitPixelAxis*image^[yPos-1]^[x]),
-               rightStart+round(yUnit*(yPos-1)),
-               pixelLinesY-round(unitPixelAxis*image^[yPos]^[x]));
-          line(rightStart+round(yUnit*(yPos-2)),
-               sobelLinesY+round(minSobel*unitSobelAxis)-
-                   round(unitPixelAxis*sobelYLine^[yPos-1]),
-               rightStart+round(yUnit*(yPos-1)),
-               sobelLinesY+round(minSobel*unitSobelAxis)-
-                   round(unitPixelAxis*sobelYLine^[yPos]))
-        end
+          line(rightStart+round(descendingUnit*(descendingLineLeftSize+i-2)),
+               pixelLinesY-round(unitPixelAxis*image^[y-(i-1)]^[x+i-1]),
+               rightStart+round(descendingUnit*(descendingLineLeftSize+i-1)),
+               pixelLinesY-round(unitPixelAxis*image^[y-i]^[x+i]));
+          line(x+i-1,y-(i-1),x+i,y-i)
+        end;
+      for i:=2 to ascendingLineSize do
+        line(leftStart+round(ascendingUnit*(i-2)),
+             sobelLinesY+round(minSobel*unitSobelAxis)-
+                 round(unitSobelAxis*ascendingLine^[i-1]),
+             leftStart+round(ascendingUnit*(i-1)),
+             sobelLinesY+round(minSobel*unitSobelAxis)-
+                 round(unitSobelAxis*ascendingLine^[i]));
+      for i:=2 to descendingLineSize do
+        line(rightStart+round(descendingUnit*(i-2)),
+             sobelLinesY+round(minSobel*unitSobelAxis)-
+                 round(unitSobelAxis*descendingLine^[i-1]),
+             rightStart+round(descendingUnit*(i-1)),
+             sobelLinesY+round(minSobel*unitSobelAxis)-
+                 round(unitSobelAxis*descendingLine^[i]))
     end;
 
 
     procedure markPositionInGraphs(x,y : word);
 
 
-      procedure markPosition(start,xPos,yPos : word;
-                             theUnit         : real;
-                             threshold       : word);
+      procedure markPosition(start,xPos,yPos         : word;
+                             unit1stAxis,unit2ndAxis : real;
+                             threshold               : word);
 
       begin
-        line(start+round(theUnit*(xPos-filterRadius)),yPos,
-             start+round(theUnit*(xPos-filterRadius)),yPos-lengthOf2ndAxis);
-        line(start+round(theUnit*xPos),yPos,
-             start+round(theUnit*xPos),yPos-lengthOf2ndAxis);
-        line(start+round(theUnit*(xPos+filterRadius)),yPos,
-             start+round(theUnit*(xPos+filterRadius)),yPos-lengthOf2ndAxis);
-        line(start,yPos-round(unitPixelAxis*threshold),
-             start+lengthOf1stAxis,yPos-round(unitPixelAxis*threshold))
+        line(start+round(unit1stAxis*(xPos-filterRadius)),yPos,
+             start+round(unit1stAxis*(xPos-filterRadius)),
+             yPos-lengthOf2ndAxis);
+        line(start+round(unit1stAxis*xPos),yPos,
+             start+round(unit1stAxis*xPos),yPos-lengthOf2ndAxis);
+        line(start+round(unit1stAxis*(xPos+filterRadius)),yPos,
+             start+round(unit1stAxis*(xPos+filterRadius)),
+             yPos-lengthOf2ndAxis);
+        line(start,yPos-round(unit2ndAxis*threshold),
+             start+lengthOf1stAxis,yPos-round(unit2ndAxis*threshold))
       end;
 
 
     begin
       setColor(30);
-      markPosition(leftStart,x,pixelLinesY,xUnit,filterThreshold);
-      markPosition(leftStart,x,sobelLinesY,xUnit,sobelThreshold);
-      markPosition(rightStart,y,pixelLinesY,yUnit,filterThreshold);
-      markPosition(rightStart,y,sobelLinesY,yUnit,sobelThreshold)
+      markPosition(leftStart,ascendingLineLeftSize,pixelLinesY,
+                   ascendingUnit,unitPixelAxis,filterThreshold);
+      markPosition(leftStart,ascendingLineLeftSize,sobelLinesY,
+                   ascendingUnit,unitSobelAxis,sobelThreshold);
+      markPosition(rightStart,descendingLineLeftSize,pixelLinesY,
+                   descendingUnit,unitPixelAxis,filterThreshold);
+      markPosition(rightStart,descendingLineLeftSize,sobelLinesY,
+                   descendingUnit,unitSobelAxis,sobelThreshold)
     end;
 
 
   begin
     initVariables;
     drawCoordinateSystems;
-    drawCharacteristics(pointToDisplay^.x,pointToDisplay^.y);
-    markPositionInGraphs(pointToDisplay^.x,pointToDisplay^.y)
+    with pointToDisplay^ do
+      begin
+        drawCharacteristics(x,y);
+        markPositionInGraphs(x,y);
+        setColor(63);
+        circle(x,y,filterRadius)
+      end
   end;
 
 
@@ -317,8 +366,7 @@ begin
   else
     begin
       closeGraph;
-      writeLn('No pupil were found!');
-      halt(1)
+      fatalError('No pupil was found!')
     end
 end;
 
@@ -327,22 +375,7 @@ procedure writeData;
 
 var   positionMessage           : string;
 
-
-  procedure markPosition;
-
-  begin
-    setColor(63);
-    with pointToDisplay^ do
-      begin
-        line(x,1,x,ySize);
-        line(1,y,xSize,y);
-        circle(x,y,filterRadius)
-      end
-  end;
-
-
 begin
-  markPosition;
   setTextStyle(defaultFont,horizDir,1);
   setTextJustify(leftText,topText);
   setColor(63);
