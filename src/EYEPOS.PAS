@@ -4,10 +4,7 @@ uses crt,dos,graph,auxil,search,SVGA;
 
 const numberOfAdjustments       = 1;
 
-var   xSize                     : word;
-      ySize                     : word;
-
-      startHours                : word;
+var   startHours                : word;
       startMinutes              : word;
       startSeconds              : word;
       start100thSeconds         : word;
@@ -16,8 +13,8 @@ var   xSize                     : word;
       endSeconds                : word;
       end100thSeconds           : word;
 
-      pupilPoint                : pointPtr;
-      pupilPosition             : pointPtr;
+      pupilPoint                : pointType;
+      pupilPosition             : pointType;
 
       pupilSearchTime           : real;
       edgeSearchTime            : real;
@@ -58,11 +55,11 @@ var   fileName                  : string;
 	if (thisParameter[1]='-') then
 	  case thisParameter[2] of
 	    'd' : showSearch:=true;
-	    'r' : filterRadius:=getParameterValue(thisParameter);
-	    't' : filterThreshold:=getParameterValue(thisParameter);
+            'l' : lakeLevel:=getParameterValue(thisParameter);
+	    'r' : filterRadiusFraction:=getParameterValue(thisParameter);
 	    's' : sobelThreshold:=getParameterValue(thisParameter);
 	    'q' : nonSearchRadius:=getParameterValue(thisParameter);
-	    'n' : numberOfIterations:=getParameterValue(thisParameter)
+	    'n' : nIterations:=getParameterValue(thisParameter)
 	  else
 	    fatalError('Illegal option: -'+thisParameter[2])
 	  end
@@ -76,10 +73,6 @@ var   fileName                  : string;
   procedure initVariables;
 
   begin
-    new(pupilPoint);
-    new(pupilPosition);
-    assign(inputFile,fileName);
-    reset(inputFile,1);
     blockRead(inputFile,buffer,4);
     xSize:=(word(buffer[1]) shl 8)+buffer[2];
     ySize:=(word(buffer[3]) shl 8)+buffer[4];
@@ -97,6 +90,8 @@ begin
 	begin
 	  SVGA_initGraphics(mode800x600);
 	  SVGA_setBlackAndWhitePalette;
+          assign(inputFile,fileName);
+          reset(inputFile,1);
 	  initVariables;
 	  getMem(image,4*ySize);
 	  for i:=1 to ySize do
@@ -110,15 +105,13 @@ begin
 		end
 	    end;
 	  close(inputFile);
-	  rectangle(startX+searchAreaLeft,startY+searchAreaTop,
-		    startX+searchAreaLeft+xSizeSearchArea,
-		    startY+searchAreaTop+ySizeSearchArea)
+	  rectangle(startX,startY,startX+xSize,startY+ySize)
 	end
       else
 	fatalError('Image file not found: '+picturePath(fileName))
     end
   else
-    fatalError('Usage: eyepos [-r<radius>][-t<threshold>][-s<threshold>] file[.pic]')
+    fatalError('Usage: eyepos [-dlrsqn] file[.pic]')
 end;
 
 
@@ -133,7 +126,7 @@ var   i                         : word;
     sec100ths:=(6000*(endMinutes     -startMinutes)+
 		 100*(endSeconds     -startSeconds)+
 		     (end100thSeconds-start100thSeconds))/
-	       (numberOfIterations/10)
+	       (nIterations/10)
   end;
 
 
@@ -141,19 +134,19 @@ begin
   if findPupilPoint(pupilPoint) then
     begin
       getTime(startHours,startMinutes,startSeconds,start100thSeconds);
-      for i:=1 to numberOfIterations do
+      for i:=1 to nIterations do
 	findPupilPoint(pupilPoint);
       getTime(endHours,endMinutes,endSeconds,end100thSeconds);
       pupilSearchTime:=sec100ths;
       getTime(startHours,startMinutes,startSeconds,start100thSeconds);
-      for i:=1 to numberOfIterations do
+      for i:=1 to nIterations do
 	findPosition(pupilPoint,pupilPosition);
       getTime(endHours,endMinutes,endSeconds,end100thSeconds);
       edgeSearchTime:=sec100ths
     end
   else
     fatalError('No pupil was found!');
-  markPosition(pupilPosition^.x,pupilPosition^.y,asStar)
+  markPosition(pupilPosition.x,pupilPosition.y,asStar)
 end;
 
 
@@ -164,7 +157,7 @@ begin
   setTextJustify(leftText,centerText);
   setColor(60);
   outTextXY(startX,startY+ySize+30,'Position                 : ('+
-	    intString(pupilPosition^.x)+','+intString(pupilPosition^.y)+')');
+	    intString(pupilPosition.x)+','+intString(pupilPosition.y)+')');
   outTextXY(startX,startY+ySize+40,'Search time (ms)         : '+
 	    realString(pupilSearchTime));
   outTextXY(startX,startY+ySize+50,'Edge detection time (ms) : '+
@@ -176,16 +169,10 @@ end;
 
 procedure finishOff;
 
-var   i                         : word;
-
 begin
+  closeSearch;
   readKey;
-  closeGraph;
-  dispose(pupilPosition);
-  dispose(pupilPoint);
-  for i:=1 to ySize do
-    freeMem(image^[i],xSize);
-  freeMem(image,4*ySize)
+  closeGraph
 end;
 
 
