@@ -1,10 +1,40 @@
+(***
+ ***  eyepos.pas, version 2.3
+ ***
+ ***  Example of how to employ search.pas, version 2.2 or later.
+ ***  The image is supplied as command line parameter, is displayed
+ ***  on the screen, and the pupil position found is marked with a
+ ***  small star in the image.
+ ***
+ ***  Usage:
+ ***
+ ***     eyepos [-d][-l<T_{l}>][-o<r_{o}>][-s<T_{e}>]
+ ***            [-w<T_{s}>][-n<nIterations>] file[.pic]
+ ***
+ ***  The -d option causes showSearch to be true and consequently each
+ ***  location in the image to which the Sobel operators are applied
+ ***  will be marked with a white point on the screen.
+ ***)
+
 program eyePos;
+
+(**
+ **  SVGA.pas contains routines for displaying high-resolution black &
+ **  white images on the screen.  Requires an ET4000 SVGA graphic card.
+ **)
 
 uses crt,dos,graph,auxil,search,SVGA;
 
-const numberOfAdjustments       = 1;
+(**
+ **  Variables
+ **)
 
-var   startHours                : word;
+var
+
+(*
+ *  Variables used to measure the time.
+ *)
+      startHours                : word;
       startMinutes              : word;
       startSeconds              : word;
       start100thSeconds         : word;
@@ -13,11 +43,21 @@ var   startHours                : word;
       endSeconds                : word;
       end100thSeconds           : word;
 
+(*
+ *  A pupil point, supplied by findPupilPoint.
+ *)
       pupilPoint                : pointType;
+
+(*
+ *  The position of the pupil in the given image.
+ *)
       pupilPosition             : pointType;
 
-      pupilSearchTime           : real;
-      edgeSearchTime            : real;
+(*
+ *  Estimate of the time needed to locate the pupil.  Accuracy
+ *  increases when nIterations increases.
+ *)
+      searchTime                : real;
 
 
 procedure init;
@@ -27,6 +67,12 @@ var   fileName                  : string;
       buffer                    : bufferType;
       i,j                       : word;
 
+
+(*
+ *  getParameters
+ *
+ *  Reads and interprets the command line parameters.
+ *)
 
   procedure getParameters(numberOfParameters : word);
 
@@ -59,7 +105,6 @@ var   fileName                  : string;
 	    'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
 	    's' : sobelThreshold:=trunc(getParameterValue(thisParameter));
             'w' : wetFraction:=getParameterValue(thisParameter);
-            'a' : nAdjustments:=trunc(getParameterValue(thisParameter));
 	    'n' : nIterations:=trunc(getParameterValue(thisParameter))
 	  else
 	    fatalError('Illegal option: -'+thisParameter[2])
@@ -99,6 +144,9 @@ begin
 	    begin
 	      blockRead(inputFile,buffer,xSize);
 	      getMem(image^[i],xSize);
+(*
+ *  Initializes the in-memory image and displays it on the screen.
+ *)
 	      for j:=1 to xSize do
 		begin
 		  image^[i]^[j]:=buffer[j];
@@ -112,9 +160,15 @@ begin
 	fatalError('Image file not found: '+picturePath(fileName))
     end
   else
-    fatalError('Usage: eyepos [-adlonqsw] file[.pic]')
+    fatalError('Usage: eyepos [-dlonsw] file[.pic]')
 end;
 
+
+(*
+ *  findPupilPosition
+ *
+ *  Finds the pupil and computes the time needed.
+ *)
 
 procedure findPupilPosition;
 
@@ -136,15 +190,12 @@ begin
     begin
       getTime(startHours,startMinutes,startSeconds,start100thSeconds);
       for i:=1 to nIterations do
-	findPupilPoint(pupilPoint);
+        begin
+          findPupilPoint(pupilPoint);
+          findPosition(pupilPoint,pupilPosition)
+        end;
       getTime(endHours,endMinutes,endSeconds,end100thSeconds);
-      pupilSearchTime:=sec100ths;
-      getTime(startHours,startMinutes,startSeconds,start100thSeconds);
-      for i:=1 to nIterations do
-        if (not	findPosition(pupilPoint,pupilPosition)) then
-          fatalError('Too few iterations!');
-      getTime(endHours,endMinutes,endSeconds,end100thSeconds);
-      edgeSearchTime:=sec100ths
+      searchTime:=sec100ths
     end
   else
     fatalError('No pupil was found!');
@@ -158,14 +209,10 @@ begin
   setTextStyle(defaultFont,horizDir,1);
   setTextJustify(leftText,centerText);
   setColor(60);
-  outTextXY(startX,startY+ySize+30,'Position                 : ('+
+  outTextXY(startX,startY+ySize+30,'Position         : ('+
 	    intString(pupilPosition.x)+','+intString(pupilPosition.y)+')');
-  outTextXY(startX,startY+ySize+40,'Search time (ms)         : '+
-	    realString(pupilSearchTime));
-  outTextXY(startX,startY+ySize+50,'Edge detection time (ms) : '+
-	    realString(edgeSearchTime));
-  outTextXY(startX,startY+ySize+60,'Total time (ms)          : '+
-	    realString(pupilSearchTime+edgeSearchTime))
+  outTextXY(startX,startY+ySize+40,'Search time (ms) : '+
+	    realString(searchTime))
 end;
 
 

@@ -1,93 +1,307 @@
+(***
+ ***  search.pas, version 2.3
+ ***
+ ***  Turbo-Pascal unit implementing the OCTOPUS eye-tracking algorithm.
+ ***  The main procedures are:
+ ***
+ ***     findPupilPoint
+ ***     findPosition,
+ ***
+ ***  implementing Steps 1 and 2, respectively, of the basic algorithm
+ ***  formulation.
+ ***)
+
 unit search;
 
 
 INTERFACE
 
+(*
+ *  auxil is a unit containing auxiliary procedures and functions.
+ *)
+
 uses graph,auxil;
 
-const maxSize                   = 512;
+(**
+ **  Global constants
+ **)
+
+const
+
+(*
+ *  maxSize corresponds to the maximum resolution N of the NxN image.
+ *)
+      maxSize                   = 512;
+
+(*
+ *  Number of gray levels in the images supplied.
+ *)
       nGrayLevels               = 64;
 
+(*
+ *  Maximum number of jumps the octopus can make.
+ *)
       nLeapsMax                 = 10;
+
+(*
+ *  Maximum number of intermediate position estimates that can be made.
+ *)
       nEstimatesMax             = 55;
 
+(*
+ *  Defining directions.  null means no direction (i.e., stationary).
+ *)
       null                      = 0;
       west                      = -1;
       east                      = 1;
       north                     = -1;
       south                     = 1;
 
+(*
+ *  Constants needed by applications calling markPosition.
+ *)
       asPoint                   = 0;
       asStar                    = 1;
       asCircle                  = 2;
 
-type  bufferType                = array[1..maxSize] of byte;
+(**
+ **  Global type definitions.
+ **)
 
+type
+
+(*
+ *  Array of byte, used by blockRead and blockWrite.
+ *)
+      bufferType                = array[1..maxSize] of byte;
+
+(*
+ *  Two-dimensional dynamic array, used to contain the image being
+ *  processed.
+ *)
       pixelLinePtr              = ^pixelLine;
       pixelLine                 = array[1..maxSize] of byte;
       pixelMatrixPtr            = ^pixelMatrix;
       pixelMatrix               = array[1..maxSize] of pixelLinePtr;
 
+(*
+ *  Array used to map between actaul gray levels and gray levels of the
+ *  lake-thresholded image.
+ *)
       mapType                   = array[0..nGrayLevels-1] of byte;
+
+(*
+ *  Boolean array mapping between gray levels and wet/not wet.
+ *)
       wetType                   = array[0..nGrayLevels-1] of boolean;
 
+(*
+ *  Type of the candidate pixels in S.  visited=true corresponds to the
+ *  pixel's having been removed from S.
+ *)
       point                     = record
         x                         : word;
         y                         : word;
         visited                   : boolean
       end;
 
+(*
+ *  Types employed to implement the set S of candidate pixels.
+ *)
       pointArrayPtr             = ^pointArray;
       pointArray                = array[0..maxSize-1] of point;
 
+(*
+ *  Array indexed by the current priority level and returning a pointer
+ *  into S corresponding to the number of candidate pixels contained in
+ *  the plausibility area corresponding to the priority level.
+ *)
       priAreasType              = array[1..3] of word;
 
-const lakeLevel                 : byte = 1;   { -l option }
-      sobelThreshold            : byte = 5;   { -s option }
+(**
+ **  Typed constants (initialized variables).  They are overridden by:
+ **  (1) initializations made in the init-file _searc.rc and (2) command
+ **  line parameters.  (2) overrides (1).
+ **)
 
-      minPupilRadiusFraction    : real = 10;  { Per cent  }
-      maxPupilRadiusFraction    : real = 20;  { Per cent  }
+const
 
-      octopusRadiusFraction     : real = 8;   { -o option }
-      wetFraction               : real = 0.8; { -w option }
+(*
+ *  T_{l} [-l option]
+ *)
+      lakeLevel                 : byte = 1;
 
-      nAdjustments              : byte = 0;   { -a option }
-      nIterations               : word = 1;   { -n option }
+(*
+ *  T_{e} [-s option]
+ *)
+      sobelThreshold            : byte = 5;
 
+(*
+ *  r_{p_{min}}, per cent.
+ *)
+      minPupilRadiusFraction    : real = 10;
+
+(*
+ *  r_{o} [-o option], per cent.
+ *)
+      octopusRadiusFraction     : real = 8;
+
+(*
+ *  r_{s} [-w option]
+ *)
+      wetFraction               : real = 0.8;
+
+(*
+ *  Used by eyepos.pas; included here so that it can be initialized in
+ *  _search.rc.  Denotes how many times an overall estimate is to be
+ *  found and is used to obtain performance measures.  [-n option]
+ *)
+      nIterations               : word = 1;
+
+(*
+ *  Used by the application program; denotes where on the physical
+ *  to display the image.
+ *)
       startX                    : word = 0;
       startY                    : word = 0;
 
-      showSearch                : boolean = false;  { -d option }
+(*
+ *  If true, each point at which the Sobel operators are applied are
+ *  marked with a white pixel in the image.  [-d option]
+ *)
+      showSearch                : boolean = false;
 
-var   image                     : pixelMatrixPtr;
+(**
+ **  Global variables.
+ **)
 
+var
+
+(*
+ *  The two-dimensional array containing the image.
+ *)
+      image                     : pixelMatrixPtr;
+
+(*
+ *  Horizontal and vertical size of the image.
+ *)
       xSize                     : word;
       ySize                     : word;
 
+(*
+ *  Instances of mapType and wetType explained above.
+ *)
       map                       : mapType;
       wet                       : wetType;
 
+(*
+ *  r_{p_{min}} in pixels.
+ *)
       minPupilRadius            : word;
+
+(*
+ *  r_{o} in pixels
+ *)
       octopusRadius             : word;
+
+(*
+ *  r_{d}; radius of the "dead" region about the origin of opration,
+ *  in pixels.
+ *)
       nonSearchRadius           : word;
+
+(*
+ *  r_{d}/sqrt(2)
+ *)
       diagonalNonSearchRadius   : word;
+
+(*
+ *  Number of the octopus' sensors that have to report wetness for the
+ *  octopus to be swimming.  Determined by T_{s}.
+ *)
       inSeaThreshold            : word;
 
+(*
+ *  The set S of candidate pixels.
+ *)
       startingPoints            : pointArrayPtr;
+
+(*
+ *  Instance of priAreasType explained above.
+ *)
       priAreas                  : priAreasType;
 
 
-function applySobelMask(x,y                     : word;
-                        northOrSouth,eastOrWest : shortInt) : integer;
+(**
+ **  Exported procedures and functions.
+ **)
+
+
+(*
+ *  findPupilPoint
+ *
+ *  Implements the swimming octopus search algorithm.  Returns true if
+ *  a pupil point is found, and in that case pupilPoint contains the
+ *  coordinates of the point.
+ *)
 
 function findPupilPoint(var pupilPoint : pointType) : boolean;
+
+
+(*
+ *  findPosition
+ *
+ *  Implements Step 2 of the basic algorithm formulation.  Returns true
+ *  if the maximum number of iterations allowed (determined by
+ *  nEstimatesMax) sufficed to arrive at a final overall estimate.
+ *  pupilPoint contains the initial origin of operation and is typically
+ *  the point returned by findPupilPoint.  position contains the overall
+ *  estimate arrived at, also when the returned value is false.
+ *)
 
 function findPosition(pupilPoint : pointType;
                   var position   : pointType) : boolean;
 
+
+(*
+ *  applySobelMask
+ *
+ *  Applies to location (x,y) in the image the Sobel mask determined by
+ *  northOrSouth and eastOrWest.  E.g., northOrSouth=north and
+ *  eastOrWest=east means the northeast mask, and northOrSouth=south
+ *  and eastOrWest=null means the south mask.
+ *)
+
+function applySobelMask(x,y                     : word;
+                        northOrSouth,eastOrWest : shortInt) : integer;
+
+
+(*
+ *  initGlobals
+ *
+ *  Initializes global variables and reads _search.rc.  Among the
+ *  variables that are initialized is the set S of candidate pixels.
+ *)
+
 procedure initGlobals;
 
+
+(*
+ *  markPosition
+ *
+ *  Marks the location (x,y) in the image as a point, circle or star,
+ *  depending on the value of asWhat (see the constant declarations
+ *  above).
+ *)
+
 procedure markPosition(x,y : word; asWhat : byte);
+
+
+(*
+ *  closeSearch
+ *
+ *  Cleans up.
+ *)
 
 procedure closeSearch;
 
@@ -105,12 +319,12 @@ type  variableRPtr              = ^variableR;
       end;
 
 
-(**************************************************************************
- *                                                                        *
- *     Internals                                                          *
- *                                                                        *
- **************************************************************************)
-
+(*
+ *  readInitFile
+ *
+ *  Internal procedure called by initGlobals which reads the init-file
+ *  _search.rc.
+ *)
 
 procedure readInitFile;
 
@@ -229,14 +443,10 @@ begin
             sobelThreshold:=trunc(variable^.value)
           else if (variable^.name='minPupilRadiusFraction') then
             minPupilRadiusFraction:=variable^.value
-          else if (variable^.name='maxPupilRadiusFraction') then
-            maxPupilRadiusFraction:=variable^.value
           else if (variable^.name='octopusRadiusFraction') then
             octopusRadiusFraction:=variable^.value
           else if (variable^.name='wetFraction') then
             wetFraction:=trunc(variable^.value)
-          else if (variable^.name='nAdjustments') then
-            nAdjustments:=trunc(variable^.value)
           else if (variable^.name='nIterations') then
             nIterations:=trunc(variable^.value);
           variable:=nextVariable
@@ -246,11 +456,9 @@ begin
 end;
 
 
-(**************************************************************************
- *                                                                        *
- *     Exported procedures and functions                                  *
- *                                                                        *
- **************************************************************************)
+(**
+ **  Implementation of the exported proedures and functions.
+ **)
 
 
 function findPupilPoint(var pupilPoint : pointType) : boolean;
@@ -395,6 +603,13 @@ var   nEstimates                : word;
       previousEstimate          : pointType;
       break                     : boolean;
 
+
+(*
+ *  Many of the subprocedures of iterateOnce and iterateTwice could
+ *  have been combined to form fewer procedures.  However, for the
+ *  sake of computational efficiency, they have been implemented
+ *  separately in order to minimize the number of operations needed.
+ *)
 
   procedure iterateOnce(origin   : pointType;
                     var estimate : pointType);
@@ -729,6 +944,17 @@ procedure initGlobals;
 var   i                         : byte;
 
 
+(*
+ *  initPointMatrix
+ *
+ *  Initializes the array implementing the set S of candidate pixels
+ *  so that the candidate pixels belonging to plausibility area 1
+ *  occupy the first elements and the pixels belonging to plausibility
+ *  area 2 occupy the following elements.  The last portion of the
+ *  array contains the candidate pixels belonging exclusively to
+ *  plausibility area 3.
+ *)
+
   procedure initPointMatrix;
 
   var   xCentre                   : word;
@@ -740,10 +966,10 @@ var   i                         : byte;
         xStart                    : word;
         yStart                    : word;
         leftOffset                : word;
-        priArea1xRadius            : word;
-        priArea1yRadius            : word;
-        priArea2xRadius            : word;
-        priArea2yRadius            : word;
+        priArea1xRadius           : word;
+        priArea1yRadius           : word;
+        priArea2xRadius           : word;
+        priArea2yRadius           : word;
         priCount                  : priAreasType;
         pri                       : byte;
         priOffset                 : word;
@@ -863,12 +1089,20 @@ begin
   randomize;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
   octopusRadius:=round(xSize*octopusRadiusFraction/100);
-{
-  nonSearchRadius:=trunc(octopusRadius/sqrt(2));
-  diagonalNonSearchRadius:=trunc(nonSearchRadius/sqrt(2));
-}
-  nonSearchRadius:=1;
-  diagonalNonSearchRadius:=1;
+
+(*
+ *  These have been commented out for reasons elaborated upon in
+ *  Section 5.3.1:
+ *
+ *     nonSearchRadius:=trunc(octopusRadius/sqrt(2));
+ *     diagonalNonSearchRadius:=trunc(nonSearchRadius/sqrt(2));
+ *
+ *  The following two assigments replace them:
+ *)
+
+  nonSearchRadius:=0;
+  diagonalNonSearchRadius:=0;
+
   inSeaThreshold:=round(4*wetFraction*pred(octopusRadius))+2;
   initPointMatrix;
   for i:=0 to lakeLevel do
