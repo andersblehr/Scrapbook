@@ -77,11 +77,11 @@ const nullMask                  : maskArray = ( 0, 0, 0,
                                                -2, 0, 2,
                                                -1, 0, 1);
 
-      xySobelMask               : maskArray = (-2,-2, 0,
+      ascendingMask             : maskArray = (-2,-2, 0,
                                                -2, 0, 2,
                                                 0, 2, 2);
 
-      yxSobelMask               : maskArray = ( 0,-2,-2,
+      descendingMask            : maskArray = ( 0,-2,-2,
                                                 2, 0,-2,
                                                 2, 2, 0);
 
@@ -96,7 +96,7 @@ const nullMask                  : maskArray = ( 0, 0, 0,
 
 IMPLEMENTATION
 
-uses crt,graph,defs,auxil,math,SVGA;
+uses crt,graph,paths,auxil,math,SVGA;
 
 
 (**************************************************************************
@@ -462,7 +462,7 @@ var   imageFile                 : file;
 
 
 begin
-  assign(imageFile,'c:\user\blehr\diplom\bilder\'+imageName+'.pic');
+  assign(imageFile,picturePath(imageName));
   rewrite(imageFile,1);
   buffer[1]:=chr(hi(xSize));
   buffer[2]:=chr(lo(xSize));
