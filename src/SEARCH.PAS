@@ -12,8 +12,8 @@ const maxSize                   = 512;
       north                     = -1;
       south                     = 1;
 
-      xSobelMask                = 0;
-      ySobelMask                = 1;
+      ascendingMask             = 1;
+      descendingMask            = -1;
 
 type  variableRPtr              = ^variableR;
       variableR                 = record
@@ -53,6 +53,9 @@ const filterRadius              : byte = 0;
 
       numberOfIterations        : word = 1;
 
+      startX                    : word = 0;
+      startY                    : word = 0;
+
 var   image                     : pixelMatrixPtr;
 
       searchAreaLeft            : word;
@@ -62,7 +65,7 @@ var   image                     : pixelMatrixPtr;
 
       minPupilRadius            : word;
       minSearchStep             : word;
-      positionStarRadius        : word;
+      starRadius                : word;
 
       aPupilPoint               : pointPtr;
       pupilPosition             : pointPtr;
@@ -70,16 +73,18 @@ var   image                     : pixelMatrixPtr;
 
 procedure initGlobals(xSize,ySize : word);
 
+procedure markPosition(x,y : word);
+
 function findPupilPoint : pointPtr;
 
-function applySobelMask(x,y : word; mask : byte) : word;
+function applySobelMask(x,y : word; mask : shortInt) : word;
 
 function findPosition(aPupilPoint : pointPtr) : pointPtr;
 
 
 IMPLEMENTATION
 
-uses graph;
+uses crt,graph;
 
 const whiteSpace                = [#9,#32];
 
@@ -146,8 +151,7 @@ begin
   reset(initFile);
   {$I+}
   initFileExists:=(IOResult=0);
-  if initFileExists then
-    initFileEmpty:=EOF(initFile);
+  initFileEmpty:=EOF(initFile);
   if (initFileExists and (not initFileEmpty)) then
     readLn(initFile,currentLine)
 end;
@@ -279,8 +283,17 @@ begin
   xSizeSearchArea:=round(xSize*searchAreaRightFraction/100)-searchAreaLeft;
   ySizeSearchArea:=round(ySize*searchAreaBottomFraction/100)-searchAreaTop;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
-  positionStarRadius:=round(2.5*xSize*maxPupilRadiusFraction/100);
+  starRadius:=round(2.5*xSize*maxPupilRadiusFraction/100);
   minSearchStep:=round(minPupilRadius/8)
+end;
+
+
+procedure markPosition(x,y : word);
+
+begin
+  setColor(63);
+  line(startX+x-3,startY+y,startX+x+3,startY+y);
+  line(startX+x,startY+y-3,startX+x,startY+y+3)
 end;
 
 
@@ -357,66 +370,76 @@ begin
 end;
 
 
-function applySobelMask(x,y : word; mask : byte) : word;
+function applySobelMask(x,y : word; mask : shortInt) : word;
 
 begin
   case mask of
-    xSobelMask : applySobelMask:=abs(-image^[y-1]^[x-1]-
-                                      2*image^[y-1]^[x]-
-                                      image^[y-1]^[x+1]+
-                                      image^[y+1]^[x-1]+
-                                      2*image^[y+1]^[x]+
-                                      image^[y+1]^[x+1]);
-    ySobelMask : applySobelMask:=abs(-image^[y-1]^[x-1]+
-                                      image^[y-1]^[x+1]-
-                                      2*image^[y]^[x-1]+
-                                      2*image^[y]^[x+1]-
-                                      image^[y+1]^[x-1]+
-                                      image^[y+1]^[x+1])
+    descendingMask : applySobelMask:=2*abs(-image^[y-1]^[x  ]-
+                                            image^[y-1]^[x+1]+
+                                            image^[y  ]^[x-1]-
+                                            image^[y  ]^[x+1]+
+                                            image^[y+1]^[x-1]+
+                                            image^[y+1]^[x  ]);
+    ascendingMask  : applySobelMask:=2*abs(-image^[y-1]^[x-1]-
+                                            image^[y-1]^[x  ]-
+                                            image^[y  ]^[x-1]+
+                                            image^[y  ]^[x+1]+
+                                            image^[y+1]^[x  ]+
+                                            image^[y+1]^[x+1])
   end
 end;
 
 
 function findPosition(aPupilPoint : pointPtr) : pointPtr;
 
-const left                      = -1;
-      right                     = 1;
-      up                        = -1;
-      down                      = 1;
-
-      xSobelMask                = 0;
-      ySobelMask                = 1;
+var   ascendingCenter           : pointPtr;
+      descendingCenter          : pointPtr;
+      position                  : pointPtr;
 
 
-  function searchXEdge(x,y : word; delta : shortInt) : word;
+  function getMiddlePoint(x,y : word; mask : shortInt) : pointPtr;
+
+  var   leftPoint                 : pointPtr;
+        rightPoint                : pointPtr;
+        middlePoint               : pointPtr;
+
+
+    function searchEdge(x,y : word; dX,dY,mask : shortInt) : pointPtr;
+
+    begin
+      repeat
+        inc(x,dX);
+        inc(y,dY);
+        if ((x<=searchAreaLeft) or (x>=searchAreaLeft+xSizeSearchArea) or
+            (y<=searchAreaTop ) or (y>=searchAreaTop +ySizeSearchArea)) then
+          fatalError('searchEdge: No edge found!')
+      until (applySobelMask(x,y,mask)>=sobelThreshold);
+      searchEdge:=makePoint(x,y)
+    end;
+
 
   begin
-    repeat
-      inc(x,delta);
-      if ((x<=searchAreaLeft) or (x>=searchAreaLeft+xSizeSearchArea)) then
-        fatalError('searchXEdge: No edge found!')
-    until (applySobelMask(x,y,ySobelMask)>=sobelThreshold);
-    searchXEdge:=x
-  end;
-
-
-  function searchYEdge(x,y : word; delta : shortInt) : word;
-
-  begin
-    repeat
-      inc(y,delta);
-      if ((y<=searchAreaTop) or (y>=searchAreaTop+ySizeSearchArea)) then
-        fatalError('searchYEdge: No edge found!')
-    until (applySobelMask(x,y,xSobelMask)>=sobelThreshold);
-    searchYEdge:=y
+    leftPoint:=searchEdge(x,y,west,-mask,mask);
+    rightPoint:=searchEdge(x,y,east,mask,mask);
+    middlePoint:=makePoint(leftPoint^.x+round((rightPoint^.x-leftPoint^.x)/2),
+                    leftPoint^.y+round(integer(rightPoint^.y-leftPoint^.y)/2));
+    dispose(leftPoint);
+    dispose(rightPoint);
+    getMiddlePoint:=middlePoint
   end;
 
 
 begin
   with aPupilPoint^ do
-    findPosition:=
-        makePoint(round((searchXEdge(x,y,left)+searchXEdge(x,y,right))/2),
-                  round((searchYEdge(x,y,up)+searchYEdge(x,y,down))/2))
+    begin
+      ascendingCenter:=getMiddlePoint(x,y,ascendingMask);
+      descendingCenter:=getMiddlePoint(x,y,descendingMask);
+      position:=makePoint(ascendingCenter^.x+descendingCenter^.x-x,
+                          ascendingCenter^.y+descendingCenter^.y-y)
+    end;
+  dispose(ascendingCenter);
+  dispose(descendingCenter);
+  findPosition:=position
 end;
 
 
