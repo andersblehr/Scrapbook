@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Mon Jan 18 10:34:12 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Mar  5 05:35:33 1993
+%%% Last Modified On: Tue Mar  9 03:26:45 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,14 +58,25 @@ direction.
 
 To gain absolute certainty about where the subject at a given time
 focuses, it is necessary to have a system which continuously tracks
-the movements of the subject's eyes, and which every $\sim$20 ms.
-makes available a coordinate pair corresponding as closesly as
-possible to the actual gaze direction.  The error in the position
-returned by the system should be less than or equal to $\pm
-0.25^{\circ}$.  When the subject is {\em drifting\/}, that is, it does
-not focus where it should, a warning signal has to be given.  A last
-requirement is that the system should be relatively cheap, its price
-not exceeding DM 12.000.
+the movements of the subject's eyes.  For our purpose it was decided
+that a system complying to the following requirements would suffice:
+\begin{itemize}
+\item The position-analyzing method of the system may in no way
+  interfere with recordings being made from the visual cortex of a
+  subject, be it man or monkey.
+\item A position measuring rate of 50 Hz.  Thus every 20 ms a
+  coordinate pair corresponding as closesly as possible to the actual
+  gaze direction has to be made available.  When the subject is {\em
+    drifting\/}, that is, it does not focus where it should, a warning
+  signal has to be given.
+\item The error in the position returned by the system should be less
+  than or equal to $\pm 0.25^{\circ}$.
+\item The measuring range of the system should be at least $\pm
+  20^{\circ}$.
+\item The system should be relatively easy to configure to comply with
+  the specific needs of an experiment.
+\item The price of the complete system may not exceed DM 12.000.
+\end{itemize}
 
 There exist several commercially available eye tracking systems, some
 of which are described in Chapter~\ref{track}.  For reasons elaborated
@@ -75,5 +86,3 @@ of video input.  And this is, in short, what has been the subject of
 my thesis; to develop, and, as far as possible, test a suitable {\em
   software platform\/} for a real-time eye position measuring system
 complying to the requirements of precision and speed mentioned above.
-
-
