@@ -4,11 +4,8 @@ uses crt,graph,auxil,search,SVGA;
 
 const displayCenterPoint        : boolean = false;
 
-var   xSize                     : word;
-      ySize                     : word;
-
-      pupilPoint                : pointPtr;
-      pointToDisplay            : pointPtr;
+var   pupilPoint                : pointType;
+      pointToDisplay            : pointType;
 
 
 procedure init;
@@ -46,8 +43,8 @@ var   fileName                  : string;
         if (thisParameter[1]='-') then
           case thisParameter[2] of
             'c' : displayCenterPoint:=true;
-            'r' : filterRadius:=getParameterValue(thisParameter);
-            't' : filterThreshold:=getParameterValue(thisParameter);
+            'l' : lakeLevel:=getParameterValue(thisParameter);
+            'r' : filterRadiusFraction:=getParameterValue(thisParameter);
             's' : sobelThreshold:=getParameterValue(thisParameter);
             'q' : nonSearchRadius:=getParameterValue(thisParameter)
           else
@@ -63,10 +60,6 @@ var   fileName                  : string;
   procedure initVariables;
 
   begin
-    new(pupilPoint);
-    new(pointToDisplay);
-    assign(inputFile,fileName);
-    reset(inputFile,1);
     blockRead(inputFile,buffer,4);
     xSize:=(word(buffer[1]) shl 8)+buffer[2];
     ySize:=(word(buffer[3]) shl 8)+buffer[4];
@@ -82,6 +75,8 @@ begin
         begin
           SVGA_initGraphics(mode1024x768);
           SVGA_setBlackAndWhitePalette;
+          assign(inputFile,fileName);
+          reset(inputFile,1);
           initVariables;
           getMem(image,4*ySize);
           for i:=1 to ySize do
@@ -140,7 +135,7 @@ var   ascendingLine             : sobelLine;
 
 
     begin
-      with pointToDisplay^ do
+      with pointToDisplay do
         case northOrSouth of
           north :
             case eastOrWest of
@@ -197,7 +192,7 @@ var   ascendingLine             : sobelLine;
 
 
   begin
-    with pointToDisplay^ do
+    with pointToDisplay do
       begin
         for i:=(ascendingLineLeftSize-2) downTo nonSearchRadius do
           ascendingLine[ascendingLineLeftSize-i]:=
@@ -345,11 +340,11 @@ var   ascendingLine             : sobelLine;
     begin
       setColor(30);
       markPosition(leftStart,ascendingLineLeftSize,pixelLinesY,
-                   ascendingUnit,unitPixelAxis,filterThreshold);
+                   ascendingUnit,unitPixelAxis,lakeLevel);
       markPosition(leftStart,ascendingLineLeftSize,sobelLinesY,
                    ascendingUnit,unitSobelAxis,sobelThreshold);
       markPosition(rightStart,descendingLineLeftSize,pixelLinesY,
-                   descendingUnit,unitPixelAxis,filterThreshold);
+                   descendingUnit,unitPixelAxis,lakeLevel);
       markPosition(rightStart,descendingLineLeftSize,sobelLinesY,
                    descendingUnit,unitSobelAxis,sobelThreshold)
     end;
@@ -358,7 +353,7 @@ var   ascendingLine             : sobelLine;
   begin
     initVariables;
     drawCoordinateSystems;
-    with pointToDisplay^ do
+    with pointToDisplay do
       begin
         drawCharacteristics(x,y);
         markPositionInGraphs(x,y);
@@ -395,11 +390,12 @@ begin
   setTextStyle(defaultFont,horizDir,1);
   setTextJustify(leftText,topText);
   setColor(63);
-  if (pointToDisplay=pupilPoint) then
+  if ((pointToDisplay.x=pupilPoint.x) and
+      (pointToDisplay.y=pupilPoint.y)) then
     positionMessage:='Position of pupil point'
   else
     positionMessage:='Center position found';
-  with pointToDisplay^ do
+  with pointToDisplay do
     outTextXY(xSize+20,1,positionMessage+': ('+
         intString(x)+','+intString(y)+')')
 end;
@@ -410,18 +406,9 @@ procedure finishOff;
 var   i                         : word;
 
 begin
+  closeSearch;
   readKey;
-  closeGraph;
-  if (pointToDisplay=pupilPoint) then
-    dispose(pointToDisplay)
-  else
-    begin
-      dispose(pupilPoint);
-      dispose(pointToDisplay)
-    end;
-  for i:=1 to ySize do
-    freeMem(image^[i],xSize);
-  freeMem(image,4*ySize)
+  closeGraph
 end;
 
 
