@@ -88,7 +88,7 @@ const nullMask                  : maskArray = ( 0, 0, 0,
 
 IMPLEMENTATION
 
-uses crt,graph,math,SVGA;
+uses crt,graph,defs,auxil,math,SVGA;
 
 
 (**************************************************************************
@@ -207,10 +207,13 @@ var   imageFile                 : file;
 
 
 begin
-  assign(imageFile,'c:\user\blehr\fag\diplom\bilder\'+whatImage+'.pic');
-  {$I-}
+  if fileExists(whatImage) then
+    assign(imageFile,whatImage)
+  else if fileExists(picturePath(whatImage)) then
+    assign(imageFile,picturePath(whatImage))
+  else
+    fatalError(whatImage+': Image not found!');
   reset(imageFile,1);
-  {$I+}
   if (IOResult<>0) then
     image:=nil
   else
