@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Apr 11 16:22:40 1993
+%%% Last Modified On: Sun Apr 11 18:30:30 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,7 +50,7 @@ is to choose one parameter, say $x$, as the {\em running parameter\/},
 and then solve for the other parameter, in this case $y$, by using the
 general slope-intercept equation $y=ax+b$.  Which parameter to choose
 as the running parameter depends on the slope $a$ of the line to be
-traced; if $-1\leq a\leq 1$, $x$ is used, oterwise $y$ is used; this
+traced; if $-1\leq a\leq 1$, $x$ is used, otherwise $y$ is used; this
 is to ensure the connectivity of the traced line.  Thus, in the
 general case, performing line oriented edge detection along a pair of
 perpendicular detection lines involves one addition and one
@@ -114,7 +114,7 @@ two.  Evidently, an overall estimate computed from only two iterations
 of line oriented edge detection will not suffice to satisfy the
 requirement of accuracy---particularly since the procedure should
 continue to iterate until the overall estimate no longer changes from
-one iteration to the next.  Apparantly, however, with the given origin
+one iteration to the next.  Apparently, however, with the given origin
 of operation, no more iterations are possible without returning to the
 direct approach which was deemed not satisfactory above.  There is,
 however, an obvious solution to this problem: Perform the two first
@@ -130,7 +130,7 @@ origin of operation has to be updated every second iteration.
 
 The process of iterating the above procedure until an overall position
 estimate has been found may, if the intermediate estimates for some
-reason are distributed over a relatively large porion of the pupil,
+reason are distributed over a relatively large portion of the pupil,
 cause the available time interval of 20 ms to be exceeded without
 having arrived at a final overall position estimate.  To avoid this
 happening, an upper limit to the number of iterations can be
@@ -163,6 +163,11 @@ applies to the direct approach above.
 \subsubsection{Skipping the ``Dead Region'' about the Origin of
   Operation}
 \label{pg:dead}
+
+\insertepswidth{dead}{\label{fig:dead}The shaded region designates a
+  portion of the pupil lake, and the white circle designates the
+  ``dead region'' about the origin of operation, inside which the
+  sought pupil contour will not be found.}{0.28}
 
 If the image quality is relatively good, that is, when choosing a
 reasonable value for $T_{l}$, the extent of the pupil lake corresponds
@@ -207,11 +212,6 @@ non-pupil ponds surrounding the pupil lake.  Consequently, the
 recommended solution, and the one I chose, since the probability of
 this happening was relatively high with the given test images, is to
 set $r_{d}=0$.
-
-\insertepswidth{dead}{\label{fig:dead}The shaded region designates a
-  portion of the pupil lake, and the white circle designates the
-  ``dead region'' about the origin of operation, inside which the
-  sought pupil contour will not be found.}{0.3}
 
 \subsubsection{Skipping Lake Pixels}
 \label{pg:skiplakepixels}
@@ -266,7 +266,7 @@ obvious candidates are the Sobel operators described in
 Section~\ref{image:edge:gradient} and shown in Fig.~\ref{fig:sobelop}.
 The result of applying these to Fig.~\ref{fig:testimages}(e) is shown
 in Fig.~\ref{fig:compare}(c).  Although the pupil contour is hardly
-discernable in the original image, it is clearly visible in the
+discernible in the original image, it is clearly visible in the
 processed image.  Thus, by moving along the detection lines
 originating at the current origin of operation and at each pixel
 appropriately thresholding the output from the Sobel operators, the
@@ -352,7 +352,7 @@ Before proceeding to design the new masks, it should be noted that,
 when moving from a point inside the pupil, the pupil contour will
 always constitute a positive edge.  Accordingly, approximately half of
 the edges encountered along the detection lines can be discarded,
-namely those that are negative.  It was pointed aout above that the
+namely those that are negative.  It was pointed out above that the
 lack of differentiation between the responses to positive and negative
 edges was due to the returned response being computed as the magnitude
 of the actual response.  Thus, by not taking the magnitude of the
@@ -362,7 +362,7 @@ edges will be detected.
 By discarding all negative responses, the two masks in
 Fig.~\ref{fig:sobelop}(a) and (b) can only be applied to detect the
 southern and eastern pupil edge, respectively, since the northern and
-western edges would cause negative responses and thus be discraded.
+western edges would cause negative responses and thus be discarded.
 However, by mirroring the mask in Fig~\ref{fig:sobelop}(a) about the
 horizontal axis and the one in (b) about the vertical axis, two masks
 are obtained that would return positive responses to the northern and
@@ -441,7 +441,7 @@ not visible (note in particular the far side of the reflection).
 \subsubsection{Thresholding the Output from the Sobel Operators}
 
 \inserteps{myprofil}{\label{fig:myprofile}(a) The profile of the image 
-  in Fig.~\protect\ref{fig:testimages}(d) along a northeastwards
+  in Fig.~\protect\ref{fig:testimages}(d) along a north-eastwards
   detection line passing through the pupil. (b) The result of applying
   the SW and NE Sobel mask of Fig.~\protect\ref{fig:masks} to this
   profile.  $O_{O}$ designates the origin of operation.}
@@ -453,7 +453,7 @@ thresholded.  With the given test images, the S/N ratio is so low that
 it often is difficult on the basis of an image profile visually to
 determine where the actual pupil contour is.  This is clearly
 demonstrated in Fig.~\ref{fig:myprofile}(a), which shows the profile
-of the image in Fig.~\ref{fig:testimages}(d) along a northeastwards
+of the image in Fig.~\ref{fig:testimages}(d) along a north-eastwards
 detection line passing through the pupil.  Although the pupil lake is
 clearly identifiable, this is not the case for the southwestern pupil
 contour (left of the pupil lake).  Note the two islands in the pupil
@@ -466,7 +466,7 @@ Fig.~\ref{fig:masks} to this profile.  $O_{O}$ designates the origin
 of operation.  Note that the processed profile also contains
 information about neighbouring lines to the actual detection line, as
 can be seen from the hill ``ranges'' on both sides of the pupil lake,
-as well as from the two ``extra'' islands by the norteastern shore.
+as well as from the two ``extra'' islands by the northeastern shore.
 
 Clearly, the detected extent of the pupil along this detection line
 depends heavily on the threshold value $T_{e}$.  Particularly,
@@ -489,7 +489,7 @@ slope of the pupil contour is relatively steep, it ought to be
 possible to choose an overall satisfactory value for $T_{e}$.
 
 Note that the standard deviation of the error in the obtained position
-estimate caused by the given value for $T_{e}$ apparantly being
+estimate caused by the given value for $T_{e}$ apparently being
 inappropriate for the profile along a detection line in a given image
 will approach zero as the number of iterations increase.  When the
 estimate no longer changes from one iteration to the next, which is

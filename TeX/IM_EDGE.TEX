@@ -11,18 +11,18 @@
 \section{Edge Detection}
 \label{image:edge}
 
-As mentioned in the previous section, {\em discontinuty detection\/}
-is a branch of image segmentation.  To the area of discontinuty
+As mentioned in the previous section, {\em discontinuity detection\/}
+is a branch of image segmentation.  To the area of discontinuity
 detection belong the fields of {\em point detection\/}, {\em line
   detection\/}, and {\em edge detection\/}.  In this section, the
 focus is on edge detection, as it constitutes by far the most common
-approach for detecting discontinuties in gray level.  An {\em edge\/}
+approach for detecting discontinuities in gray level.  An {\em edge\/}
 is defined as the boundary between two regions characterized by having
 relatively distinct gray levels.
 
 A difficulty with edge detection as an approach to image segmentation
 is that the detected edges often have gaps in them, due to places
-where transistions between regions are not abrupt enough that an edge
+where transitions between regions are not abrupt enough that an edge
 be detected.  In addition, if the image is noisy, edges may be
 detected at points which are not parts of region boundaries, as
 discussed below.  Thus the detected edges will not necessarily form
@@ -31,7 +31,7 @@ closed, connected curves which surround closed, connected regions.
 \subsection{Thresholding}
 \label{image:edge:threshold}
 
-The tresholding technique introduced in
+The thresholding technique introduced in
 Section~\ref{image:segment:threshold} can, with slight modifications,
 be applied to detect edges in an image, as described in~\cite{digim}.
 The idea is to choose a threshold $T$, based on some criteria,

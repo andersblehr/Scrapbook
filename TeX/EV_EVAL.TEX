@@ -11,7 +11,7 @@
 \section{Evaluation}
 \label{eval:eval}
 
-As mentioned in Section~\ref{image:intro:categories}, the tecniques
+As mentioned in Section~\ref{image:intro:categories}, the techniques
 presented in Chapter~\ref{image} can be divided into two main
 categories: {\em Noise reduction\/} schemes and {\em image
   segmentation\/} schemes.  With regard to the noise reduction schemes
@@ -93,7 +93,7 @@ noise function aforehand.  This is seldom the case in real-time
 applications, where the noise normally has a random distribution.
 
 The prohibitive aspect of these schemes (and of any frequency domain
-scheme), however, is their computational cost, eleborated upon in
+scheme), however, is their computational cost, elaborated upon in
 Section~\ref{image:frequency:fourier}, p.~\pageref{pg:fft:O}.  Thus
 frequency domain noise reduction schemes implemented in software can
 be discarded as an alternative in real-time applications (hardware
@@ -125,7 +125,7 @@ threshold value $T$.
 However, as pointed out in Section~\ref{image:segment:threshold}, the
 problem with thresholding is, when applied to real images, to decide
 on a value for $T$ which unambiguously differentiates between actual
-pupil points and points not belonging to the pupil.  The probablility
+pupil points and points not belonging to the pupil.  The probability
 that all pixels in the pupil have values below $T$ and all pixels
 outside of it have values above $T$ is for real images practically
 zero.  Thus, in the most cases, applying a pure pixel-by-pixel
@@ -183,7 +183,7 @@ edges.  With this scheme, during the growing process, all pixels not
 recognized as edge points are included.
 
 The problems with this approach are to choose an optimal edge
-detecting operator and, again, to choose an apropriate threshold
+detecting operator and, again, to choose an appropriate threshold
 value $T$.  Also, the danger exists of the pupil having a boundary
 with ``holes'' in it; that is, actual edge points that are not
 recognized as such by the edge detecting operator.  In that case, the
@@ -200,7 +200,7 @@ as possible, the problem remains of determining the position of the
 data structure, registering the coordinates of the end points of the
 rows and columns of the region being grown.  When the region is
 complete, the $x$-position of its centre (and thus of the pupil's,
-assuming that the correspondance between the region and the pupil is
+assuming that the correspondence between the region and the pupil is
 approximately 1:1) is computed by taking the average of the centre
 points of all rows (using the relation $x_{\mbox{\scriptsize
     centre}}=\frac{1}{2} (x_{\mbox{\scriptsize
@@ -225,7 +225,7 @@ employed.
 \subsubsection{Template Matching}
 
 As mentioned in Section~\ref{image:segment:template},~\cite{template}
-offers an evaluation of three template metching algorithms for
+offers an evaluation of three template matching algorithms for
 detecting and locating the pupil in an image of the eye.  Of the three
 match measures employed, the SAVD and the SSC are characterized as
 satisfactory, whereas the correlation coefficient $\rho$ is deemed to
@@ -272,7 +272,7 @@ looking for an edge forming an circle whose radius lies inside this
 interval.  This can be done by applying the Hough transform on the
 image, as described below and in Section~\ref{image:edge:hough}.
 
-Another way of unambigously recognizing the pupil-iris edge as such,
+Another way of unambiguously recognizing the pupil-iris edge as such,
 is to make it the first edge that the edge detecting algorithm
 encounters.  To ensure this, the edge detection procedure has to start
 from a point positively classified as a pupil point, the {\em origin
@@ -311,7 +311,7 @@ the previous section.
 \end{figure}
 
 The first three edge detection algorithms presented in
-Section~\ref{image:edge}---thresholding, gradiant operators and
+Section~\ref{image:edge}---thresholding, gradient operators and
 highpass filtering---are evaluated with respect to being employed in
 this algorithm.  The main evaluation criterion, next to computational
 cost, is thus how strongly they respond to the pupil-iris contour. The
@@ -370,7 +370,7 @@ second-order derivative operator, it tends to be unacceptably
 sensitive to noise; note for instance the ``rippling'' in the upper
 left corner of the image in the figure.  Most importantly, however,
 and what excludes the Laplacian as a means of detecting the pupil, is
-that the pupil is not discernable in the image at all.
+that the pupil is not discernible in the image at all.
 
 \subsubsection{Highpass Filtering}
 

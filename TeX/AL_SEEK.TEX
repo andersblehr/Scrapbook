@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Apr 11 16:16:00 1993
+%%% Last Modified On: Sun Apr 11 18:30:38 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,7 +13,7 @@
 
 In this section, the {\em swimming octopus\/} search algorithm is
 described.  As pointed out in the previous section, the aim of the
-algorithm is to locate a point in a given image that unambigously can
+algorithm is to locate a point in a given image that unambiguously can
 be classified as a pupil point.  The reason for the name is that the
 performance of the algorithm can be compared to an octopus looking for
 the sea, as will become clear below.  The basic idea behind the
@@ -48,7 +48,7 @@ descends below $T_{l}$, this lake comes to the surface, forming
 ``ponds'' whose sizes depend on the extent of the corresponding
 sub-lake portion of the landscape.  This is illustrated in
 Fig.~\ref{fig:lake}.  Note that, although the pupil is hardly
-discernable in Fig~\ref{fig:landscape}, it is clearly visible as
+discernible in Fig~\ref{fig:landscape}, it is clearly visible as
 forming the largest pond, or {\em lake\/}, after thresholding.  Note
 also that a number of relatively large lakes are formed by non-pupil
 portions of the eye.  This form of thresholding will hereafter be
@@ -115,13 +115,12 @@ described.
 
 \subsubsection{The Octopus Pixel Filter}
 
-The pupil lake is assumed to constitute the largest lake in an image
-(if this is not the case, $T_{l}$ has been badly chosen).  Thus a point
-can safely be classified as a pupil point if it is known to be part of
-a lake whose size is in the order of the average pupil size.  More
-precisely, the neighbourhood about the candidate pixel over which the
-filtering is made must have a radius slightly smaller than the minimum
-radius of the pupil.  
+The pupil lake is assumed to constitute the largest lake in an image.
+Thus a point can safely be classified as a pupil point if it is known
+to be part of a lake whose size is in the order of the average pupil
+size.  More precisely, the neighbourhood about the candidate pixel
+over which the filtering is made must have a radius slightly smaller
+than the minimum radius of the pupil.
 
 The pixel filter, hereafter referred to as the {\em octopus\/} (not to
 be confused with {\octopus}, the name of the entire eye-tracking
@@ -164,7 +163,7 @@ be relatively large in comparison with the pupil lake, and have small
 probability of having the first swim-criterion satisfied outside the
 pupil lake.  As a consequence, $T_{s}$ has to be chosen as high as
 possible in order to minimize the probability of recognizing the
-corresponding point as a pupil point.  Preferrably, $T_{s}$ should be
+corresponding point as a pupil point.  Preferably, $T_{s}$ should be
 chosen near 1.  However, in low-contrasted images the number of
 islands in the lakes, including the pupil lake, tends to be relatively
 high, and thus choosing $T_{s}=1$ may cause no actual pupil points to
@@ -187,7 +186,7 @@ one island, thus reducing the number of sensors reporting wetness, is
 relatively high.  Accordingly, the probability $p$ that the second
 swim-criterion will not be satisfied at a given location is higher
 than it would be if there were none or few islands in the pupil lake.
-Evidently, $p$ is inversly proportional to $T_{s}$.  Since, in
+Evidently, $p$ is inversely proportional to $T_{s}$.  Since, in
 addition, the number $n$ of points in the image that have to be
 filtered in order to land at a point satisfying the swim-criteria is
 inversely proportional to $p$, it follows that $n$ is directly
@@ -198,7 +197,7 @@ islands in the pupil lake, and accordingly an actual pupil point would
 be recognized as such more or less independently of $T_{s}$, thus
 making the search time independent of $T_{s}$ as well.  Consequently,
 when working with ``good'' images, $T_{s}$ should be chosen as high as
-possible, preferrably 1, since it would be preferrable to have the
+possible, preferably 1, since it would be preferable to have the
 octopus return pupil points as near to the centre of the pupil as
 possible, and low values of $T_{s}$ imposes the danger of the octopus
 settling with one arm on the ``beach'' of the pupil lake, its hand in
@@ -287,7 +286,7 @@ whereas the east arm becomes a force of 3 associated with it.  The
 arrows indicate the strength of the pulling forces.  By forming the
 vector sum of the individual forces, the new location is found, and
 the octopus is moved, as indicated by the dotted cross.  In the next
-iteration all pulling forces are 6, exept the west force, which is 5,
+iteration all pulling forces are 6, except the west force, which is 5,
 causing the octopus to retain its vertical position and moving one
 pixel eastwards, as indicated by the first small arrow; thereafter it
 retains its horizontal position and moves one pixel southwards, as
@@ -362,7 +361,7 @@ Basically, the pixels in {\SS} are grid points of a grid superimposed
 on the image, whose spacing is equal to the estimated minimum pupil
 radius.  However, not all grid points of this grid are candidate
 pixels, as shown in Fig.~\ref{fig:candidate}.  For the sake of
-clarity, crosses of equal size to the octopus have been superimosed at
+clarity, crosses of equal size to the octopus have been superimposed at
 each location of a candidate pixel.  As is seen, the spacing between
 candidate pixels in each row and column of the grid is twice the
 estimated minimum pupil radius $r_{p_{min}}$, and their horizontal and

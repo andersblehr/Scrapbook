@@ -27,7 +27,7 @@ most promising of the presented schemes.
 \label{eval:approach:reject}
 
 In the previous sections, a number of techniques were discarded as
-unappliccable to the given problem.  Most of the techniques were
+not applicable to the given problem.  Most of the techniques were
 discarded due to being to computationally expensive.  This applies to
 frequency domain methods in general, being at least
 $O(N^{2}\log_{2}N)$ in time; to template matching, being $O(N^{4})$ in
@@ -54,7 +54,7 @@ listed below:
   growing, and as a means of detecting the pupil-iris contour.
   However, as was pointed out in Section~\ref{eval:eval:segment}, it
   can be applied to implement a {\em pixel filter\/} which can be used
-  to unambigously classify a given pixel as either a pixel point or a
+  to unambiguously classify a given pixel as either a pixel point or a
   non-pixel point.
 \item The region growing technique, supplied with a seed point from a
   search algorithm employing some sort of pixel filter as stop
@@ -68,8 +68,8 @@ listed below:
   positively classified as a pupil point and then proceed in
   all directions until, in each direction, an edge is detected, the
   extent of the pupil and thus its centre can be computed.
-\item Of the presented edge detecting schemes, gradiant operators,
-  examplified by the Sobel operators, turned out to give the strongest
+\item Of the presented edge detecting schemes, gradient operators,
+  exemplified by the Sobel operators, turned out to give the strongest
   response to the relatively weak pupil contour in the test image in
   Fig.~\ref{fig:compare}(a).
 \end{itemize}
@@ -201,7 +201,7 @@ image of the eye consists of two separate steps:
 
 \begin{description}
 \item[Step 1:] Apply a search strategy employing some sort of pixel
-  filter to locate a point which unambigously can be classified as a
+  filter to locate a point which unambiguously can be classified as a
   pupil point.
 \item[Step 2:] Assign the pupil point returned by the search strategy
   to the origin of operation, and use line oriented edge detection
@@ -213,12 +213,12 @@ image of the eye consists of two separate steps:
 \end{description}
 
 In order to minimize the probability of returning a non-pupil point as
-input to Step 2, care has to be taken when chosing the search strategy
-in Step 1.  Also, the fraction of the total time for the algorithm
-spent searching for a pupil point has to be minimized, in order to
-have as much time as possible available for Step 2, since it is not
-known at the outset of the procedure how many iterations will be
-needed to arrive at a final estimate.  In addition, a reasonable
+input to Step 2, care has to be taken when choosing the search
+strategy in Step 1.  Also, the fraction of the total time for the
+algorithm spent searching for a pupil point has to be minimized in
+order to have as much time as possible available for Step 2, since it
+is not known at the outset of the procedure how many iterations will
+be needed to arrive at a final estimate.  In addition, a reasonable
 choice has to be made as to the edge detection operator(s) to be
 employed in Step 2.  From the list of promising aspects given in
 Section~\ref{eval:approach:aspect}, it is clear that some sort of
