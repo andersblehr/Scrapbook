@@ -102,6 +102,7 @@ var   i                         : word;
   procedure hexify(inBuffer : PICBufferType; var outBuffer : EPSBufferType);
 
   var   i                         : word;
+        outValue                  : byte;
         loFour                    : byte;
         hiFour                    : byte;
 
@@ -133,8 +134,12 @@ var   i                         : word;
   begin
     for i:=0 to xSize-1 do
       begin
-        loFour:=4*(inBuffer[i]) and $0F;
-        hiFour:=(4*(inBuffer[i]) shr 4) and $0F;
+        if (inBuffer[i]=63) then
+          outValue:=255
+        else
+          outValue:=4*inBuffer[i];
+        loFour:=outValue and $0F;
+        hiFour:=(outValue shr 4) and $0F;
         outBuffer[2*i]:=dec2hex(hiFour);
         outBuffer[2*i+1]:=dec2hex(loFour)
       end
