@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 18 08:41:32 1993
+%%% Last Modified On: Fri Mar 19 07:09:06 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,18 +97,93 @@ two-dimensional function $f(x,y)$ is defined as the vector
       \partial x \\ \\
       \underline{\partial f} \\
       \partial y
+    \end{array}\right]=\left[
+    \begin{array}{c}
+      G_{x} \\ \\
+      G_{y}
     \end{array}\right]\mbox{.}
 \end{equation}
 $\vec{G}[f(x,y)]$ always points in the direction of the maximum rate
 of increase of $f(x,y)$ at $(x,y)$, and the rate of increase per unit
 distance in this direction, denoted $G[f(x,y)]$, is given by
 \begin{equation}
-  G[f(x,y)]=|\vec{G}|=\sqrt{(\frac{\partial f}{\partial x})^{2}+
-    (\frac{\partial f}{\partial y})^{2}}\mbox{.}
+\label{eq:gradient:sqrt}
+  G[f(x,y)]=|\vec{G}|=\sqrt{G_{x}^{2}+G_{y}^{2}}\mbox{.}
 \end{equation}
 The magnitude function $G[f(x,y)]$ is generally referred to as the
 {\em gradient\/} of $f$, to avoid constantly having to refer to it as
-``the magnitude of the gradient''.
+``the magnitude of the gradient''.  To reduce computational costs, the
+gradient is commonly approximated using absolute values:
+\begin{equation}
+\label{eq:gradient:abs}
+  G[f(x,y)]\approx|G_{x}|+|G_{y}|\mbox{.}
+\end{equation}
+For digital images, $G_{x}$ and $G_{y}$ are approximated using
+differences.  One approach is to use first-order differences in a
+$2\times 2$ neighbourhood.  A typical approximation in this respect is
+\begin{equation}
+  G_{x}\simeq f(x,y)-f(x+1,y)
+\end{equation}
+\begin{equation}
+  G_{y}\simeq f(x,y)-f(x,y+1)\mbox{,}
+\end{equation}
+yielding the following expression for $G[f(x,y)]$:
+\begin{equation}
+  G[f(x,y)]\simeq|f(x,y)-f(x+1,y)|+|f(x,y)-f(x,y+1)|\mbox{.}
+\end{equation}
+
+\subsubsection{Sobel Operators}
+
+Approximations of the kind described above tend to be too sensitive to
+noise, in that only two pixels in each direction are taken into
+consideration.  Using a $3\times 3$ neighbourhood to compute the
+gradient has the advantage of increased smoothing over $2\times 2$
+operators.  Consider the following definitions of $G_{x}$ and $G_{y}$:
+\begin{equation}
+  \begin{array}{lll}
+    G_{x} & = & [f(x-1,y+1)+2f(x,y+1)+f(x+1,y+1)]\ - \\
+          &   & [f(x-1,y-1)+2f(x,y-1)+f(x+1,y-1)]
+  \end{array}
+\end{equation}
+\begin{equation}
+  \begin{array}{lll}
+    G_{y} & = & [f(x+1,y-1)+2f(x+1,y)+f(x+1,y+1)]\ - \\
+          &   & [f(x-1,y-1)+2f(x-1,y)+f(x-1,y+1)]\mbox{.}
+  \end{array}
+\end{equation}
+
+\insertepswidth{sobelop}{\label{fig:sobel}Spatial masks used to
+  compute $G_{x}$ (a) and $G_{y}$ (b).}{0.3}
+
+The spatial masks shown in Figs.~\ref{fig:sobel}(a) and (b) implement
+$G_{x}$ and $G_{y}$, respectively.  These two masks are commonly
+referred to as the {\em Sobel operators\/}.  The responses of these
+two operators at any point $(x,y)$ in an image are combined using
+Eq.~(\ref{eq:gradient:sqrt}) or Eq.~(\ref{eq:gradient:abs}) to obtain
+the gradient at that point.  Convolving these masks with an image
+yields the gradient at all points $(x,y)$ in the image, the result
+often being referred to as a {\em gradient image\/}.  An example of a
+gradient image based on Eq.~(\ref{eq:gradient:abs}) is shown in
+Fig.~\ref{fig:gradient}.
+
+\inserttwoeps{histbl05}{gradbl05}{\label{fig:gradient}An image of a
+  monkey's eye (left), and the result of applying the Sobel operators
+  on this image (right).}
+
+\subsubsection{The Laplacian Operator}
+
+The {\em Laplacian operator\/} $L[f(x,y)]$ is a second-order
+derivative operator, an is in the continuous case defined by the
+equation
+\begin{equation}
+  L[f(x,y)]=\frac{\partial^{2}f}{\partial x^{2}}+
+  \frac{\partial^{2}f}{\partial y^{2}}\mbox{.}
+\end{equation}
+In the discrete case, the Laplacian at point $(x,y)$ is approximated
+by the relation
+\begin{equation}
+  L[f(x,y)]\simeq f(x,y-1)+f(x-1,y)+f(x+1,y)+f(x,y+1)-4f(x,y)\mbox{.}
+\end{equation}
 
 \subsection{The Hough Transform}
 \label{image:edge:hough}

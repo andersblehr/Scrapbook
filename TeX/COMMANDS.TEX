@@ -32,7 +32,7 @@
 % \inserteps[2]
 %
 % Bruksmaate:
-%   \inserteps{filnavn}{figurtekst\label{fig:labref}}
+%   \inserteps{filnavn}{\label{fig:labref}figurtekst}
 %
 % X-utstrekningen til figuren settes til 0.7 ganger tekstbredden.
 %
@@ -43,14 +43,13 @@
 % \insertepswidth[3]
 %
 % Bruksmaate:
-%   \insertepswidth{filnavn}{figurtekst\label{fig:labref}}{bredde}
+%   \insertepswidth{filnavn}{\label{fig:labref}figurtekst}{bredde}
 %
 % `bredde' er et tall mellom 0 og 1 som angir broekdel av
 % tekstbredden som figuren skal ha.
 %
 
-\newcommand{\insertepswidth}[3]
-{
+\newcommand{\insertepswidth}[3] {
   \begin{figure}[htb]
     \leavevmode
     \epsfxsize #3\textwidth
@@ -59,7 +58,34 @@
       \caption{#2}
     \end{centering}
   \end{figure}
-}
+  }
+
+%
+% \inserttwoeps[3]
+%
+% Bruksmaate:
+%   \inserttwoeps{filnavn1}{filnavn2}{\label{fig:labref}figurtekst}
+%
+% Setter inn to EPS-filer ved siden av hverandre.  Hver av dem faar
+% bredde lik 0.3 ganger tekstbredden, og figurteksten kommer sentrert
+% under begge.
+%
+
+\newcommand{\inserttwoeps}[3] {
+  \begin{figure}[htb]
+    \epsfxsize 0.3\textwidth
+    \leavevmode
+    \begin{centering}
+      \parbox{0.49\textwidth}{
+ 	\hspace*{0.14\textwidth}
+        \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#1.eps}}
+      \parbox{0.49\textwidth}{
+	\hspace*{0.04\textwidth}
+        \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#2.eps}}
+      \caption{#3}
+    \end{centering}
+  \end{figure}
+  }
 
 %%
 %%  Torp's saker
