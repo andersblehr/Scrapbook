@@ -77,6 +77,14 @@ const nullMask                  : maskArray = ( 0, 0, 0,
                                                -2, 0, 2,
                                                -1, 0, 1);
 
+      xySobelMask               : maskArray = (-2,-2, 0,
+                                               -2, 0, 2,
+                                                0, 2, 2);
+
+      yxSobelMask               : maskArray = ( 0,-2,-2,
+                                                2, 0,-2,
+                                                2, 2, 0);
+
       laPlaceMask               : maskArray = ( 0, 1, 0,
                                                 1,-4, 1,
                                                 0, 1, 0);
