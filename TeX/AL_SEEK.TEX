@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Apr  6 13:01:12 1993
+%%% Last Modified On: Sun Apr 11 16:16:00 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,12 +34,12 @@ swimming octopus search algorithm.
 
 The foundation of the algorithm is a variant of thresholding in which
 all pixels with values (gray levels) below or equal to the threshold
-value $T_{l}$ have their old values replaced by $T_{l}$, and all
-pixels with values above $T_{l}$ retain their old values.  The effect
-of applying thresholding of this sort to an image can be illustrated
-by picturing the image as a three-dimensional landscape, as depicted
-in Fig.~\ref{fig:landscape}.  The negative peaks correspond to the
-aforementioned spots, whereas the positive peak in the left of the
+value $T_{l}$ have their old values replaced by $T_{l}$ and all pixels
+with values above $T_{l}$ retain their old values.  The effect of
+applying thresholding of this sort to an image can be illustrated by
+picturing the image as a three-dimensional landscape, as depicted in
+Fig.~\ref{fig:landscape}.  The negative peaks correspond to the
+aforementioned spots, whereas the positive peak to the left in the
 image represents an actual bright point (compare
 Fig.~\ref{fig:testimages}(b)).  When the image is thresholded, $T_{l}$
 can be viewed as representing the surface level of a mostly
@@ -137,21 +137,22 @@ octopus are viewed as consisting of {\em sensors\/}.  When applied at
 a given location $(x,y)$ in an image, each sensor registers and
 reports whether or not the pixel it covers is wet.  The {\em first
   swim-criterion\/} that has to be satisfied for the octopus to report
-that it is (hence the name) {\em swimming\/}, that is, that it has
-found the pupil lake, is that its central sensor, covering the pixel
-at $(x,y)$, as well as its hands, that is, the outermost sensors of
-each arm, report wetness.  If this requirement is satisfied, the
-octopus starts to count how many of its sensors that report wetness.
-If this number is higher than a given fraction $T_{s}$ of the total
-number of sensors, the octopus is swimming and consequently reports
-that the pixel at location $(x,y)$ represents a pupil point.  This
-last requirement will be referred to as the {\em second
-  swim-criterion\/}.
+that it is {\em swimming\/}\footnote{Hence the name of the
+  algorithm.}, i.e., that it has found the pupil lake, is that its
+central sensor, covering the pixel at $(x,y)$, as well as its {\em
+  hands\/}, i.e., the outermost sensors of each arm, report wetness.
+If this requirement is satisfied, the octopus starts to count how many
+of its sensors that report wetness.  If this number is higher than a
+given fraction $T_{s}$ of the total number of sensors, the octopus is
+swimming and consequently reports that the pixel at location $(x,y)$
+represents a pupil point.  This last requirement will be referred to
+as the {\em second swim-criterion\/}.
 
 \insertepswidth{octopus}{\label{fig:octopus}The {\em octopus\/} pixel
   filter.  $r_{o}$ is its radius i pixels.}{0.33}
 
 \subsubsection{Satisfying the Second Swim-Criterion}
+\label{pg:Ts}
 
 The probability that the point which the octopus reports to be a pupil
 point actually is a non-pupil point depends on the threshold value
@@ -164,7 +165,7 @@ probability of having the first swim-criterion satisfied outside the
 pupil lake.  As a consequence, $T_{s}$ has to be chosen as high as
 possible in order to minimize the probability of recognizing the
 corresponding point as a pupil point.  Preferrably, $T_{s}$ should be
-chosen near 1.  However, in such low-contrasted images, the number of
+chosen near 1.  However, in low-contrasted images the number of
 islands in the lakes, including the pupil lake, tends to be relatively
 high, and thus choosing $T_{s}=1$ may cause no actual pupil points to
 be recognized as such.  Accordingly, a balance has to be found.  With
@@ -179,11 +180,11 @@ This can be attributed to the poor image quality, and in particular to
 the low contrast.  The average gray level of the pupil lakes in the
 images was found to be 17, making the average depth of any pupil lake
 1 (given that $T_{l}=18$).  Thus local variations in the pupil with
-positive amplitudes of 2 and more cause islands to appear in the pupil
-lake.  Hence, if the octopus actually {\em is\/} in the pupil sea, the
-probability that one or more of its arms cross at least one island,
-thus reducing the number of sensors reporting wetness, is relatively
-large.  Accordingly, the probability $p$ that the second
+positive amplitudes of 2 and more are apt to cause islands to appear
+in the pupil lake.  Hence, if the octopus actually {\em is\/} in the
+pupil sea, the probability that one or more of its arms cross at least
+one island, thus reducing the number of sensors reporting wetness, is
+relatively high.  Accordingly, the probability $p$ that the second
 swim-criterion will not be satisfied at a given location is higher
 than it would be if there were none or few islands in the pupil lake.
 Evidently, $p$ is inversly proportional to $T_{s}$.  Since, in
@@ -202,21 +203,21 @@ octopus return pupil points as near to the centre of the pupil as
 possible, and low values of $T_{s}$ imposes the danger of the octopus
 settling with one arm on the ``beach'' of the pupil lake, its hand in
 a small pond\footnote{The danger of having small ponds on the shores
-  of the pupil lake decreases with the increased image quality.  With
-  the given test images, however, this was a common phenomenon.}.
+  of the pupil lake decreases with increased image quality.  With the
+  given test images, however, this was a common phenomenon.}.
 
 \subsection{The ``Intelligent'' Octopus}
 \label{algo:seek:IQ}
 
 One approach to finding a pupil point would be to apply the octopus as
-described above to every pixel in the image, say, starting in the
+described above to every pixel in the image starting, say, in the
 upper left corner (the reference point), until a pupil point had been
 detected.  This would, however, not be a very time-efficient solution.
 Another approach would be to define a grid covering the image and only
 apply the octopus to the grid points, using some strategy as to the
 order in which the points are subjected to filtering.  With this
 approach, the time needed to detect a pupil point would depend on two
-factors: The grid spacing, and the application strategy.  An even
+factors: The grid spacing and the application strategy.  An even
 better approach would be to incorporate into the octopus some sort of
 mechanism which, from its current location, iteratively moves it in
 the most probable direction with respect to finding the pupil lake.
@@ -236,10 +237,10 @@ Each time a pixel has been chosen as starting pixel, it is removed
 from {\SS}, thus avoiding that the same candidate pixel is chosen
 multiple times.  The pixels initially in {\SS} are evenly distributed
 over the entire image, and their number depends only on the fraction
-of the image occupied by the pupil, and not on the image resolution.
-Starting pixels continue to be selected from {\SS} until the lastly
-selected starting pixel caused the octopus to report detection of a
-pupil point, or until {\SS} is empty.  In the latter case, the pupil
+of the image occupied by the pupil and not on the image resolution.
+Starting pixels continue to be selected from {\SS} until either the
+lastly selected starting pixel caused the octopus to report detection
+of a pupil point or {\SS} is empty.  In the latter case, the pupil
 could not be found in the given image, and an error signal is given.
 In Section~\ref{algo:seek:strategy}, a detailed description is given
 of the semi-random manner in which starting pixels are selected from
@@ -248,14 +249,11 @@ of the semi-random manner in which starting pixels are selected from
 \subsubsection{Determining the Most Probable Direction to the
   Pupil Lake}
 
-\insertepswidth{octoiq}{\label{fig:IQ}The principle behind the
-  ``intelligent'' octopus.}{0.5}
-
 From a given pixel in an image, the most probable direction to the
 pupil lake is determined by letting the sensors of each arm
 successively register whether or not the pixel it covers is wet,
 starting at the hand and moving towards the centre (or {\em body\/})
-of the octopus, stopping if a wet pixel is detected, or if the body is
+of the octopus, stopping if a wet pixel is detected or if the body is
 reached without having detected any wet pixels.  When a sensor sees a
 wet pixel, a {\em pulling force\/} is associated with the arm to which
 it belongs, equal to the distance from the sensor to the body of the
@@ -265,15 +263,18 @@ Otherwise, the sensor next to the hand is made current, and the
 procedure is repeated.  Thus, if sensor number 3 from the hand detects
 a wet pixel, the pulling force associated with the arm is set to
 $r_{o}-3$.  If the body is reached without having detected any wet
-pixels, the pulling force associated with the hand is set to zero.
+pixels, the pulling force associated with the arm is set to zero.
 After each arm has had a pulling force associated with it, the octopus
 is moved to a new location whose offset relative to the old position
 is given by the vector sum of the individual pulling forces.  By using
 the pixel of the new location as starting pixel, the above procedure
 is repeated until the octopus remains in the same position, that is,
-the vector sum of the indvidual pulling forces is zero.  When this is
+the vector sum of the individual pulling forces is zero.  When this is
 the case, the swim-criteria are applied to determine whether the
 current location corresponds to a pupil point.
+
+\insertepswidth{octoiq}{\label{fig:IQ}The principle behind the
+  ``intelligent'' octopus.}{0.5}
 
 The principle is illustrated in Fig.~\ref{fig:IQ}.  Each square
 corresponds to a pixel in an image, the shaded region in the lower
@@ -323,21 +324,21 @@ second category corresponds to a location where the octopus actually
 is on dry land, but has all of its arms crossing small ponds at equal
 distances from its body.  A special case of this scenario is when it
 has its hands as well as its body in small ponds, but the major part
-of its other sensors are dry.  In this case, the first swim/criterion
+of its other sensors are dry.  In this case, the first swim-criterion
 will be satisfied, thus invoking the second, which causes the location
 to be discarded as a pupil point (that is, if $T_{s}$ has been
 assigned a reasonable value).  The third category is when it settles
 in a lake that is too small for it to fit.  That is, its body is in
 the lake, but either two or all of its hands are on land.  Note also
 that it is in this case that the danger of entering an infinite loop
-as described above is largest.  Evidently, locations belonging to
-either of the two first categories will not satisfy the first
-swim-criterion, obliterating the need to apply the second.  The last
-category is when the octopus jumps into a lake which is large enough
-to contain it.  This is the scenario depicted in Fig.~\ref{fig:IQ}.
-In this case, the first swim-criterion will always be satisfied, and
-the second has to be applied to determine whether or not the given
-location corresponds to a pupil point.
+as described above is largest.  Evidently, locations belonging to the
+first and third categories will not satisfy the first swim-criterion,
+obliterating the need to apply the second.  The last category is when
+the octopus jumps into a lake which is large enough to contain it.
+This is the scenario depicted in Fig.~\ref{fig:IQ}.  In this case, the
+first swim-criterion will always be satisfied, and the second has to
+be applied to determine whether or not the given location corresponds
+to a pupil point.
 
 \subsection{The Pick Strategy}
 \label{algo:seek:strategy}
@@ -347,7 +348,7 @@ of candidate pixels were evenly distributed over the entire image, and
 that their number was determined by the fraction of the image occupied
 by the pupil, and not by the image resolution.  It was also mentioned
 that the points supplied as starting pixels to the ``intelligent''
-octopus were selection in a semi-random manner from {\SS}.  Below, the
+octopus are selected in a semi-random manner from {\SS}.  Below, the
 distribution and selection aspects of the {\em pick strategy\/} are
 given separate treatment.
 
@@ -371,22 +372,23 @@ spacing is equal to the estimated minimum pupil size, the number of
 candidate pixels in {\SS} depends only only on the fraction of the
 image occupied by the pupil.
 
-Since the neurophysiological experiments, into whose setup {\octopus}
-is going to be incorporated, take place in relative darkness, the only
+Since the neurophysiological experiments into whose setup {\octopus}
+is going to be incorporated take place in relative darkness, the only
 source of visible light being the inducing monitor (cf.\ 
 Section~\ref{intro:motivation}), it is clear that the actual radius of
 the pupil in the images supplied to {\octopus} will be considerably
 larger than the estimated minimum size.  If assuming that the actual
 pupil radius will be at least 20\% larger than the estimated
-minimum\footnote{In the given test images, the actual pupil radius is
-  $\sim 30\%$ larger than the estimated minumum.}, careful examination
-of Fig.~\ref{fig:candidate} reveals that the minimum number of
-starting pixels that cause the octopus to jump into the pupil lake is
-4.  If the image quality is relatively good and the lake level $T_{l}$
-is chosen so that the number of islands in the pupil lake is minimal
-the probability of the octopus settling in the pupil lake without
-recognizing its location as a pupil point is negligible (cf.\ 
-Section~\ref{algo:seek:idea}).
+minimum\footnote{In the given test images, made under relatively
+  bright light conditions (cf.\ Section~\ref{algo:intro:images}), the
+  actual pupil radius is $\sim 30\%$ larger than the estimated
+  minumum.}, careful examination of Fig.~\ref{fig:candidate} reveals
+that the minimum number of starting pixels that cause the octopus to
+jump into the pupil lake is 4.  If the image quality is relatively
+good and the lake level $T_{l}$ is chosen so that the number of
+islands in the pupil lake is minimal the probability of the octopus
+settling in the pupil lake without recognizing its location as a pupil
+point is negligible (cf.\ Section~\ref{algo:seek:idea}).
 
 \subsubsection{Selecting Starting Pixels}
 
@@ -427,14 +429,15 @@ With the given test images it turned out that, in nearly all cases,
 the pupil was found without having to leave plausibility area 1.  In
 terms of time consumption, the search algorithm was found to run 4--5
 times as fast with plausibility areas as it did when starting pixels
-were chosen at complete random.  The effect of the plausibility areas
-is that the average image area that has to be searched in order to
-detect the pupil is drastically reduced without imposing the danger of
-not detecting the pupil if it should happen to be located outside this
-area.  Moreover, the average time needed to detect the pupil when
-located peripherally in the image is only slightly more than the
-average time\footnote{1--2 ms with the given test images.} needed for
-general pupil detection without plausibility areas.
+were chosen from {\SS} at complete random.  The effect of the
+plausibility areas is that the average image area that has to be
+searched in order to detect the pupil is drastically reduced without
+imposing the danger of not detecting the pupil if it should happen to
+be located outside this area.  Moreover, the average time needed to
+detect the pupil when located peripherally in the image is only
+slightly more than the average time\footnote{1--2 ms with the given
+  test images.} needed for general pupil detection without
+plausibility areas.
 
 \insertepswidth{plausibl}{\label{fig:plausible}The division of the
   image plane into plausible areas.  The gray levels of the areas
@@ -443,19 +446,22 @@ general pupil detection without plausibility areas.
 \subsection{Number of Operations}
 \label{algo:seek:O}
 
-If assuming that the fraction of the image occupied by the pupil is
-constant, it is clear that the number of candidate pixels in {\SS} is
-$O(1)$ (cf.\ Section~\ref{algo:seek:strategy}).  The number of jumps
-that the octopus can do from a given starting pixel is limited by a
-constant (10 in the current implementation), and is thus also $O(1)$.
-The number of operations needed to apply the first swim-criterion at a
-location is 5 (cf.\ Section~\ref{algo:seek:octopus}), and accordingly
-$O(1)$.  For the second swim-criterion, the number of operations is
-proportional to the estimated minimum pupil radius in pixels.
 Assuming that the fraction of the image occupied by the pupil is
-constant, and that the image is of size $N\times N$, this number is
-$O(N)$.  It should be noted, however, that each of these operations
-consists of looking up a boolean value in an array, and thus is very
-cheap computationally.  Nevertheless, the overall number of operations
-for the swimming octopus search algorithm as presented above is
-$O(N)$.
+constant, it is clear that the number of candidate pixels in {\SS} is
+$O(1)$ (cf.\ Section~\ref{algo:seek:strategy}).  The number of
+operations needed to determine the strength of the pulling forces
+exerted by each arm at a given location depends on the radius of the
+octopus in pixels.  Assuming that the fraction of the image occupied
+by the pupil is constant and that the image is of size $N\times N$,
+$r_{p_{min}}$ is $O(N)$.  Since $r_{o}$ is given in terms of
+$r_{p_{min}}$, the number of operations needed to determine the
+pulling forces is $O(N)$.  The number of jumps that the octopus can do
+from a given starting pixel is limited by a constant, and is thus also
+$O(1)$.  The number of operations needed to apply the first
+swim-criterion at a location is 5 and accordingly $O(1)$.  For the
+second swim-criterion, the number of operations is proportional to
+$r_{o}$ in pixels and is thus $O(N)$.  It should be noted, however,
+that each of these operations consists of looking up a boolean value
+in an array, and thus is very cheap computationally.  Nevertheless,
+the overall number of operations for the swimming octopus search
+algorithm as presented above is $O(N)$.

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 25 04:25:48 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Apr  6 12:27:11 1993
+%%% Last Modified On: Sun Apr 11 13:55:22 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,13 +31,13 @@ unappliccable to the given problem.  Most of the techniques were
 discarded due to being to computationally expensive.  This applies to
 frequency domain methods in general, being at least
 $O(N^{2}\log_{2}N)$ in time; to template matching, being $O(N^{4})$ in
-time; and lastly, to the Hough transform, being $O(N^{k})$ in time,
-$k\geq 3$.  The other incentive to rejection was failure to serve the
-purpose.  The techniques thus rejected were simple thresholding, both
-as a means of segmenting out the pupil, as a criterion for inclusion
-in region growing, and as a means of detecting the pupil-iris contour;
-and the Laplacian operator, responding to weakly to the edges of
-interest.
+time; and lastly, to the Hough transform, being $O(N^{2})$ in time,
+but with a proportionality constant presumably larger than $N$.  The
+other incentive to rejection was failure to serve the purpose.  The
+techniques thus rejected were simple thresholding, both as a means of
+segmenting out the pupil, as a criterion for inclusion in region
+growing, and as a means of detecting the pupil-iris contour; and the
+Laplacian operator, responding to weakly to the edges of interest.
 
 \subsection{Promising Aspects}
 \label{eval:approach:aspect}
@@ -67,7 +67,7 @@ listed below:
 \item By letting an edge detection procedure start from a point
   positively classified as a pupil point and then proceed in
   all directions until, in each direction, an edge is detected, the
-  extent of the pupil, and thus its centre can be computed.
+  extent of the pupil and thus its centre can be computed.
 \item Of the presented edge detecting schemes, gradiant operators,
   examplified by the Sobel operators, turned out to give the strongest
   response to the relatively weak pupil contour in the test image in
@@ -89,13 +89,13 @@ high: 262.144.  In contrast to this number is the maximum time of 20
 ms for the algorithm to detect and locate the pupil in a given image.
 From these more or less incompatible requirements it is evident that
 every effort has to be put into making the algorithm as fast as
-possible, without compromising the requirement of accuracy.
+possible without compromising the requirement of accuracy.
 
 To solve this problem it would be beneficial if it were possible to
 detect and locate the pupil without having to consider every single
 pixel in the image.  The smaller the fraction of the total number of
 pixels that have to be taken into consideration, the faster the
-algorithm.  
+algorithm.
 
 \subsubsection{Region Growing?}
 
@@ -107,14 +107,14 @@ expensive.  In addition, to keep track of the pixels that have been
 visited and those that have not, it would be necessary to maintain a
 large data structure of size similar to that of the image.  Each time
 a pixel is to be tested for inclusion, this structure has to be
-consulted as to whether it already {\em has\/} been tested, which
-implies a large number of unnecessary comparisons.  And, perhaps most
-importantly, this approach requires that {\em all\/} pixels in the
-pupil be tested as to whether they are to be included in the growing
-region or not.  The number of pixels in the pupil is not large
-compared to the total number of pixels in the image, but an even
-better solution would be one with which only a subset of the pixels in
-the pupil has to be considered.
+consulted as to whether it already has been tested, which implies a
+large number of unnecessary comparisons.  And, perhaps most
+importantly, this approach requires that all pixels in the pupil be
+tested as to whether they are to be included in the growing region or
+not.  The number of pixels in the pupil is not large compared to the
+total number of pixels in the image, but an even better solution would
+be one with which only a subset of the pixels in the pupil has to be
+considered.
 
 \subsection{Line Oriented Edge Detection}
 \label{eval:approach:edge}
@@ -125,25 +125,26 @@ the pupil has to be considered.
 
 An algorithm of which the above region growing procedure is but an
 implementation is the edge detection based algorithm referred to in
-the list in Section~\ref{eval:approach:aspect}, and described in
+the list in Section~\ref{eval:approach:aspect} and described in
 Section~\ref{eval:eval:edge}.  The basis of this algorithm is that the
 pupil-iris edge can be recognized as such by letting it be the first
 edge that an edge detecting algorithm encounters.  The algorithm
-operates by proceeding, from a point positively classified as a pupil
-point (the {\em origin of operation\/}), in different directions,
-applying some edge detecting operator successively on every pixel
-encountered in each direction, and, if an edge point is recognized,
-registering the coordinates of this point.  Since the pupil-iris edge
-can be assumed to be the first edge encountered when moving in any
-direction from a point within the pupil, the points thus detected
-represent the extent of the pupil.  A line passing through the origin
-of operation and traversing the entire extent of the pupil in some
-direction will hereafter be referred to as a {\em detection line\/}.
-To compute the position of the centre of the pupil, it is necessary to
-know the coordinates of the oppositely positioned edge points along
-two perpendicular detection lines.  The procedure is illustrated in
+assumes the pupil to form a circle in the image and operates by
+proceeding, from a point positively classified as a pupil point (the
+{\em origin of operation\/}), in different directions, applying some
+edge detecting operator successively on every pixel encountered in
+each direction, and, if an edge point is recognized, registering the
+coordinates of this point.  Since the pupil-iris edge can be assumed
+to be the first edge encountered when moving in any direction from a
+point within the pupil, the points thus detected represent the extent
+of the pupil.  A line passing through the origin of operation and
+traversing the entire extent of the pupil in some direction will
+hereafter be referred to as a {\em detection line\/}.  To compute the
+position of the centre of the pupil, it is necessary to know the
+coordinates of the oppositely positioned edge points along two
+perpendicular detection lines.  The procedure is illustrated in
 Fig.~\ref{fig:compute}.  $(x_{o},y_{o})$ designates the origin of
-operation, and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge points
+operation and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge points
 detected along the two detection lines.  The centre points $(x',y')$
 and $(x'',y'')$ of the two lines with respect to the extent of the
 pupil are given by the relations
@@ -159,14 +160,25 @@ $x_{c}$ and $y_{c}$ of the pupil:
 \label{eq:centre:y}
   y_{c}=y'+y''-y_{o}\mbox{.}
 \end{equation}
-In other words, to compute an estimate of the position of the pupil on
-the basis of an already known pupil point, the origin of operation
-with coordinates $x_{o}$ and $y_{o}$, one needs to (1) detect the
-extent of the pupil along two detection lines relative to this point,
-and (2) combine the coordinates of the interception points of the
-lines with the pupil-iris contour to compute $x_{c}$ and $y_{c}$,
-using Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}).  This method
-of detecting the extent of the pupil along detection lines will in the
+
+As mentioned above, this formulation assumes the pupil to form a
+circle in the image.  As pointed out in Section~\ref{back:eye:visual},
+this is only the case when the subject looks straight into the camera.
+However, since the primary need of the Eckhorn-Bauer group is to be
+able to determine whether or not the subject is drifting, the approach
+is deemed satisfactory, assuming that the setup ensures the subject's
+focusing on the reference point corresponds to its looking straight
+into the camera.
+
+With this in mind, it is clear that to compute an estimate of the
+position of the pupil on the basis of an already known pupil
+point---the origin of operation having coordinates $x_{o}$ and
+$y_{o}$---one needs to (1) detect the extent of the pupil along two
+perpendicular detection lines relative to this point, and (2) combine
+the coordinates of the interception points of the lines with the
+pupil-iris contour to compute $x_{c}$ and $y_{c}$, using
+Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}).  This method of
+detecting the extent of the pupil along detection lines will in the
 following be referred to as {\em line oriented edge detection\/}.
 
 Obviously, the estimate obtained by performing the above procedure on
@@ -214,7 +226,7 @@ first-order gradient operator would be best suited for this task,
 considering the superior response of the Sobel-operators to the
 relatively weak pupil-iris contour of the test image in
 Fig.~\ref{fig:compare}(a).  It would be desirable, however, to modify
-these operators in order to maximize this response.
+these operators in order to maximize their response.
 
 In the next chapter, both the search strategy and the design of a
 suitable edge detection operator are given thorough treatment.

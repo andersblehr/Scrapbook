@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Mar 27 20:39:51 1993
+%%% Last Modified On: Sun Apr 11 13:07:49 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,8 +16,9 @@ Another approach to digital image processing is to manipulate the {\em
 is commomly referred to as analyzing the image in the {\em frequency
   domain\/}.  Below, a short introduction is given to the Fourier
 transforms of one- and two-dimensional functions, starting with the
-continuous case and then extending to the discrete case, which, in the
-two-dimenaional case, corresponds to digitized images.
+continuous case and then extending the formulation to include the
+discrete case, which, in the two-dimensional case, corresponds to
+digitized images.
 
 \subsection{The Fourier Transform}
 \label{image:frequency:fourier}
@@ -34,26 +35,26 @@ variable $x$.  The Fourier transform of $f(x)$, denoted ${\cal
   F}\{f(x)\}$, is then defined by the equation
 \begin{equation}
 \label{eq:fourier:def}
-  {\cal F}\{f(x)\}=F(u)=\int_{-\infty}^{\infty}f(x)e^{-j2\pi
-    ux}dx\mbox{,} 
+{\cal F}\{f(x)\}=F(u)=\int_{-\infty}^{\infty}f(x)e^{-j2\pi
+  ux}dx\mbox{,}
 \end{equation}
 where $j=\sqrt{-1}$.  When $F(u)$ is known, $f(x)$ can be obtained
 using the {\em inverse Fourier transform\/}, denoted ${\cal
   F}^{-1}\{F(u)\}$, and defined by the equation
 \begin{equation}
 \label{eq:inverse_fourier:def}
-  {\cal F}^{-1}\{F(u)\}=f(x)=\int_{-\infty}^{\infty}F(u)e^{j2\pi
-    ux}du\mbox{.}
+{\cal F}^{-1}\{F(u)\}=f(x)=\int_{-\infty}^{\infty}F(u)e^{j2\pi
+  ux}du\mbox{.}
 \end{equation}
 Eqs.~(\ref{eq:fourier:def}) and~(\ref{eq:inverse_fourier:def}) are
 called a {\em Fourier transform pair\/}.  The Fourier transform and
-its inverse can be shown if $f(x)$ is continuous and integrable and
-$F(u)$ is integrable.
+its inverse can be shown to exist if $f(x)$ is continuous and
+integrable and $F(u)$ is integrable.
 
 The Fourier transform of a real function is generally complex:
 \begin{equation}
 \label{eq:fourier:R+I}
-  F(u)=R(u)+jI(u)\mbox{,}
+F(u)=R(u)+jI(u)\mbox{,}
 \end{equation}
 where $R(u)$ and $I(u)$ are the real and imaginary parts of $F(u)$,
 respectively.  It is often convenient to express
@@ -64,31 +65,30 @@ Eq.~(\ref{eq:fourier:R+I}) in exponential form:
 where
 \begin{equation}
 \label{eq:fourier:spectrum}
-  |F(u)|=\sqrt{R^{2}(u)+I^{2}(u)}
+|F(u)|=\sqrt{R^{2}(u)+I^{2}(u)}
 \end{equation}
 and
 \begin{equation}
 \label{eq:fourier:phase}
-  \phi(u)=\tan^{-1}\left[\frac{I(u)}{R(u)}\right]\mbox{.}
+\phi(u)=\tan^{-1}\left[\frac{I(u)}{R(u)}\right]\mbox{.}
 \end{equation}
 The magnitude function $|F(u)|$ is called the {\em Fourier spectrum\/}
 of $f(x)$, and $\phi(u)$ its {\em phase angle\/}.  The square of the
 Fourier spectrum,
 \begin{equation}
 \label{eq:fourier:power}
-  P(u)=|F(u)|^{2}=R^{2}(u)+I^{2}(u)
+P(u)=|F(u)|^{2}=R^{2}(u)+I^{2}(u)
 \end{equation}
 is called the {\em power spectrum\/} of $f(x)$.
 
-The term {\em frequency domain\/} stems from the fact that the
-exponential term of Eq.~(\ref{eq:fourier:def}) can be expressed in the
-form
+The term frequency domain stems from the fact that the exponential
+term of Eq.~(\ref{eq:fourier:def}) can be expressed in the form
 \begin{equation}
   e^{-j\pi ux}=\cos 2\pi ux-j\sin 2\pi ux\mbox{,}
 \end{equation}
 thus indicating that $F(u)$ is composed of an infinite sum of sine and
-cosine terms, the {\em frequency\/} of which being determinded by the
-{\em frequency variable\/} $u$.
+cosine terms, the frequency of which being determinded by the {\em
+frequency variable\/} $u$.
 
 The general two-dimensional Fourier transform pair is analogously
 defined:
@@ -101,7 +101,7 @@ and
   {\cal F}^{-1}\{F(u,v)\}=f(x,y)=\int_{-\infty}^{\infty}
   \int_{-\infty}^{\infty}F(u,v)e^{j2\pi(ux+vy)}dudv\mbox{,}
 \end{equation}
-$u$ and $v$ being the {\em frequency variables\/}.
+$u$ and $v$ being the frequency variables.
 
 The Fourier spectrum, phase and power spectrum in the two-dimensional
 case are defined ana-logously to
@@ -109,31 +109,32 @@ Eqs.~(\ref{eq:fourier:spectrum}),~(\ref{eq:fourier:phase}),
 and~(\ref{eq:fourier:power}):
 \begin{equation}
 \label{eq:fourier:spectrum2}
-  |F(u,v)|=\sqrt{R^{2}(u,v)+I^{2}(u,v)}
+|F(u,v)|=\sqrt{R^{2}(u,v)+I^{2}(u,v)}
 \end{equation}
 \begin{equation}
 \label{eq:fourier:phase2}
-  \phi(u,v)=\tan^{-1}\left[\frac{I(u,v)}{R(u,v)}\right]
+\phi(u,v)=\tan^{-1}\left[\frac{I(u,v)}{R(u,v)}\right]
 \end{equation}
 and
 \begin{equation}
 \label{eq:fourier:power2}
-  P(u,v)=|F(u,v)|^{2}=R^{2}(u,v)+I^{2}(u,v)\mbox{.}
+P(u,v)=|F(u,v)|^{2}=R^{2}(u,v)+I^{2}(u,v)\mbox{.} 
 \end{equation}
 
 \subsubsection{The Discrete Fourier Transform}
 
-Since we are dealing with digitized images, consisting of $M\times N$
-pixels having discrete intensity (gray) levels, it is necessary to
-formulate the Fourier transform in the discrete case.  The principle
-is first introduced for the one-dimensional case, and thereafter
-extended to include the two-dimensional case.
+Since we are dealing with digitized images consisting of $M\times N$
+pixels having discrete gray levels, it is necessary to reformulate the
+Fourier transform for the discrete case.  The principle is first
+introduced for the one-dimensional case, and thereafter extended to
+include the two-dimensional case.
 
-When a continuous function $f(x)$, is discretized into a sequence
+When a continuous function $f(x)$ is discretized into a sequence
 $\{f(x_{0}),f(x_{0}+\Delta x),f(x_{0}+2\Delta x),\ldots,
 f(x_{0}+(N-1)\Delta x)\}$ by taking $N$ samples $\Delta x$ units
-apart, its {\em discrete\/} Fourier transform is given by\footnote{For
-  a proof of these results, see for instance~\cite{brigham}.}
+apart, its {\em discrete\/} Fourier transform is given by the
+relation\footnote{For a proof of these results, see for
+  instance~\cite{brigham}.}
 \begin{equation}
 \label{eq:fourier:discrete}
   F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{-\frac{j2\pi ux}{N}}
@@ -150,9 +151,9 @@ Analogously, the inverse discrete Fourier transform is given by
 for $x=0,1,2,\ldots,N-1$.
 
 The discrete Fourier transform pair of a two-dimensional function
-$f(x,y)$, whose one variable $x$ has been discretized by taking $M$
-samples $\Delta x$ units apart, and whose second variable $y$ has been
-discretized taking $N$ samples $\Delta y$ units apart, is defined
+$f(x,y)$ whose one variable $x$ has been discretized by taking $M$
+samples $\Delta x$ units apart and whose second variable $y$ has been
+discretized taking $N$ samples $\Delta y$ units apart is defined
 analogously to the one-dimensional case above:
 \begin{equation}
   F(u,v)=\frac{1}{MN}\sum_{x=0}^{M-1}\sum_{y=0}^{N-1}f(x,y)e^{-j2\pi
@@ -174,14 +175,14 @@ that the independent variables are discrete.
 \subsubsection{The Fast Fourier Transform}
 
 When implementing the discrete Fourier transform, it is important that
-the number of operations be as small as possible, in order to reduce
-computing time.  It can be shown that the formulation in
+the number of operations be kept as low as possible in order to
+reduce computing time.  It can be shown that the formulation in
 Eq.~(\ref{eq:fourier:discrete}) requires $O(N^{2})$ operations, $N$
 being the number of samples used to discretize the original continuous
 function.  The {\em fast Fourier transform\/} ({\fft}) is an algorithm
 which, by properly decomposing Eq.~(\ref{eq:fourier:discrete}),
 reduces the number of operations needed to $O(N\log_{2}N)$.  The
-formulation given here is from~\cite{digim}, and is by no means a
+formulation given here is from~\cite{digim}, but is by no means a
 unique formulation.  For a comprehensive discussion of a number of
 formulations for the {\fft}, including this one, see~\cite{brigham}.
 
@@ -254,8 +255,8 @@ Eq.~(\ref{eq:fft:Fevenodd}) to the results to form $F(u)$ for $u$ in
 $[0,M-1]$.  The values of $F(u)$ for $u$ in $[M,N-1]$ follow directly
 from Eq.~(\ref{eq:fft:doubling}).  Computation of $F_{\even}(u)$ and
 $F_{\odd}(u)$ is carried out in the exact same manner, by dividing
-each of them into two, and proceeding as described above.  This
-process is carried on recursively downwards until the transforms to be
+each of them into two and proceeding as described above.  This process
+is carried on recursively downwards until the transforms to be
 computed are $1$-point transforms, which correspond to the samples
 themselves.  These are then promoted upwards to form intermediate
 results on all levels, until finally, on the top level, the overall
@@ -315,10 +316,10 @@ Eq.~(\ref{eq:fourier:discrete}), still is comparably expensive.
 
 The foundation of frequency domain image processing techniques is the
 {\em convolution theorem\/}.  As was the case for the Fourier
-transformation, this theorem is presented in two steps.  First, the
-general formulation of the theorem is stated for one- and
-two-dimensional continuous functions, then this formulation is
-extended to include the discrete case.
+transform, the theorem is presented in two steps.  First, the general
+formulation of the theorem is stated for one- and two-dimensional
+continuous functions, then this formulation is extended to include the
+discrete case.
 
 \subsubsection{Convolution in the Continuous Case}
 
@@ -334,11 +335,11 @@ to illustrate it graphically with a simple example
 (from~\cite{digim}):
 
 \paragraph{Example:} Consider Eq.~(\ref{eq:convolution:def}) as applied
-to the two functions $f(x)$ and $g(x)$, shown in
+to the two functions $f(x)$ and $g(x)$ shown in
 Figs.~\ref{fig:convolution}(a) and (b), respectively.  Before the
 integration can be carried out, it is necessary to form the function
 $g(x-\alpha)$.  This is accomplished by mirroring $g(\alpha)$ about
-the vertical axis to give $g(-\alpha)$, and then displacing this
+the vertical axis to give $g(-\alpha)$ and then displacing this
 function by $x$, as shown in Figs.~\ref{fig:convolution}(c) and (d).
 Then, for all values of $x$, $f(x)$ is multiplied with $g(x-\alpha)$,
 and the result (the shaded portion of Fig.~\ref{fig:convolution}(e))
@@ -379,7 +380,7 @@ reduces to multiplication in the spatial domain:
 \begin{equation}
   {\cal F}^{-1}\{F(u)\ast G(u)\}=f(x)g(x)\mbox{.}
 \end{equation}
-These to results, formally stated as
+These two results, formally stated as
 \begin{equation}
   f(x)\ast g(x)\Leftrightarrow F(u)G(u)
 \end{equation}
@@ -403,7 +404,7 @@ The two-dimensional convolution theorem is given by the relations
 \label{eq:convolution:2Db}
   f(x,y)g(x,y)\Leftrightarrow F(u,v)\ast G(u,v)\mbox{.}
 \end{equation}
-For a graphical illustration of the two-dimensional convolution,
+For a graphical illustration of two-dimensional convolution,
 see~\cite{digim}, p.\ 89.
 
 \subsubsection{Convolution in the Discrete Case}
@@ -449,7 +450,7 @@ for $x=0,1,2,\ldots,M-1$ and $y=0,1,2,\ldots,N-1$.
 
 The two-dimensional convolution theorem stated in
 Eqs.~(\ref{eq:convolution:2Da}) and~(\ref{eq:convolution:2Db}) also
-apply to the discrete case with $u=0,1,2,\ldots,M-1$ and
+applies to the discrete case with $u=0,1,2,\ldots,M-1$ and
 $v=0,1,2,\ldots,n-1$.  
 
 All computations involve, as indicated above, the extended functions
@@ -462,7 +463,7 @@ use $f_{e}$ and $g_{e}$ in most practical applications.
 \subsubsection{Application of Convolution in Digital Image Processing}
 
 As mentioned above, the convolution theorem forms the basis of image
-processing in the frequency domain.  Let $g(x,y)$ be an image that is
+processing in the frequency domain.  Let $g(x,y)$ be an image which is
 the result of convolving an image $f(x,y)$ with a position-invariant
 operator $h(x,y)$\footnote{A position-invariant operator is an
   operator whose result depends only on the value of $f(x,y)$ at a
@@ -471,7 +472,7 @@ operator $h(x,y)$\footnote{A position-invariant operator is an
 \label{eq:convolution:operator}
   g(x,y)=h(x,y)\ast f(x,y)\mbox{.}
 \end{equation}
-From the convolution theorem (Eq.~(\ref{eq:convolution:2Da})), we then
+From the convolution theorem (Eq.~(\ref{eq:convolution:2Da})) we then
 have that the following relation holds in the frequency domain:
 \begin{equation}
   G(u,v)=H(u,v)F(u,v)\mbox{,}
@@ -489,6 +490,7 @@ trying to choose a transfer function $H$ such that the resulting image
 exhibits some desired property.
 
 \subsubsection{Spatial Masks as Convolution Masks}
+\label{pg:convolutionmasks}
 
 From a practical point of view it is often more convenient to compute
 the discrete convolution of an image $f$ with an operator $h$ in the
@@ -496,9 +498,9 @@ frequency domain instead of using Eq.~(\ref{eq:convolution:discrete})
 directly.  This is done by computing the Fourier transforms $F$ and
 $H$ using an {\fft} algorithm, multiplying the Fourier transforms to
 obtain $G$, and then applying the inverse Fourier transform to obtain
-the desired image $g$.  Brigham shows, however, in~\cite{brigham},
-that for one-dimensional arrays, the {\fft} approach is faster only if
-the number of points contributing to the operator is greater than 32.
+the desired image $g$.  However, in~\cite{brigham} Brigham shows that
+for one-dimensional arrays, the {\fft} approach is faster only if the
+number of points contributing to the operator is greater than 32.
 Thus, when applying small operators, it would be convenient to be able
 to perform the convolution in the spatial domain.
 
@@ -519,7 +521,7 @@ described as {\em convolving\/} the image with the mask.
 \subsection{Image Processing in the Frequency Domain}
 \label{image:frequency:image}
 
-In the Fourier transform $F$ of an image $f$, the high frequency
+In the Fourier transform $F$ of an image $f$ the high frequency
 component is to a large extent caused by edges and other sharp
 transitions in the gray levels of the image (such as noise).
 Correspondingly, the low frequency component of $F$ corresponds to
@@ -542,7 +544,7 @@ $F$.  The resulting image, given by
 then exhibits the desired properties.  Cross sections of an ideal
 lowpass filter and a lowpass Butterworth filter are shown in
 Fig.~\ref{fig:lowpass}, $D(u,v)$ being the distance from the point
-$(u,v)$ to the origin of the frequency plane, and $D_{0}$ being the
+$(u,v)$ to the origin of the frequency plane and $D_{0}$ being the
 {\em cut-off frequency\/}.
 
 \inserteps{lowpass}{\label{fig:lowpass}Cross section of an ideal
@@ -550,9 +552,9 @@ $(u,v)$ to the origin of the frequency plane, and $D_{0}$ being the
 
 Since the high-frequency component of an image corresponds to edges
 and other abrupt gray level transitions, lowpass filtering has the
-effect of {\em blurring\/} the original image.  On the other hand, if
-the image has been distorted by noise, which is also high frequency in
-content, an additional effect is one of noise reduction (see
+effect of blurring the original image.  On the other hand, if the
+image has been distorted by noise, which is also high frequency in
+content, an additional effect is one of noise reduction (cf.\ 
 Section~\ref{image:noise:frequency}).
 
 \subsubsection{Highpass Filtering}
@@ -565,10 +567,10 @@ filter, as shown in Fig.~\ref{fig:highpass}.
   highpass filter (a) and a highpass Butterworth filter (b).}
 
 If the low-frequency content of an image is severely attenuated, the
-resulting image will be one in which the edges between areas of
-different gray levels are predominant.  If the intent is to sharpen
-the edges without loss of low-frequency information, a constant $c$ is
-often added to the highpass filter transfer function, as shown in
+resulting image will be one in which edges between areas of different
+gray levels are predominant.  If the intent is to sharpen the edges
+without loss of low-frequency information, a constant $c$ is often
+added to the highpass filter transfer function, as shown in
 Fig.~\ref{fig:homomorphic}, by choosing $\gamma_{L}=c$ and
 $\gamma_{H}=1+c$.  This is known as {\em high frequency emphasis\/}.
 
@@ -577,7 +579,7 @@ $\gamma_{H}=1+c$.  This is known as {\em high frequency emphasis\/}.
 
 High frequency emphasis is actually a special case of what is known as
 {\em homomorphic filtering\/}.  Homomorphic filtering is based on an
-{\em image model\/} saying that an image $f(x,y)$ is composed of an
+image model saying that an image $f(x,y)$ is composed of an
 {\em illumination component\/} $i(x,y)$ and a {\em reflection
   component\/} $r(x,y)$ according to the equation
 \begin{equation}
@@ -587,7 +589,7 @@ High frequency emphasis is actually a special case of what is known as
 The illumination component of an image is generally characterized by
 slow spatial variation, and is thus low frequency in content.  The
 reflection, on the other hand, depends on the nature of the objects in
-image, and tends to vary abruptly, thus being high frequency in
+image and tends to vary abruptly, thus being high frequency in
 content.  Assuming that $\gamma_{L}$ and $\gamma_{H}$ are chosen so
 that $\gamma_{L}<1$ and $\gamma_{H}>1$, the filter function in
 Fig.~\ref{fig:homomorphic} affects the low and high frequency
@@ -596,4 +598,4 @@ and amplifying the high frequencies.  The net result is simultaneous
 dynamic range compression and contrast enhancement.  On pp.\ 192-193
 in~\cite{digpic} is shown the result of applying the filter in
 Fig.~\ref{fig:homomorphic} with $\gamma_{L}=0.5$ and $\gamma_{H}=2.0$
-on an image with little contrast.
+to an image with little contrast.

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:32:42 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Apr  8 16:47:13 1993
+%%% Last Modified On: Sun Apr 11 16:02:50 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,9 +36,9 @@ complete eye-tracking system will be as follows:
   signal the end of the next 20 ms period.
 \item As soon as a final position estimate has been arrived at, the
   position of the corresponding point of focus is sent to a given port
-  address of the host PC.  A signal is given that this position is
+  address of the host PC.  A signal is given that the position is
   available at the port.  The relation between position estimate and
-  point of focus was given in Section~\ref{algo:future:output} above.
+  point of focus in given in Section~\ref{algo:future:output} below.
 \item {\octopus} returns to step 1 and the process is repeated.
 \end{enumerate}
 
@@ -66,7 +66,7 @@ Consequently, the position of the pupil in an image has to be mapped
 to the point on the inducing monitor corresponding to it.
 
 An admittedly memory consuming but time-efficient approach to
-implementing this mapping is to create for the $n\times N$ image a
+implementing this mapping is to create for the $N\times N$ image a
 $N\times N$ array containing, for each possible (discrete) location of
 the pupil in the image, the corresponding point of focus on the
 inducing monitor.  Accordingly, when {\octopus} has arrived at a final
@@ -75,29 +75,99 @@ estimate are used to index the array, and the coordinate pair thus
 obtained is made available to the outside world.
 
 An array of this type would, assuming an image resolution of
-$512\times 512$, require 1MB of memory, when each coordinate pair
+$512\times 512$, require 1 MB of memory when each coordinate pair
 contained in it requires 32 byte.  This would, however, constitute no
 major problem, considering today's low cost and availability of RAM
 expanders.  The advantage of this approach is that, assuming an
 invariant experimental setup (cf.\ the next section), the values
-contained in it can be computed once and then be stored in a file
-which is read anew each time {\octopus} is invoked.  Moreover, the
-inherit non-linearity between the pupil position in the image and the
-actual gaze angle can be compensated for without computational
-overhead by incorporating the needed correction in the values
-contained in the array.
+contained in it can be computed once and then stored in a file which
+is read anew each time {\octopus} is invoked.  Moreover, the inherit
+non-linearity between the pupil position in the image and the actual
+gaze angle can be compensated for without computational overhead by
+incorporating the needed correction in the values contained in the
+array.
 
 \subsection{Calibrating the Experimental Setup}
 \label{algo:future:calibrate}
 
+Evidently, {\octopus} will need some calibrating before being able to
+run satisfactorily within the framework of a complete eye-tracking
+system.  Here, two calibration issues are addressed; parameter values
+and initializing the mapping array described above.
+
+\subsubsection{Parameter Values}
+
+As is clear from the preceeding chapters, the position estimates
+returned by {\octopus} depend heavily on the values assigned to the
+different parameters it employs.  These are:
+
+\begin{description}
+\item[$T_{l}$] The threshold value for the lake-thresholding technique
+  described in Section~\ref{algo:seek:idea}.  Accordingly, also the
+  surface level of the lakes in an image are given by $T_{l}$.  For
+  the given test images it was found that $T_{l}=18$ ensures
+  ``optimal'' pupil lakes and sufficiently small non-pupil lakes.  For
+  a thorough discussion on the choice of a value for $T_{l}$, see
+  Section~\ref{algo:seek:idea}.
+\item[$T_{s}$] The fraction of the total number of sensors possessed
+  by the octopus pixel filter that have to detect wetness for the
+  octopus to report that it is swimming.  With the given test images,
+  $T_{s}=0.8$ was found to be the best choice.  A discussion on how to
+  decide on a value for $T_{s}$ is found in
+  Section~\ref{algo:seek:octopus}.
+\item[$T_{e}$] The threshold value used to determine whether or not
+  the responses returned by the Sobel operators in
+  Fig.~\ref{fig:masks} correspond to the pupil edge.  The choice made
+  for the given test images was $T_{e}=0.5$.  See
+  Section~\ref{algo:pos:operators} for a discussion of how to choose
+  an appropriate value for $T_{e}$, and in particular
+  p.~\pageref{pg:TEproblems} for a discussion of problems related to
+  this choice.
+\item[$r_{p_{min}}$] The fraction of the image resolution $N$ to which
+  the minimum pupil radius corresponds.  With the given test images,
+  $r_{p_{min}}$ was estimated to be 10\% of the images' size in the
+  $x$ direction\footnote{Recall that the given test images are not
+    square, i.e., they are of size $M\times N$, $M\neq N$.}.
+\item[$r_{o}$] The fraction of the image resolution $N$ to which the
+  radius of the octopus pixel filter corresponds.  In the current
+  implementation, this fraction was set to $0.8r_{p_{min}}$.  Two
+  general rules for choosing a value for $r_{o}$ are (1)
+  $r_{o}<r_{p_{min}}$ and (2) the better the image quality, the
+  smaller $r_{o}$ can be chosen without running the risk of
+  recognizing a non-pupil point as pupil point.  Evidently, the number
+  of operations for {\octopus} decreases with lower values for $r_{o}$
+  (cf.\ Section~\ref{algo:seek:O}).
+\item[$r_{d}$] The radius of the ``dead'' region about the origin of
+  operation inside which the probability of locating the pupil edge is
+  zero.  In the algorithm formulation, it is automatically set to
+  $r_{o}/\sqrt{2}$ along the horizontal and vertical detection lines
+  and to $r_{o}/2$ along the diagonal detection lines, whereas in the
+  current implementation it is set to 0 along all detection lines.
+  See Section~\ref{algo:pos:operation}, p.~\pageref{pg:dead}, for a
+  discussion of problems related to defining a ``dead'' region about
+  the origin of operation.
+\end{description}
+
+Clearly, the appropriateness of a given set of values for these
+parameters depends on the image quality and on the illumination
+conditions under which the images are made.  Assuming that these are
+the same from one experiment to another, the same set of values can be
+used each time.  Otherwise, a somewhat cumbersome process of
+determining an apparantly optimal set of values has to be carried out.
+How cumbersome this process would be depends on its
+implementation\footnote{In the current implementation, the parameters
+  are assigned values through constants and command-line parameters.}.
+
+\subsubsection{Initializing the Mapping Array}
+
 When employing the above array to map the location of the pupil in an
 image to the corresponding point of focus on the inducing monitor, it
-is of vital imortance that the coordinate pairs contained in the array
-actually represent the correct points of focus in the given setup.  If
-this is not the case, the estimates supplied by {\octopus} are of no
-value whatsoever.  Accordingly, either care has to be taken when
-calibrating the experimental setup, or the values contained in the
-array have to be computed anew for each experiment.
+is of vital importance that the coordinate pairs contained in the
+array actually represent the correct points of focus in the given
+setup.  If this is not the case, the estimates supplied by {\octopus}
+are of no value whatsoever.  Accordingly, either care has to be taken
+when calibrating the experimental setup or the values contained in
+the array have to be computed anew for each experiment.
 
 An approach to initially compute the values to be contained in the
 array is to make five illuminated points appear on the inducing
@@ -136,7 +206,7 @@ From the above, it is evident that some sort of communication between
 {\octopus} and the employed frame-grabber has to take place.  The line
 of operation depicted indicates that this has to be a two-way
 communication, having {\octopus} tell the frame-grabber that it is
-ready to start processing a new image, as well as having the
+ready to start processing a new image as well as having the
 frame-grabber tell {\octopus} that a new image is available for
 processing.  In a strict sense, only the latter of these two is
 necessary, since the former can be implemented by having {\octopus}
@@ -164,24 +234,23 @@ memory.
 The easiest and most cost-efficient solution, though, would be the
 straightforward approach; to let the frame-grabber write the digitized
 images to its own storage device(s).  This, however, imposes another
-problem on the setup, since {\octopus} operates by accessing indvidual
-pixels of the digitized image.  If the digitized image is to be stored
-on the frame-grabber board and the processing is to take place in the
-CPU of the host PC, the pixel values of the image have to be accessed
-over the PC bus.  Since {\octopus} operates by accessing individual
-pixels of the image, this would imply initiating and closing a
-dedicated transfer session for each pixel value needed, thus imposing
-an unproportionally high transfer overhead, in addition to the
-question of the transfer rate of the PC bus at all being able to
-sustain this communication.  Again, a possible solution would be to
-employ a dedicated bus for this purpose, but the transfer overhead
-involved suggests that another solution be sought.
+problem on the setup.  If the digitized image is to be stored on the
+frame-grabber board and the processing is to take place in the CPU of
+the host PC, the pixel values of the image have to be accessed over
+the PC bus.  Since {\octopus} operates by accessing individual pixels
+of the image, this would imply initiating and closing a dedicated
+transfer session for each pixel value needed, thus imposing an
+unproportionally high transfer overhead in addition to the question
+of the transfer rate of the PC bus at all being able to sustain this
+communication.  Again, a possible solution would be to employ a
+dedicated bus for this purpose, but the transfer overhead involved
+suggests that another solution be sought.
 
 The apparantly most promising approach to the above problem would be
 to purchase a frame-grabber also possessing an on-board processor
 capable of running an implementation of {\octopus} within the given
 time limits.  Ideally, one processor should be dedicated to digitizing
-frames received from the camera, and another processor should perform
+frames received from the camera and another processor should perform
 the image analysis.  In addition, the purchased board should possess
 two memory banks to enable {\octopus} to access one image while the
 next is being digitized.  Accordingly, the digitized frames have to be
@@ -192,7 +261,7 @@ group's disposal, possessing one T800 and one T200.  Attempts are
 being made at having the T200 grab the frames, which at a later stage
 would make it possible to have the T800 perform the image analysis.
 However, the board will remain at our disposal only for a limited time
-period, and its cost ($\sim$ DM18.000) suggests that another board
+period, and its cost ($\sim$ DM 18,000) suggests that another board
 would have to be sought for the final implementation.  Still, the
 experiences obtained with it may prove valuable when a cheaper board
 has been chosen and is about to be programmed.

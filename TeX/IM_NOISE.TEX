@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:38:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Fri Apr  9 11:17:20 1993
+%%% Last Modified On: Sun Apr 11 13:16:48 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,25 +48,26 @@ of neighbourhood averaging of an $N\times N$ image $f$ is
   g(x,y)=\frac{1}{M}\sum_{(n,m)\in S}f(n,m)
 \end{equation}
 for $x,y=0,1,2,\ldots,N-1$, where $S$ is the set of coordinates
-defining the neighbourhood of $(x,y)$, and $M$ is the number of points
+defining the neighbourhood of $(x,y)$ and $M$ is the number of points
 in the neighbourhood.
 
-Given that the noise values at each point in the image are independent
-samples from a distribution whose mean is 0, it is clear that the
-standard deviation of the noise present is reduced by neighbourhood
-averaging (for a formal proof of this, see~\cite{digpic}), thus
-indicating an improved signal-to-noise (S/N) ratio.
+Assuming that the noise values at each point in the image are
+independent samples from a distribution whose mean is 0, it is clear
+that the standard deviation of the noise present is reduced by
+neighbourhood averaging (for a formal proof of this,
+see~\cite{digpic}), thus indicating an improved signal-to-noise (S/N)
+ratio.
 
-An obvious side-effect of neighbourhood averaging is one of {\em
-  blurring\/} the image.  The degree of blurring is proportional to
-the size of averaging neighbourhood used.  If the noise is finer
-grained than the smallest details of interest in the image, the
-blurring can be made negligible by choosing a correspondingly small
-averaging neighbourhood.  If this is not the case, or if it for some
-reason is desirable to use a larger averaging neighbourhood, the
-averaging can be ``switched off'' in regions with large variations in
-gray level (lines, edges, etc.) by using the following criterion
-instead of Eq.~(\ref{eq:averaging:neighbourhood}):
+An obvious side-effect of neighbourhood averaging is one of blurring
+the image.  The degree of blurring is proportional to the size of the
+averaging neighbourhood used.  If the noise is finer grained than the
+smallest details of interest in the image, the blurring can be made
+negligible by choosing a correspondingly small averaging
+neighbourhood.  If this is not the case, or if it for some reason is
+desirable to use a larger averaging neighbourhood, the averaging can
+be ``switched off'' in regions with large variations in gray level
+(lines, edges, etc.) by using the following criterion instead of
+Eq.~(\ref{eq:averaging:neighbourhood}):
 \begin{equation}
   g(x,y)=\left\{
     \begin{array}{ll}
@@ -90,13 +91,16 @@ all the noisy images at hand:
 \begin{equation}
   \overline{g}(x,y)=\frac{1}{M}\sum_{i=1}^{M}g_{i}(x,y)\mbox{,}
 \end{equation}
-where $M$ is the number of noisy images.  Since the mean of the noise
+$M$ being the number of noisy images.  Since the mean of the noise
 function $\eta(x,y)$ is 0, the expected value of $\overline{g}$ at any
 point is given by
 \begin{equation}
   E\{\overline{g}(x,y)\}=f(x,y)\mbox{.}
 \end{equation}
-The standard deviation at any point in the average image is given by
+If $\sigma_{\eta(x,y)}$ denotes the standard deviation of the noise
+function $\eta(x,y)$, the standard deviation
+$\sigma_{\overline{g}(x,y)}$ at any point in the averaged image is 
+given by the relation
 \begin{equation}
   \sigma_{\overline{g}(x,y)}=\frac{1}{\sqrt{M}}\sigma_{\eta(x,y)}\mbox{,}
 \end{equation}
@@ -114,7 +118,7 @@ cost-efficient approach.
 
 {\em Median filtering\/} is a technique with which the gray level of
 each pixel in an image is replaced by the {\em median\/} of the gray
-levels in a neighbourhood of that pixel, instead of by the average, as
+levels in a neighbourhood of that pixel instead of by the average, as
 was the case in the previous section.  The median of a set of values
 is the value that is such that half of the values in the set is
 smaller than or equal to it, and the other half is greater than or
@@ -145,8 +149,8 @@ transform of the image, noise reduction can be achieved.
 
 \subsubsection{Lowpass Filtering}
 
-The most general, and also most obvious, approach to noise reduction
-in the frequency domain, is lowpass filtering, as touched upon in
+The most general and also most obvious approach to noise reduction
+in the frequency domain is lowpass filtering, as touched upon in
 Section~\ref{image:frequency:image}.  Since not only the noise, but
 also gray level transitions in the image are high-frequency in
 content, lowpass filtering, as was the case also for neighbourhood
@@ -169,16 +173,16 @@ so predominant as for pure lowpass filtering.
 
 \subsubsection{Selective Filtering}
 
-If the noise consists of a {\em regular pattern\/} which has been
-superimposed on the image, this pattern tends to have most or all of
-its energy concentrated at small spots in the frequency plane.  Thus,
-if the Fourier transform of this superimposed pattern is known, it can
-be removed entirely simply by frequency-domain subtraction of its
-Fourier transform from the Fourier transform of the noisy image.  The
-loss of information in the processed image will be negligible.
+If the noise constitutes a regular pattern which has been superimposed
+on the image, this pattern tends to have most or all of its energy
+concentrated at small spots in the frequency plane.  Thus, if the
+Fourier transform of this superimposed pattern is known, it can be
+removed entirely simply by frequency-domain subtraction of its Fourier
+transform from the Fourier transform of the noisy image.  The loss of
+information in the processed image will be negligible.
 
 If the nature of the superimposed noise is only partly known, but one
-is able to locate the spots in the frequency plane where most of the
-energy of the noise seems to be concentrated, one can reduce the
-amount of noise in the image without serious loss of information by
-suppressing these spots.  This is called {\em selective filtering\/}.
+is able to locate the spots in the frequency plane where the energy of
+the noise seems to be concentrated, one can reduce the amount of noise
+in the image without serious loss of information by suppressing these
+spots.  This is called {\em selective filtering\/}.

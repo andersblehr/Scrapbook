@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:28:57 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Apr  8 18:51:05 1993
+%%% Last Modified On: Sun Apr 11 14:56:40 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,7 +18,7 @@ overall number of operations for the algorithm is derived in
 Section~\ref{algo:eval:O}.  In Section~\ref{algo:eval:test}, an
 implementation (previously referred to as the {\em current\/}
 implementation) is run on the set of test images presented in
-Fig.~\ref{fig:testimages} and the results returned are discussed, with
+Fig.~\ref{fig:testimages} and the results returned are discussed with
 respect to both accuracy and time consumption.  Lastly in
 Section~\ref{algo:eval:improve}, some suggestions as to how to improve
 the performance and accuracy of the algorithm are presented.
@@ -28,20 +28,19 @@ the performance and accuracy of the algorithm are presented.
 
 In Section~\ref{algo:seek:O}, it was shown that the swimming octopus
 search algorithm, described in Section~\ref{algo:seek} and
-implementing Step 1 in the basic algorithm formulation given in
-Section~\ref{eval:approach:algo}, performs in $O(N)$ time when applied
-to an $N\times N$ image.  In Section~\ref{algo:pos:O} it was shown
-that the position determining algorithm described in
-Section~\ref{algo:pos}, implementing Step 2 of the basic algorithm
-formulation, performs in $O(N)$ time.  Thus it can be concluded that
-the {\octopus} eye-tracking algorithm, being composed of the given
-implementations of Steps 1 and 2 of the basic algorithm formulation,
-performs in $O(N)$ time.  Taking into account that the number of
-locations in the image at which the edge detection operators of
-Fig.~\ref{fig:masks} have to employed, assuming relatively good image
-quality, is $O(1)$ (cf.\ Section~\ref{algo:pos:O}), the advantage of
-{\octopus} over a ``traditional'' approach in terms of computational
-cost is evident.
+implementing Step 1 of the basic algorithm formulation, performs in
+$O(N)$ time when applied to an $N\times N$ image.  In
+Section~\ref{algo:pos:O} it was shown that the position determining
+algorithm described in Section~\ref{algo:pos}, implementing Step 2 of
+the basic algorithm formulation, performs in $O(N)$ time.  Thus it can
+be concluded that the {\octopus} eye-tracking algorithm, being
+composed of the given implementations of Steps 1 and 2 of the basic
+algorithm formulation, performs in $O(N)$ time.  Taking into account
+that the number of locations in the image at which the edge detection
+operators of Fig.~\ref{fig:masks} have to employed, assuming
+relatively good image quality, is $O(1)$ (cf.\ 
+Section~\ref{algo:pos:O}), the advantage of {\octopus} over a
+``traditional'' approach in terms of computational cost is evident.
 
 \subsection{Test Results}
 \label{algo:eval:test}
@@ -77,7 +76,7 @@ cost is evident.
 The major amount of testing was done while developing and implementing
 {\octopus}.  Six of the images with which I worked during that time
 are given in Fig.~\ref{fig:testimages}; in addition I had another four
-images at my disposal.  How these images were acquired is described in
+images at my disposal.  How the images were acquired is described in
 Section~\ref{algo:intro:images}.  The tests performed at this stage
 were a vital part of the development process, pointing at weaknesses
 in the current algorithm formulation, suggesting solutions to
@@ -90,7 +89,7 @@ In the following, the focus will be on the final formulation of
 {\octopus} as given in the previous sections, and on its ability to
 satisfy the requirements listed in the algorithmic problem definition
 given in Section~\ref{intro:problem}.  Three points will be addressed,
-accuracy, distortion of the pupil's appearance, and time consumption.
+accuracy, distortion of the pupil's appearance and time consumption.
 With respect to the requirement that {\octopus} give an error signal
 whenever the pupil cannot be found in a given image, refer to
 Section~\ref{algo:intro:problem}.  The relatively low resolution of
@@ -104,21 +103,21 @@ In Fig.~\ref{fig:results}, the position estimates returned by
 {\octopus} when supplied with the images in Fig.~\ref{fig:testimages}
 are shown.  As is seen, the actual extent of the pupil in the images
 can hardly be determined visually, which imply relatively weak pupil
-edges.  Moreover, the edges of the bright reflexes, which are seen to
-cover portions of the pupil in all images, evidently constitute the
+edges.  Moreover, the edges of the bright reflections, which are seen
+to cover portions of the pupil in all images, evidently constitute the
 sharpest and most clearly defined edges present.  As pointed out in
-Section~\ref{algo:intro:images}, these reflexes are of a non-additive
-nature, i.e., the information contained in the regions they cover is
-lost, and accordingly they cannot be removed.  Hence it is unavoidable
-that the position estimates returned by {\octopus} are influenced by
-these reflexes.  Taking this and the inaccuraccies due to the chosen
-value for $T_{e}$ not being appropriate for all images into account
-(cf.\ Section~\ref{algo:pos:operators}, p.~\pageref{pg:TEproblems}),
-it is evident that the difference between the actual pupil centre and
-the position estimate returned by {\octopus} cannot be used as an
-accuracy measure.  Actually, due to the poor image quality, it would
-be practically impossible with some of the images to manually
-determine the actual pupil centre.
+Section~\ref{algo:intro:images}, these reflections are of a
+non-additive nature, i.e., the information contained in the regions
+they cover is lost, and accordingly they cannot be removed.  Hence it
+is unavoidable that the position estimates returned by {\octopus} are
+influenced by these reflections.  Taking this and the inaccuraccies
+due to the chosen value for $T_{e}$ not being appropriate for all
+images into account (cf.\ Section~\ref{algo:pos:operators},
+p.~\pageref{pg:TEproblems}), it is evident that the difference between
+the actual pupil centre and the position estimate returned by
+{\octopus} cannot be used as an accuracy measure.  Actually, due to
+the poor image quality, it would be practically impossible with some
+of the images to manually determine the actual pupil centre.
 
 \begin{table}[tb]
   \begin{center}
@@ -160,7 +159,7 @@ tolerable, even without the given accuracy requirement.
 This error can be ascribed to two factors.  For one, the low
 resolution of the images limits the number of different intermediate
 estimates that can be obtained during the iteration process.
-Consequently, relatively few iterations are necessary for a final
+Consequently, comparably few iterations are necessary for a final
 estimate to be obtained, correspondingly reducing the ``weight'' of
 this estimate.  Accordingly, depending on the location of the initial
 origin of operation, different final estimates may be obtained which
@@ -168,9 +167,9 @@ would have converged if the number of iterations were higher.
 Secondly, the technique of moving the origin of operation to the
 current overall estimate every two iterations may cause the overall
 estimate to converge at a location constituting the centre of the
-pupil as seen along the detection lines from this location, but which
-may not constitute the centre as seen from another location.  Thus,
-once the overall estimate has landed at this possibly erroneous
+pupil as seen along the detection lines intercepting at this location,
+but which may not constitute the centre as seen from another location.
+Thus, once the overall estimate has landed at this possibly erroneous
 location, it will remain there no matter how many consequent
 iterations are performed.  In Section~\ref{algo:eval:improve} below, a
 possible solution to this problem is suggested.
@@ -182,7 +181,7 @@ needed for {\octopus} to succeedingly obtain a position estimate for
 the same image 2000 times.  The times needed for the two steps of the
 algorithm were measured separately, and the times thus obtained were
 divided by 2000 to obtain estimates of the times required to perform
-each step once.  The times thus obtained are presented in
+each step once.  The times measured are presented in
 Table~\ref{tab:time}.  $t_{s}$ denotes the search time, corresponding
 to Step 1 of the basic algorithm formulation, and $t_{p}$ the position
 determining time, corresponding to Step 2 of the basic algorithm
@@ -278,14 +277,14 @@ Admittedly, as pointed out in Section~\ref{algo:intro:images}, the low
 contrast of the images has helped in exposing the weaknesses of the
 algorithm, weaknesses of which some are still present (cf.\ the
 footnote on p.~\pageref{pg:TEproblems}), but the presence of the
-strong reflexes occupying partly large portions of the pupil area has
-made it more or less impossible for {\octopus} to arrive at position
-estimates corresponding to the actual pupil centre.  One thing which
-has become increasingly clear during my work with {\octopus} is that,
-if it is to work satisfactorily, the quality of the images supplied to
-it has to be better.  In particular, strong reflexes of the kind
-present in the given test images must be avoided, and the contrast has
-to be improved.
+strong reflections occupying partly large portions of the pupil area
+has made it more or less impossible for {\octopus} to arrive at
+position estimates corresponding to the actual pupil centre.  One
+thing which has become increasingly clear during my work with
+{\octopus} is that, if it is to work satisfactorily, the quality of
+the images supplied to it has to be better.  In particular, strong
+reflections of the kind present in the given test images must be
+avoided, and the contrast has to be improved.
 
 Another problem with the test images with respect to the validity of
 the test results is their low resolution, being in the order of $\sim
@@ -321,7 +320,7 @@ From the above, it is evident that {\octopus} needs some refinement
 before being suitable for incorporation into a complete eye-tracking
 system.  This pertains in particular to the accuracy of the current
 algorithm formulation.  A problem which thus far has not been touched
-upon, is that the appearance of the pupil as seen from the camera
+upon is that the appearance of the pupil as seen from the camera
 rarely constitutes a perfect circle.  This will be given a short
 treatment below, along with a suggestion of how to lower the overall
 number of operations needed to perform one iteration of line oriented
@@ -342,7 +341,7 @@ A way of avoiding this happening is to, instead of assigning the
 current overall estimate to the origin of operation, choose the new
 location of the origin of operation randomly from a predefined
 neighbourhood of the overall estimate.  When deciding the extent of
-this neighbourhood, care has to be taken that it not extend beyond the
+the neighbourhood, care has to be taken that it not extend beyond the
 actual pupil contour, since this would impose a danger of assigning to
 the origin of operation a pixel located outside the actual pupil.  A
 possible approach to deciding the extent of this neighbourhood would
@@ -362,8 +361,8 @@ contribute to it.
 The advantage of this approach is that the locations from which new
 intermediate estimates are computed are dispersed over a relatively
 large portion of the pupil, thus avoiding viewing the pupil contour
-repeatedly from only one location, as might happen with the
-implemented approach.
+repeatedly from only one location, as may happen with the implemented
+approach.
 
 Finally, the ``weight'' of the final overall estimate can be increased
 by not having as stop criterion for the iteration process that the
@@ -393,10 +392,10 @@ Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}), apply only to the
 case when the pupil is circular.  However, since the vital requirement
 the complete eye-tracking system has to satisfy is that it be able to
 determine whether or not the subject is drifting (cf.\ 
-Section~\ref{intro:synch}), this error thus introduced constitutes no
+Section~\ref{intro:synch}), the error thus introduced constitutes no
 major problem.  Moreover, correcting for this error would introduce a
 large amount of overhead computing into the algorithm, since the
-nature of the pupil distortion depends on the gaze angle in a
+nature of the pupil's distortion depends on the gaze angle in a
 computationally expensive manner.  Still, if {\octopus} is to be
 viewed as interesting from a general point of view, this problem has
 to be addressed.
@@ -438,12 +437,12 @@ the images ought to satisfy are:
 \item The eye should occupy as large a fraction of the image as
   possible without leaving out possible locations of the pupil.
 \item The pupil should constitute the largest dark region in the
-  image, and should be connected to no other dark regions in the
+  image and should be connected to no other dark regions in the
   image.  With dark region is to be understood a member of the set of
   darkest regions in the image (i.e., those regions that constitute
   lakes by the introduced notation).
-\item No bright reflexes protruding into the pupil.  As described
-  above, reflexes are of a non-additive nature and thus cannot be
+\item No bright reflections protruding into the pupil.  As described
+  above, reflections are of a non-additive nature and thus cannot be
   removed.
 \item The contrast of the image should be as high as possible, in
   order to have a pupil lake with as few islands as possible and also
@@ -452,5 +451,5 @@ the images ought to satisfy are:
   possible to the actual extent of the pupil.  Having a gray scale of
   256 gray levels ought to supply the desired contrast, given that the
   camera has the needed sensitivity and that the frame-grabber
-  introduces a minimum of noise and errors into the image.
+  introduces a minimum of noise and errors into the digitized image.
 \end{itemize}

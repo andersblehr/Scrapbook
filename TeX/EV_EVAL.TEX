@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Apr  1 02:59:48 1993
+%%% Last Modified On: Sun Apr 11 13:41:38 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,40 +23,40 @@ With that in mind, the noise reduction schemes are evaluated in
 Section~\ref{eval:eval:noise}.
 
 For the sake of clarity, the presentation of general image
-segmentation schemes was divided in two: {\em Image segmentation\/} as
-a means of recognizing parts of an image as belonging to a continuous
-region with certain characteristics, elaborated upon in
-Section~\ref{image:segment}; and {\em edge detection\/}, which was
-given separate treatment in Section~\ref{image:edge}.  In
+segmentation schemes was divided in two: Image segmentation as a means
+of recognizing parts of an image as belonging to a continuous region
+with certain characteristics, elaborated upon in
+Section~\ref{image:segment}; and edge detection, which was given
+separate treatment in Section~\ref{image:edge}.  In
 Section~\ref{eval:eval:segment} below, the image segmentation schemes
 are evaluated, and in Section~\ref{eval:eval:edge}, the edge detection
 schemes.  Note that the schemes are evaluated with respect to their
 applicability fro detecting the pupil in an image, and that, when
-evaluating them, it is assumed that the pupil is circular (see
+evaluating them, it is assumed that the pupil is circular (cf.\
 Section~\ref{back:eye}).
 
-The key criterion for applicability is {\em low computational cost\/}.
-In the following, when comparing the computational cost of the
-different techniques, it is assumed that the given image is of size
-$N\times N$, and that the technique in question is carried out on the
-{\em entire\/} image.  The cost is measured in terms of $N$.
-Obviously, the cost of any technique applied on an entire image cannot
-be lower than $O(N^{2})$.  Thus, techniques are deemed too costly that
-are more expensive than $O(N^{2})$.  Another obvious criterion is that
-the technique in question serves the purpose.
+The key criterion for applicability is low computational cost.  In the
+following, when comparing the computational cost of the different
+techniques, it is assumed that the given image is of size $N\times N$,
+and that the technique in question is carried out on the entire image.
+The cost is measured in terms of $N$.  Obviously, the cost of any
+technique applied on an entire image cannot be lower than $O(N^{2})$.
+Thus, techniques are deemed too costly that are more expensive than
+$O(N^{2})$.  Another obvious criterion is that the technique in
+question serves the purpose.
 
 \subsection{Noise Reduction Schemes}
 \label{eval:eval:noise}
 
 The noise reduction schemes presented in this chapter belong to two
-different categories, which are treated separately below: Spatial
+different categories which are treated separately below: Spatial
 domain and frequency domain schemes.
 
 \subsubsection{Spatial Domain Approaches}
 
 As pointed out in Section~\ref{image:spatial}, applying spatial
 operators on an image generally requires $O(N^{2})$ operations.  Thus
-all the spatial noise reduction schemes presented in
+the spatial noise reduction schemes presented in
 Sections~\ref{image:noise:averaging} and~\ref{image:noise:median},
 neighbourhood averaging, averaging of multiple images and median
 filtering, perform in $O(N^{2})$ time.
@@ -70,7 +70,7 @@ schemes difficult.
 
 As pointed out in Section~\ref{image:noise:median}, median filtering
 turns out to be clearly superior to averaging techniques, both with
-respect to removing noise from an image, and to maintaining edges in
+respect to removing noise from an image and to maintaining edges in
 the image.  In addition, median filtering is, when carefully
 implemented, computationally cheaper than averaging schemes, in that
 it requires mostly comparisons and no multiplications.
@@ -82,10 +82,8 @@ have that performing an {\fft} algorithm on an image requires
 $O(N^{2}\log_{2}N)$ complex operations.  Thus image processing
 techniques operating in the frequency plane generally perform in
 minimum $O(N^{2}\log_{2}N)$ time, assuming that the image first has to
-be Fourier transformed.  This pertains to both the highpass filtering
-noise reduction schemes described in
-Section~\ref{image:noise:frequency}, simple highpass filtering and
-selective filtering.
+be Fourier transformed.  This applies to both simple highpass
+filtering and selective filtering.
 
 Simple highpass filtering has a similar effect to neighbourhood
 averaging, namely blurring of the image, and consequently attenuating
@@ -133,7 +131,7 @@ outside of it have values above $T$ is for real images practically
 zero.  Thus, in the most cases, applying a pure pixel-by-pixel
 thresholding technique to obtain a binary image will on the one hand
 result in an image where the pupil forms the largest recognizable
-object; on the other hand, this object will have holes in it, and its
+object; on the other hand, this object may have holes in it, and its
 boundary will hardly form a perfect circle.
 
 A better approach would be to apply some averaging technique in the
@@ -157,8 +155,8 @@ technique, it performs in $O(N^{2})$ time.
 Region growing is a technique which would seem well suited for
 detecting the area and the extent of the pupil.  One problem, however,
 is the requirement of a positive pupil point as seed point.  A search
-algorithm operating on the image, and employing a carefully designed
-pixel filter of the kind depicted above as stop criterion, could be
+algorithm operating on the image and employing a carefully designed
+pixel filter of the kind depicted above as stop criterion could be
 expected to return such a point.
 
 Another problem is to chose the similarity criteria such that as many
@@ -172,20 +170,20 @@ above, given that the image and $T$ are the same.  A usual, and
 better, similarity criterion is that the gray level of a pixel to be
 included not differ from that of the seed point by more than a
 specified amount.  This is, however, also a form of thresholding
-(ref.\ Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1}), and
+(cf.\ Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1}), and
 puts a rigid limit on the interval of gray levels accepted.
 
 Since the pupil is assumed to constitute the darkest region in the
 image, having a relatively well defined edge to the surrounding iris,
 a third approach would be to employ some sort of edge detecting scheme
-(see Section~\ref{image:edge}, and Section~\ref{eval:eval:edge}
+(cf.\ Section~\ref{image:edge} as well as Section~\ref{eval:eval:edge}
 below) as a criterion for inclusion.  That is, to use thresholding not
 on the image itself, but on some sort of operator aimed at detecting
 edges.  With this scheme, during the growing process, all pixels not
 recognized as edge points are included.
 
 The problems with this approach are to choose an optimal edge
-detecting operator, and, again, to choose an apropriate threshold
+detecting operator and, again, to choose an apropriate threshold
 value $T$.  Also, the danger exists of the pupil having a boundary
 with ``holes'' in it; that is, actual edge points that are not
 recognized as such by the edge detecting operator.  In that case, the
@@ -206,7 +204,7 @@ assuming that the correspondance between the region and the pupil is
 approximately 1:1) is computed by taking the average of the centre
 points of all rows (using the relation $x_{\mbox{\scriptsize
     centre}}=\frac{1}{2} (x_{\mbox{\scriptsize
-    left}}+x_{\mbox{\scriptsize right}}$).  The $y$-position is
+    left}}+x_{\mbox{\scriptsize right}}$)).  The $y$-position is
 computed analogously.
 
 As mentioned above, region growing seems to suggest a reasonable
@@ -262,7 +260,7 @@ in Section~\ref{eval:eval:noise}, performs in $O(N^{2}\log_{2}N)$
 time.  The performance of the Hough transform is discussed below.
 
 The main problem with determining the position of the pupil based on
-edge detection is that you have to know whether or not a given edge
+edge detection is that it has to be known whether or not a given edge
 corresponds to the contour between the pupil and the iris.  There is
 nothing in the nature of this edge that uniquely separates it from the
 other edges in the image.  There is, however, only one other circular
@@ -343,10 +341,10 @@ have looked different.  However, since the average gray level of the
 images delivered by the camera tend to vary over time, it is not safe
 to depend on a fixed threshold value in order to detect the pupil-iris
 contour.  Moreover, this simplest form of thresholding looks only at
-individual pixels, and induces thus no smoothing whatsoever, leaving
-it too sensitive to noise.  All in all, thresholding can be discarded
-as an edge detecting scheme applicable in the algorithm described
-above.
+individual pixels, and accordingly induces no smoothing whatsoever,
+leaving it too sensitive to noise.  All in all, thresholding can be
+discarded as an edge detecting scheme applicable in the algorithm
+described above.
 
 \subsubsection{Gradient Operators}
 
@@ -356,7 +354,7 @@ image in which edges are depicted as relatively thick curves whose
 intensities depend on the rate of change in gray level, as expected of
 derivative operators.  The contour of the pupil is clearly seen,
 although it is not very prominent.  The definitely strongest response
-in the image is induced by the reflection in the left of the image,
+in the image is induced by the reflection to the left in the image,
 where the largest transition in gray level takes place.  By carefully
 choosing a threshold value for determining whether the response
 corresponds to an edge point, it ought to be possible to employ the
@@ -366,7 +364,7 @@ level of an image.
 
 In Fig.~\ref{fig:compare}(d), the result of applying the Laplacian on
 the image in Fig.~\ref{fig:compare}(a) is shown.  As pointed out in
-Section~\ref{image:edge:gradient}, the Laplacian does not respond so
+Section~\ref{image:edge:gradient}, the Laplacian does not respond as
 strongly to edges as do other gradient operators.  Moreover, being a
 second-order derivative operator, it tends to be unacceptably
 sensitive to noise; note for instance the ``rippling'' in the upper
@@ -419,14 +417,15 @@ detect circles in an image is rather expensive.  In
 Section~\ref{image:edge:hough}, it was shown that the Hough transform
 as applied to detecting lines in an image performs in $O(N^{2})$ time,
 assuming that the proportionality constant $K$, corresponding to the
-resolution along the $a$ and $b$ axes in parameter space, satisfy the
-relation $K\ll N$.  In the three-dimensional case, however, the
+resolution along the $a$ and $b$ axes in parameter space, satisfies
+the relation $K\ll N$.  In the three-dimensional case, however, the
 proportionality constant is $K^{2}$, which makes it no longer sound to
 assume $K^{2}\ll N$.  Moreover, due to high resolution in parameter
 space being a prerequisite to high resolution in the $(x,y)$ plane, it
-is more than probable that $K^{2}>N$, since one main requirement of
-the system to be designed is accuracy.  Consequently, the Hough
-transform as applied to detecting the pupil in an image of the eye can
-be assumed to perform in $O(N^{k})$ time, where $k\geq 3$.  Thus also
-the Hough transform can be discarded as a suitable approach to the
-problem at hand, on grounds on being too expensive computationally.
+is more than probable that in our case $K$ would have to be chosen so
+that $K^{2}>N$.  Consequently, the Hough transform as applied to
+detecting the pupil in an image of the eye performs in $O(N^{2})$
+time, but with a proportionality constant presumably larger than $N$.
+Thus, also the Hough transform can be discarded as a suitable approach
+to the problem at hand, on grounds on being too expensive
+computationally.

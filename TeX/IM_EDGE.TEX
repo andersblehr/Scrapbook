@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:55 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 28 00:08:04 1993
+%%% Last Modified On: Sun Apr 11 13:29:44 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -74,18 +74,18 @@ relation:
 \begin{equation}
   g(x,y)=\left\{
     \begin{array}{ll}
-      L_{E} & \mbox{if $(g_{1}(x,y)=L_{E}\vee g_{2}(x,y)=L_{E})$,} \\
+      L_{E} & \mbox{if $(g_{1}(x,y)=L_{E})\vee (g_{2}(x,y)=L_{E})$,} \\
       L_{B} & \mbox{otherwise.}
     \end{array}\right.
 \end{equation}
 As is the case with thresholding in general, care has to be taken when
-choosing the threshold $T$.  
+choosing the threshold value $T$.  
 
 As is evident from its formulation, this procedure assumes that the
 edges in the given image are characterized by monotonously increasing
 or decreasing functions.  This is seldom the case in real
 applications.  If the image has been subjected to additive noise, so
-that in regions with gray levels in the proximity of $T$, pixel values
+that in regions with gray levels in the proximity of $T$ pixel values
 are randomly distributed on both sides of $T$, which is normally the
 case, this method will detect an edge point each time a transition
 from one band to another occurs, thus making it difficult to
@@ -100,9 +100,9 @@ edge, this problem is less dominant.
 
 As edge points in an image are characterized as points where the gray
 level of the image changes rapidly, an obvious approach to edge
-detection is to apply some kind of {\em differentiation\/} on the
-image.  The most common approach to differentiation in image
-processing applications is the {\em gradient\/}.  The gradient of a
+detection is to apply some kind of differentiation on the image.  The
+most common approach to differentiation in image processing
+applications is the {\em gradient\/}.  The gradient of a
 two-dimensional function $f(x,y)$ is defined as the vector
 \begin{equation}
   \vec{G}[f(x,y)]=\left[
@@ -118,7 +118,7 @@ two-dimensional function $f(x,y)$ is defined as the vector
     \end{array}\right]\mbox{.}
 \end{equation}
 $\vec{G}[f(x,y)]$ always points in the direction of the maximum rate
-of increase of $f(x,y)$ at $(x,y)$, and the rate of increase per unit
+of increase of $f$ at $(x,y)$, and the rate of increase per unit
 distance in this direction, denoted $G[f(x,y)]$, is given by
 \begin{equation}
 \label{eq:gradient:sqrt}
@@ -161,7 +161,7 @@ of adjacent pixels to compute the gradient.  Thus, for about the same
 reasons given in Section~\ref{image:edge:threshold}, these
 approximations tend to be sensitive to noise.
 
-\subsubsection{Sobel Operators}
+\subsubsection{The Sobel Operators}
 
 Using a $3\times 3$ neighbourhood to compute the gradient has the
 advantage of increased smoothing over $2\times 2$ operators.  Consider
@@ -195,7 +195,7 @@ obtain the gradient at that point.  Convolving these masks with an
 image yields the gradient at all points $(x,y)$ in the image, the
 result often being referred to as a {\em gradient image\/}.
 
-\subsubsection{The Laplacian Operator}
+\subsubsection{The Laplacian}
 
 Higher order derivative operators can also be used to detect edges in
 an image.  The {\em Laplacian\/} operator $L[f(x,y)]$ is a
@@ -215,7 +215,7 @@ A mask implementing Eq.~(\ref{eq:laplacian}) is shown in
 Fig.~\ref{fig:laplacian}.  Note that Eq.~(\ref{eq:laplacian}) implies
 that $L[f(x,y)]$ takes on both positive and negative values.  If only
 positive values are desired, the absolute value can be used.  Note
-also that the Laplacian is zero in constant areas, and on the ramp
+also that the Laplacian is zero in constant areas and on the ramp
 section of edges, as expected of a second-order derivative operator.
 
 As a consequence of its being a second-order derivative operator,
@@ -252,22 +252,22 @@ The last approach to edge detection discussed here, is the so-called
 applying the Hough transform to detect straight lines and edges in an
 image, but the principle can be extended to detecting any curve or
 edge that can be described by the equation $g(\vec{x},\vec{c})=0$,
-where $\vec{x}$ is a vector of coordinates, and $\vec{c}$ is a vector
+where $\vec{x}$ is a vector of coordinates and $\vec{c}$ is a vector
 of coefficients.
 
 Consider a point $(x_{i},y_{i})$ in an image.  An infinite number of
-lines, satisfying the equation $y_{i}=ax_{i}+b$ for varying values of
-$a$ and $b$, pass through this point.  However, the equation
+lines satisfying the equation $y_{i}=ax_{i}+b$ for varying values of
+$a$ and $b$ pass through this point.  However, the equation
 $b=-x_{i}a+y_{i}$, which is equivalent to the previous one, describes
-a {\em single\/} line in the {\it ab\/} plane (often referred to as
-{\em parameter space\/}) for a fixed pair $(x_{i},y_{i})$.
-Correspondingly, a second image point $(x_{j},y_{j})$ also has a line
-in parameter space associated with it.  This line intercepts the line
-associated with $(x_{i},y_{i})$ at a point $(a',b')$, where $a'$ is
-the slope and $b'$ the intercept of the line in the {\it xy\/} plane
-(the image) containing both $(x_{i},y_{i})$ and $(x_{j},y_{j})$.  All
-points on this line will have lines in parameter space which intercept
-at $(a',b')$.
+a single line in the {\it ab\/} plane (often referred to as {\em
+  parameter space\/}) for a fixed pair $(x_{i},y_{i})$.  Analogously,
+a second image point $(x_{j},y_{j})$ also has a line in parameter
+space associated with it.  This line intercepts the line associated
+with $(x_{i},y_{i})$ at a point $(a',b')$, where $a'$ is the slope and
+$b'$ the intercept of the line in the {\it xy\/} plane (the image)
+containing both $(x_{i},y_{i})$ and $(x_{j},y_{j})$.  All points on
+this line will have lines in parameter space which intercept at
+$(a',b')$.
 
 By associating with each point $(a_{i},b_{i})$ in parameter space an
 {\em accumulator cell\/}, it is possible to keep track of how many
@@ -285,7 +285,7 @@ both slope and intercept approach infinity as the line approaches a
 vertical position.  This problem is circumvented by using the {\em
   normal\/} description $x\cos\theta+y\sin\theta=\rho$ of the line
 instead.  The only difference in using this representation when
-constructing the set of accumulator cells, is that the intercepts in
+constructing the set of accumulator cells is that the intercepts in
 parameter space ($\rho\theta$ plane) are between sinusoidal curves
 instead of straight lines.
 
@@ -293,15 +293,15 @@ As mentioned above, these principles can be applied to detect any
 curve or edge which can be described by the relation
 $g(\vec{x},\vec{c})=0$.  The equation
 $(x-c_{1})^{2}+(y-c_{2})^{2}=c_{3}^{2}$, for example, describes a
-circle, and can thus be used correspondingly to the above procedure to
+circle and can thus be used analogously to the above procedure to
 detect circles in an image.  One possible application would be to
-detect the (circular) pupil in an image of the eye (see
+detect the (circular) pupil in an image of the eye (cf.\
 Section~\ref{eval:eval:edge}).
 
-If the number of points in the image equals $N^{2}$ (i.e., an image of
-size $N\times N$), and the $a$ axis is divided into $K$ equal
+If the number of points in the image equals $N^{2}$ (i.e., the image
+is of size $N\times N$) and the $a$ axis is divided into $K$ equal
 increments, the number of computations needed for the above procedure
-is $N^{2}K$, since, for each image point $(x_{i},y_{i})$, $a$ is
-varied from $a_{1}$ to $a_{K}$ to obtain the corresponding values for
-$b$.  Thus the Hough transform performs in $O(N^{2})$ time, assuming
-that $K\ll N$.
+is $KN^{2}$, since for each image point $(x_{i},y_{i})$, $a$ is varied
+from $a_{1}$ to $a_{K}$ to obtain the corresponding values for $b$.
+Thus the Hough transform performs in $O(N^{2})$ time, assuming that
+$K\ll N$.
