@@ -3,11 +3,68 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 28 02:28:40 1993
+%%% Last Modified On: Thu Apr  1 06:51:10 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Deciding the Position of the Pupil}
+\section{Determining the Position of the Pupil}
 \label{algo:pos}
+
+The principle behind the line oriented edge detection algorithm
+employed in {\octopus} was given a fairly thorough presentation in
+Section~\ref{eval:approach:edge}.  Thus the focus in this section is
+on the different application specific aspects of the general
+algorithm.  In Section~\ref{algo:pos:operation}, an operational
+description of how line oriented edge detection has been tailored to
+suit the specific needs of {\octopus} is given, and in
+Section~\ref{algo:pos:operators}, the gradient operators employed to
+detect the pupil contour are presented.  In Section~\ref{algo:pos:O},
+the number of operations required to determine the position of the
+pupil is derived.
+
+\subsection{Operational Description}
+\label{algo:pos:operation}
+
+The original formulation of line oriented edge detection, as stated in
+Section~\ref{eval:approach:edge}, says that the algorithm operates by
+proceeding, from the origin of operation, in different directions,
+applying some edge detecting operator successively on every pixel
+encountered in each direction, and, if an edge point is recognized,
+registering the coordinates of this point.  By registering the
+coordinates of the oppositely positioned edge points of two
+perpendicular lines intercepting at the origin of operation, an
+estimate for the position of the pupil can be computed using the
+procedure illustrated in Fig.~\ref{fig:compute}.  By taking the
+average of several estimates thus computed, an improved estimate of
+the position is obtained.  Accordingly, as stated in the basic
+formulation of the {\octopus} algorithm in
+Section~\ref{eval:approach:algo}, line oriented edge detection must be
+applied to as high a number of line pairs as allowed by the time
+available, in order to obtain as accurate an estimate of the centre
+position of the pupil as possible.
+
+\subsubsection{Computational Limitations}
+
+\insertepswidth{lines}{\label{fig:lines}Horizontal, vertical and
+  diagonal lines in an image, as opposed to lines having other
+  inclinations.  $(x_{o},y_{o})$ designates the origin of operation.
+  Note that $x_{1}=y_{1}$, whereas $x_{2}\neq y_{2}$.}{0.35}
+
+From a computational point of view, there are only four directions in
+an image in which lines are easily traced, namely horizontally,
+vertically, and in the two diagonal directions, as illustrated in
+Fig.~\ref{fig:lines}.  Horizontally, only the $x$ variable is varied,
+and vertically only the $y$ variable, whereas diagonally, both the $x$
+and $y$ variables are varied, either with equal signs (southeastwards,
+assuming that the origin is in the upper left corner of the image) or
+with opposite signs (northeastwards).  In all other directions, the
+two variables are varied unequally, and thus require overhead
+computations.
+
+\subsection{Operators Employed}
+\label{algo:pos:operators}
+
+\subsection{Number of Operations}
+\label{algo:pos:O}
 

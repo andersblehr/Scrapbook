@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 25 04:25:48 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 29 21:00:04 1993
+%%% Last Modified On: Thu Apr  1 04:42:17 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,7 +121,7 @@ the pupil has to be considered.
 
 \insertepswidth{compute}{\label{fig:compute}Illustration of how the
   centre of the pupil can be computed.  The circle designates the
-  pupil.}{0.5}
+  pupil.}{0.4}
 
 An algorithm of which the above region growing procedure is but an
 implementation is the edge detection based algorithm referred to in
@@ -181,7 +181,7 @@ higher the number of line pairs, the higher the accuracy.
 From the above, it is clear that of the presented algorithms and
 techniques, line oriented edge detection constitutes the most
 promising approach to satisfying both the requirement of speed and the
-requirement of accuracy.  Accordingly, it was decided to develop the
+requirement of accuracy.  Accordingly, I decided to develop the
 eye-tracking algorithm on this basis.  With this in mind, it is
 evident that an algorithm to detect and locate the pupil in a given
 image of the eye consists of two separate steps:
@@ -203,8 +203,8 @@ in Step 1.  Also, the fraction of the total time for the algorithm
 spent searching for a pupil point has to be minimized, in order to
 have as much time as possible available for Step 2, thus maximizing
 the accuracy of the algorithm.  In addition, a reasonable choice has
-to be made as to the edge detection operator to be employed in Step 2.
-From the list of promising aspects given in
+to be made as to the edge detection operator(s) to be employed in Step
+2.  From the list of promising aspects given in
 Section~\ref{eval:approach:aspect}, it is clear that some sort of
 first-order gradient operator would be best suited for this task,
 considering the superior response of the Sobel-operators to the

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:41:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 28 21:26:13 1993
+%%% Last Modified On: Thu Apr  1 02:59:48 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,8 +148,8 @@ for all practical purposes impossible.
 
 From the above it can be concluded that thresholding is a technique
 which enables the unambiguous recognition of a pupil point, although
-as a means of reliably deciding the {\em centre\/} of the pupil, it is
-not particularly suited.  Lastly, since thresholding is a spatial
+as a means of reliably determining the {\em centre\/} of the pupil, it 
+is not particularly suited.  Lastly, since thresholding is a spatial
 technique, it performs in $O(N^{2})$ time.
 
 \subsubsection{Region Growing}
@@ -197,16 +197,17 @@ threshold value $T$, it ought to be possible to reduce the probability
 of this happening to a minimum.
 
 After a region has been grown that corresponds as closely to the pupil
-as possible, the problem remains of deciding the position of the {\em
-  centre\/} of the pupil.  This can be done by, by means of some data
-structure, registering the coordinates of the end points of the rows
-and columns of the region being grown.  When the region is complete,
-the $x$-position of its centre (and thus of the pupil's, assuming that
-the correspondance between the region and the pupil is approximately
-1:1) is computed by taking the average of the centre points of all
-rows (using the relation $x_{\mbox{\scriptsize centre}}=\frac{1}{2}
-(x_{\mbox{\scriptsize left}}+x_{\mbox{\scriptsize right}}$).  The
-$y$-position is computed analogously.
+as possible, the problem remains of determining the position of the
+{\em centre\/} of the pupil.  This can be done by, by means of some
+data structure, registering the coordinates of the end points of the
+rows and columns of the region being grown.  When the region is
+complete, the $x$-position of its centre (and thus of the pupil's,
+assuming that the correspondance between the region and the pupil is
+approximately 1:1) is computed by taking the average of the centre
+points of all rows (using the relation $x_{\mbox{\scriptsize
+    centre}}=\frac{1}{2} (x_{\mbox{\scriptsize
+    left}}+x_{\mbox{\scriptsize right}}$).  The $y$-position is
+computed analogously.
 
 As mentioned above, region growing seems to suggest a reasonable
 approach to the given problem.  It remains to be seen, however, if it
@@ -260,8 +261,8 @@ perform in $O(N^{2})$ time, whereas highpass filtering, as pointed out
 in Section~\ref{eval:eval:noise}, performs in $O(N^{2}\log_{2}N)$
 time.  The performance of the Hough transform is discussed below.
 
-The main problem with deciding the position of the pupil based on edge
-detection is that you have to know whether or not a given edge
+The main problem with determining the position of the pupil based on
+edge detection is that you have to know whether or not a given edge
 corresponds to the contour between the pupil and the iris.  There is
 nothing in the nature of this edge that uniquely separates it from the
 other edges in the image.  There is, however, only one other circular
@@ -283,8 +284,8 @@ together be assumed to represent the pupil-iris contour.  By
 registering the coordinates of opposite edge points, it is possible to
 compute the position of the centre of the pupil, as described in the
 previous section.  As a matter of fact, the last proposed inclusion
-criterion for the region growing procedure -- that only those pixels
-that are {\em not\/} edge points be included -- constitutes no more
+criterion for the region growing procedure---that only those pixels
+that are {\em not\/} edge points be included---constitutes no more
 than a concrete implementation of the algorithm described here.  To
 supply the necessary pupil point, some search strategy can be applied
 on the image, employing, for instance, a pixel filter, as described in
@@ -312,8 +313,8 @@ the previous section.
 \end{figure}
 
 The first three edge detection algorithms presented in
-Section~\ref{image:edge} -- thresholding, gradiant operators and
-highpass filtering -- are evaluated with respect to being employed in
+Section~\ref{image:edge}---thresholding, gradiant operators and
+highpass filtering---are evaluated with respect to being employed in
 this algorithm.  The main evaluation criterion, next to computational
 cost, is thus how strongly they respond to the pupil-iris contour. The
 image in Fig.~\ref{fig:compare}(a) is used to illustrate the individual

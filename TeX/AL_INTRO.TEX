@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 18 04:05:10 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 29 23:58:29 1993
+%%% Last Modified On: Thu Apr  1 03:01:34 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,9 +56,9 @@ before continuing the presentation of the algorithm.  These are:
   of the image has been used as reference point, having coordinates
   $(0,0)$.
 \item[Error signal:] ``{\em\ldots an error signal is to be
-    returned\ldots\/}'' The position deciding procedure has been
-  implemented as a boolean function, returning {\em false\/} if the
-  pupil cannot be found in an image.
+    returned\ldots\/}'' The procedure to determine the position of the
+  pupil has been implemented as a boolean function, returning {\em
+    false\/} if the pupil cannot be found in an image.
 \item[Resolution:] ``{\em Preferably, the image should have a
     resolution of 512$\times$512 pixels with 256 gray levels, and the
     eye should fill the entire image.\/}'' The frame-grabber that was
@@ -105,16 +105,17 @@ next section.
 \end{figure}
 
 \noindent Throughout this chapter, a number of images of the monkey's
-eye will be used as reference.  These images, which constitute a
-subset of the images that were used while developing and testing
-{\octopus}, are shown in Fig.~\ref{fig:testimages}.  The image in
-Fig.~\ref{fig:compare}(a) is identical to image (e) above.  The slight
-variation in size/resolution of the images is due to the fact that
-they have been acquired by manually clipping out of larger images the
-portion containing the eye, as pointed out in the previous section.
-Clearly, the image quality is not very good.  Note in particular the
-strong reflections present in the images, as well as their ``flat''
-appearance.  Three factors contribute to the bad quality:
+eye will be used to illustrate principles, examples and results.
+These images, which constitute a subset of the images that were used
+while developing and testing {\octopus}, are shown in
+Fig.~\ref{fig:testimages}.  The image in Fig.~\ref{fig:compare}(a) is
+identical to image (e) above.  The slight variation in size/resolution
+of the images is due to the fact that they have been acquired by
+manually clipping out of larger images the portion containing the eye,
+as pointed out in the previous section.  Clearly, the image quality is
+not very good.  Note in particular the strong reflections present in
+the images, as well as their ``flat'' appearance.  Three factors
+contribute to the bad quality:
 \begin{description}
 \item[Light conditions:] The images are from a non-IR video recording
   of the monkey, made under ``normal'' light conditions in the
@@ -132,7 +133,7 @@ appearance.  Three factors contribute to the bad quality:
 \item[The frame-grabber:] The ``flat'' appearance of the images is due
   to relatively low contrast.  This is a consequence of a bug in the
   frame-grabber, where increasing the contrast induces spurious dark
-  pixels -- ``spots'' -- into the digitized frames.  The number of
+  pixels---``spots''---into the digitized frames.  The number of
   induced spots increases with the contrast.  Accordingly, a balance
   between high contrast and few induced spots had to be found.
   Actually, the induced spots have gray levels that are {\em darker\/}
@@ -151,7 +152,9 @@ appearance.  Three factors contribute to the bad quality:
 However, although the images can be characterized as bad, they are
 good {\em test\/} images, apart from their low resolution, in that
 their bad quality is apt to expose the weaknesses of the eye tracking
-algorithm.
+algorithm.  In the following, when referring to ``the given test
+images'', the entire set of test images with which I have been working
+is meant, not only those of Fig.~\ref{fig:testimages}.
 
 \subsection{Structure of the Chapter}
 \label{algot:intro:structure}
