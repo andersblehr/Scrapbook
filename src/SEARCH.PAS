@@ -6,6 +6,7 @@ INTERFACE
 uses auxil;
 
 const maxSize                   = 512;
+      numberOfGrayLevels        = 64;
 
       west                      = -1;
       east                      = 1;
@@ -40,8 +41,11 @@ type  variableRPtr              = ^variableR;
       pixelMatrixPtr            = ^pixelMatrix;
       pixelMatrix               = array[1..maxSize] of pixelLinePtr;
 
+      mapType                   = array[0..numberOfGrayLevels] of byte;
+
 const filterRadius              : byte = 0;
       filterThreshold           : byte = 1;
+      lakeLevel                 : byte = 0;
       sobelThreshold            : byte = 5;
       nonSearchRadius           : byte = 0;
 
@@ -61,6 +65,7 @@ const filterRadius              : byte = 0;
       showSearch                : boolean = false;
 
 var   image                     : pixelMatrixPtr;
+      map                       : mapType;
 
       searchAreaLeft            : word;
       searchAreaTop             : word;
@@ -114,6 +119,8 @@ begin
               filterRadius:=variable^.value
             else if (variable^.name='filterThreshold') then
               filterThreshold:=variable^.value
+            else if (variable^.name='lakeLevel') then
+              lakeLevel:=variable^.value
             else if (variable^.name='sobelThreshold') then
               sobelThreshold:=variable^.value
             else if (variable^.name='nonSearchRadius') then
@@ -287,13 +294,13 @@ function findPupilPoint(pupilPoint : pointPtr) : boolean;
         i                         : word;
 
   begin
-    filterSum:=image^[searchAreaTop+y]^[searchAreaLeft+x];
+    filterSum:=map[image^[searchAreaTop+y]^[searchAreaLeft+x]];
     for i:=1 to (filterRadius div 2) do
       filterSum:=filterSum+
-          image^[searchAreaTop+y]^[searchAreaLeft+x-2*i]+
-          image^[searchAreaTop+y]^[searchAreaLeft+x+2*i]+
-          image^[searchAreaTop+y-2*i]^[searchAreaLeft+x]+
-          image^[searchAreaTop+y+2*i]^[searchAreaLeft+x];
+          map[image^[searchAreaTop+y]^[searchAreaLeft+x-2*i]]+
+          map[image^[searchAreaTop+y]^[searchAreaLeft+x+2*i]]+
+          map[image^[searchAreaTop+y-2*i]^[searchAreaLeft+x]]+
+          map[image^[searchAreaTop+y+2*i]^[searchAreaLeft+x]];
     getFilterValue:=round(filterSum/(2*filterRadius+1))
   end;
 
@@ -353,14 +360,15 @@ var   ascendingCenter           : pointPtr;
       descendingCenter          : pointPtr;
 
 
-  function getMiddlePoint(x,y : word; direction : shortInt) : pointPtr;
+  procedure getMiddlePoint(x,y         : word;
+                           direction   : shortInt;
+                           middlePoint : pointPtr);
 
   var   leftPoint                 : pointPtr;
         rightPoint                : pointPtr;
-        middlePoint               : pointPtr;
 
 
-    function searchEdge(x,y : word; dX,dY : shortInt) : pointPtr;
+    procedure searchEdge(x,y : word; dX,dY : shortInt; edgePoint : pointPtr);
 
     begin
       inc(x,dX*nonSearchRadius+1);
@@ -374,31 +382,35 @@ var   ascendingCenter           : pointPtr;
             (y<=searchAreaTop ) or (y>=searchAreaTop +ySizeSearchArea)) then
           fatalError('searchEdge: No edge found!')
       until (applySobelMask(x,y,dY,dX)>=sobelThreshold);
-      searchEdge:=makePoint(x,y)
+      makePoint(x,y,edgePoint)
     end;
 
 
   begin
-    leftPoint:=searchEdge(x,y,west,-direction);
-    rightPoint:=searchEdge(x,y,east,direction);
-    middlePoint:=makePoint(leftPoint^.x+round((rightPoint^.x-leftPoint^.x)/2),
-                    leftPoint^.y+round(integer(rightPoint^.y-leftPoint^.y)/2));
-    dispose(leftPoint);
+    new(leftPoint);
+    new(rightPoint);
+    searchEdge(x,y,west,-direction,leftPoint);
+    searchEdge(x,y,east,direction,rightPoint);
+    makePoint(leftPoint^.x+round((rightPoint^.x-leftPoint^.x)/2),
+              leftPoint^.y+round(integer(rightPoint^.y-leftPoint^.y)/2),
+              middlePoint);
     dispose(rightPoint);
-    getMiddlePoint:=middlePoint
+    dispose(leftPoint)
   end;
 
 
 begin
+  new(ascendingCenter);
+  new(descendingCenter);
   with pupilPoint^ do
     begin
-      ascendingCenter:=getMiddlePoint(x,y,south);
-      descendingCenter:=getMiddlePoint(x,y,north);
+      getMiddlePoint(x,y,south,ascendingCenter);
+      getMiddlePoint(x,y,north,descendingCenter);
       position^.x:=ascendingCenter^.x+descendingCenter^.x-x;
       position^.y:=ascendingCenter^.y+descendingCenter^.y-y
     end;
-  dispose(ascendingCenter);
-  dispose(descendingCenter)
+  dispose(descendingCenter);
+  dispose(ascendingCenter)
 end;
 
 
@@ -409,33 +421,33 @@ begin
   case northOrSouth of
     north :
       case eastOrWest of
-        west : applySobelMask:=2*image^[y-2]^[x-2]+
-                                 image^[y-2]^[x  ]+
-                                 image^[y  ]^[x-2]-
-                                 image^[y  ]^[x+2]-
-                                 image^[y+2]^[x  ]-
-                               2*image^[y+2]^[x+2];
-        east : applySobelMask:=  image^[y-2]^[x  ]+
-                               2*image^[y-2]^[x+2]-
-                                 image^[y  ]^[x-2]+
-                                 image^[y  ]^[x+2]-
-                               2*image^[y+2]^[x-2]-
-                                 image^[y+2]^[x  ]
+        west : applySobelMask:=2*map[image^[y-2]^[x-2]]+
+                                 map[image^[y-2]^[x  ]]+
+                                 map[image^[y  ]^[x-2]]-
+                                 map[image^[y  ]^[x+2]]-
+                                 map[image^[y+2]^[x  ]]-
+                               2*map[image^[y+2]^[x+2]];
+        east : applySobelMask:=  map[image^[y-2]^[x  ]]+
+                               2*map[image^[y-2]^[x+2]]-
+                                 map[image^[y  ]^[x-2]]+
+                                 map[image^[y  ]^[x+2]]-
+                               2*map[image^[y+2]^[x-2]]-
+                                 map[image^[y+2]^[x  ]]
       end;
     south :
       case eastOrWest of
-        west : applySobelMask:= -image^[y-2]^[x  ]-
-                               2*image^[y-2]^[x+2]+
-                                 image^[y  ]^[x-2]-
-                                 image^[y  ]^[x+2]+
-                               2*image^[y+2]^[x-2]+
-                                 image^[y+2]^[x  ];
-        east : applySobelMask:=-2*image^[y-2]^[x-2]-
-                                  image^[y-2]^[x  ]-
-                                  image^[y  ]^[x-2]+
-                                  image^[y  ]^[x+2]+
-                                  image^[y+2]^[x  ]+
-                                2*image^[y+2]^[x+2]
+        west : applySobelMask:= -map[image^[y-2]^[x  ]]-
+                               2*map[image^[y-2]^[x+2]]+
+                                 map[image^[y  ]^[x-2]]-
+                                 map[image^[y  ]^[x+2]]+
+                               2*map[image^[y+2]^[x-2]]+
+                                 map[image^[y+2]^[x  ]];
+        east : applySobelMask:=-2*map[image^[y-2]^[x-2]]-
+                                  map[image^[y-2]^[x  ]]-
+                                  map[image^[y  ]^[x-2]]+
+                                  map[image^[y  ]^[x+2]]+
+                                  map[image^[y+2]^[x  ]]+
+                                2*map[image^[y+2]^[x+2]]
       end
   end
 end;
@@ -443,13 +455,19 @@ end;
 
 procedure initGlobals(xSize,ySize : word);
 
+var   i                         : byte;
+
 begin
   searchAreaLeft:=round(xSize*searchAreaLeftFraction/100);
   searchAreaTop:=round(ySize*searchAreaTopFraction/100);
   xSizeSearchArea:=round(xSize*searchAreaRightFraction/100)-searchAreaLeft;
   ySizeSearchArea:=round(ySize*searchAreaBottomFraction/100)-searchAreaTop;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
-  minSearchStep:=round(minPupilRadius/8)
+  minSearchStep:=round(minPupilRadius/8);
+  for i:=0 to lakeLevel do
+    map[i]:=lakeLevel;
+  for i:=(lakeLevel+1) to (numberOfGrayLevels-1) do
+    map[i]:=i
 end;
 
 
