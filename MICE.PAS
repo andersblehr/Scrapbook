@@ -73,7 +73,7 @@ procedure waitMouseGone(xMin,yMin,xMax,yMax : integer);
 
 procedure textMouse;
 
-procedure graphMouse;
+procedure graphMouse(minX,minY,maxX,maxY : word);
 
 procedure setMouseCursor(cursorType : byte);
 
@@ -127,12 +127,12 @@ begin
 end;
 
 
-procedure GraphMouse;
+procedure GraphMouse(minX,minY,maxX,maxY : word);
 begin
   pfeil;
   q:=1;
   k:=0;
-  MouseBorders(0,0,630,466);
+  MouseBorders(minX,minY,maxX,maxY);
 end;
 
 
