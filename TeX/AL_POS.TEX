@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Apr  6 17:09:26 1993
+%%% Last Modified On: Wed Apr  7 16:58:37 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,17 +136,17 @@ available time interval of 20 ms to be exceeded without having arrived
 at a final overall position estimate.  To avoid this happening, an
 upper limit to the number of iterations can be determined.  This
 number has to determined on the basis of the time required to perform
-one iteration\footnote{In the current implementation, this number is
-  set to 75, given that each iterations requires $\sim 0.25$ ms.  The
-  lowest number of iterations required to arrive at a final overall
-  estimate for all test images is 5.}.  If it should happen that the
-allowed number of iterations has been carried out without having
-arrived at a final overall estimate, the current estimate has to be
-returned.  Clearly, the estimate thus returned would hardly satisfy
-the requirement of accuracy.  However, assuming a relatively good
-image quality and thus minimizing the spatial distribution of the
-intermediate estimates, the probability of this happening will
-practically be zero.
+one iteration\footnote{\label{pg:iterationtime}In the current
+  implementation, this number is set to 55, given that each iterations
+  requires $\sim 0.35$ ms.  The lowest number of iterations required
+  to arrive at a final overall estimate for all test images is 5.}.
+If it should happen that the allowed number of iterations has been
+carried out without having arrived at a final overall estimate, the
+current estimate has to be returned.  Clearly, the estimate thus
+returned would hardly satisfy the requirement of accuracy.  However,
+assuming a relatively good image quality and thus minimizing the
+spatial distribution of the intermediate estimates, the probability of
+this happening will practically be zero.
 
 Note that, when combining an intermediate position estimate with the
 current overall estimate to obtain an improved overall estimate, the
@@ -497,9 +497,10 @@ the stop criterion for iteration process, the error is less than one
 pixel with respect to the pupil contour as seen from the current
 origin of operation.  Thus it is of vital importance to ensure the
 highest possible image quality in the images fed to the {\octopus}
-eye-tracking algorithm.  The requirements the images have to satisfy
-in order to have {\octopus} return accurate position estimates are
-listed in Section~\ref{algo:eval:improve}.
+eye-tracking algorithm.  The requirements the images ought to satisfy
+in order to increase the probability of having {\octopus} return
+accurate position estimates are listed in
+Section~\ref{algo:eval:improve}.
 
 \subsection{Number of Operations}
 \label{algo:pos:O}
