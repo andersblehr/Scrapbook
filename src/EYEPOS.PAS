@@ -2,10 +2,10 @@ program eyePos;
 
 uses crt,dos,graph,auxil,search,SVGA;
 
+const numberOfAdjustments       = 1;
+
 var   xSize                     : word;
       ySize                     : word;
-      startX                    : word;
-      startY                    : word;
 
       startHours                : word;
       startMinutes              : word;
@@ -120,7 +120,7 @@ end;
 
 procedure findPupilPosition;
 
-var   i                         : byte;
+var   i,j                       : word;
 
 begin
   getTime(startHours,startMinutes,startSeconds,start100thSeconds);
@@ -128,13 +128,17 @@ begin
     begin
       aPupilPoint:=findPupilPoint;
       if (aPupilPoint<>nil) then
-	pupilPosition:=findPosition(aPupilPoint)
+	begin
+	  pupilPosition:=findPosition(aPupilPoint);
+	  dispose(aPupilPoint)
+	end
       else
 	begin
 	  closeGraph;
-	  writeLn('No pupil was found!');
-	  halt(1)
-	end
+	  fatalError('No pupil was found!')
+	end;
+      if (i<numberOfIterations) then
+	dispose(pupilPosition)
     end;
   getTime(endHours,endMinutes,endSeconds,end100thSeconds);
   markPosition(pupilPosition^.x,pupilPosition^.y)
