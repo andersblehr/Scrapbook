@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Apr  4 14:57:29 1993
+%%% Last Modified On: Tue Apr  6 13:01:12 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -453,7 +453,9 @@ location is 5 (cf.\ Section~\ref{algo:seek:octopus}), and accordingly
 $O(1)$.  For the second swim-criterion, the number of operations is
 proportional to the estimated minimum pupil radius in pixels.
 Assuming that the fraction of the image occupied by the pupil is
-constant, and that the image is of size $N\times N$ (which is not the
-case with the test images), this number is $O(N)$.  The overall number
-of operations for the swimming octopus search algorithm as presented
-above is thus $O(N)$.
+constant, and that the image is of size $N\times N$, this number is
+$O(N)$.  It should be noted, however, that each of these operations
+consists of looking up a boolean value in an array, and thus is very
+cheap computationally.  Nevertheless, the overall number of operations
+for the swimming octopus search algorithm as presented above is
+$O(N)$.

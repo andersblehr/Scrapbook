@@ -3,13 +3,25 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:28:57 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Apr  5 17:37:14 1993
+%%% Last Modified On: Tue Apr  6 19:28:42 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Evaluation}
 \label{algo:eval}
+
+In this section, the {\octopus} eye-tracking algorithm described in
+the previous sections is evaluated with respect to the algorithmic
+problem definition given in Section~\ref{intro:problem}.  First, the
+overall number of operations for the algorithm is derived in
+Section~\ref{algo:eval:O}.  In Section~\ref{algo:eval:test}, an
+implementation (previously referred to as the {\em current\/}
+implementation) is run on the set of test images presented in
+Fig.~\ref{fig:testimages} and the results returned are discussed, with
+respect to both accuracy and time consumption.  Lastly in
+Section~\ref{algo:eval:improve}, some suggestions as to how to improve
+the performance and accuracy of the algorithm are presented.
 
 \subsection{Overall Number of Operations}
 \label{algo:eval:O}
@@ -23,14 +35,182 @@ that the position determining algorithm described in
 Section~\ref{algo:pos}, implementing Step 2 of the basic algorithm
 formulation, performs in $O(N)$ time.  Thus it can be concluded that
 the {\octopus} eye-tracking algorithm, being composed of the given
-implementations of Steps 1 and 2 of the basic algorithm formulations,
-performs in $O(N)$ time.
+implementations of Steps 1 and 2 of the basic algorithm formulation,
+performs in $O(N)$ time.  Taking into account that the number of
+locations in the image at which the edge detection operators of
+Fig.~\ref{fig:masks} have to employed, assuming relatively good image
+quality, is $O(1)$ (cf.\ Section~\ref{algo:pos:O}), the advantage of
+{\octopus} over a ``traditional'' approach in terms of computational
+cost is evident.
 
 \subsection{Test Results}
 \label{algo:eval:test}
 
-\subsection{Known Problems}
-\label{algo:eval:problems}
+\begin{figure}[tb]
+  \epsfxsize 0.3\textwidth
+  \paragraph{}
+  \makebox[0.425\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbl01.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbr01.eps}}\\
+  \hspace*{0.28\textwidth}(a)\hspace*{0.38\textwidth}(b)
+  \paragraph{}
+  \makebox[0.425\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbl02.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbr02.eps}}\\
+  \hspace*{0.28\textwidth}(c)\hspace*{0.38\textwidth}(d)
+  \paragraph{}
+  \makebox[0.425\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbl05.eps}}
+  \makebox[0.4\textwidth][r]{
+    \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/posbr03.eps}}\\
+  \hspace*{0.28\textwidth}(e)\hspace*{0.38\textwidth}(f)
+  \caption{\label{fig:results}Returned estimates of the pupil position
+    in the images in Fig.~\protect\ref{fig:testimages}.  The
+    coordinates of the estimates relative to the upper left image
+    corner are: (a) $x=65$, $y=32$; (b) $x=59$, $y=44$; (c) $x=49$,
+    $y=44$; (d) $x=71$, $y=42$; (e) $x=54$, $y=39$; (f) $x=54$,
+    $y=44$.}
+\end{figure}
+
+The major amount of testing was done while developing and implementing
+{\octopus}.  Six of the images with which I worked during that time
+are given in Fig.~\ref{fig:testimages}; in addition I had another four
+images at my disposal.  How these images were acquired is described in
+Section~\ref{algo:intro:images}.  The tests performed at this stage
+were a vital part of the development process, pointing at weaknesses
+in the current algorithm formulation, suggesting solutions to
+difficult problems and in general guiding the development process
+towards sounder and more time-efficient algorithm formulations.
+Figs.~\ref{fig:compare}, \ref{fig:landscape}, \ref{fig:lake},
+\ref{fig:profile}, \ref{fig:mysobel} and~\ref{fig:myprofile} were all
+obtained using software primarily designed to sustain this process.
+In the following, the focus will be on the final formulation of
+{\octopus} as given in the previous sections, and on its ability to
+satisfy the requirements listed in the algorithmic problem definition
+given in Section~\ref{intro:problem}.  Two points will be addressed,
+corresponding to the two main aspects of the problem definition,
+namely time consumption and accuracy.
+
+\subsubsection{Accuracy}
+
+In Fig.~\ref{fig:results}, the position estimates returned by
+{\octopus} when supplied with the images in Fig.~\ref{fig:testimages}
+are shown.  As is seen, the actual extent of the pupil in the images
+can hardly be determined visually, which imply relatively weak pupil
+edges.  Moreover, the edges of the bright reflexes, which are seen to
+cover portions of the pupil in all images, evidently constitute the
+sharpest and most clearly defined edges present.  As pointed out in
+Section~\ref{algo:intro:images}, these reflexes are of a non-additive
+nature, that is, the information contained in the regions they cover
+is lost, and accordingly they cannot be removed.  Hence it is
+unavoidable that the position estimates returned by {\octopus} are
+influenced by these reflexes.  Taking this and the inaccuraccies due
+to the chosen value for $T_{e}$ not being appropriate for all images
+(cf.\ Section~\ref{algo:pos:operators}, pg.~\pageref{pg:TEproblems})
+into account, it is evident that the difference between the actual
+pupil centre and the position estimate returned by {\octopus} cannot
+be used as an accuracy measure.  Actually, due to the poor image
+quality, it would be practically impossible with some of the images to
+manually determine the actual pupil centre.
+
+\begin{table}[tb]
+  \begin{center}
+    \begin{tabular}{|c|l|}               \hline
+      (a) & (65,31), (65,32)          \\ \hline
+      (b) & (59,44), (60,44), (60,43) \\ \hline
+      (c) & (49,43), (49,44), (50,44) \\ \hline
+      (d) & (71,41), (72,41)          \\ \hline
+      (e) & (54,39)                   \\ \hline
+      (f) & (55,44)                   \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{\label{tab:estimates}Position estimates obtained from 
+    the figures in Fig.~\protect\ref{fig:results}.}
+\end{table}
+
+Consequently, another accuracy measure has to be employed.  Since the
+stop criterion of the iterating position determining algorithm is that
+the overall position estimate not change from one iteration to the
+next, a natural choice is to use the variation in the estimates given
+for one image as an accuracy measure.  Ideally and in compliance with
+the requirement of accuracy given in the problem definition, this
+variation should be zero both horizontally and vertically.  In other
+words, {\octopus} should always return the same position estimate when
+supplied with the same image.  This is, however, not the case with all
+the given images.  The estimates obtained with the different images
+are given in Table~\ref{tab:estimates}.  The letters refer to
+Fig.~\ref{fig:results}.  As is seen, only for images (e) and (f) does
+{\octopus} satisfy the requirement of accuracy.  For images (a) and
+(d), two estimates are returned, and for images (b), (c) and (d),
+three different estimates are returned.  It is noted, however, that
+the maximum deviation from one estimate to another is not more than 1
+pixel, either horizontally, vertically or both.  Still, with the low
+resolution of the given images, 1 pixel corresponds to approximately
+5\% of the pupil diameter, an error which hardly can be called
+tolerable, even without the given accuracy requirement.
+
+This error can be ascribed to two factors.  For one, the low
+resolution of the images limits the number of different intermediate
+estimates that can be obtained during the iteration process.
+Consequently, relatively few iterations are necessary for a final
+estimate to be obtained, thus reducing the ``weight'' of this
+estimate.  Accordingly, depending on the location of the initial
+origin of operation, different final estimates may be obtained which
+would have converged if the number of iterations were higher.
+Secondly, the technique of moving the origin of operation to the
+current overall estimate every two iterations may cause the overall
+estimate to converge at a location constituting the centre of the
+pupil as seen along the detection lines from this location, but which
+may not constitute the centre as seen from another location.  However,
+once the overall estimate has landed at this possibly erroneous
+location, it will remain there no matter how many consequent
+iterations are performed.  In Section~\ref{algo:eval:improve} below, a
+possible solution to this problem is suggested.
+
+\subsubsection{Time Consumption}
+
+The time measures presented here were obtained by letting {\octopus}
+run 2000 times on the same image and then dividing the total time for
+the two steps of the algorithm by this number in order to obtain an
+estimate for the time required to perform the algorithm once.  The
+results thus obtained are presented in Table~\ref{tab:time}.  $t_{s}$
+designates the search time, corresponding to Step 1 of the basic
+algorithm formulation, and $t_{p}$ the position determining time,
+corresponding to Step 2 of the basic algorithm formulation.  $t$
+designates the overall time for the algorithm.  All times are in ms.
+The letters refer to Fig.~\ref{fig:results}.  Clearly, the requirement
+of determining the position of the eye within 20 ms is satisfied.
+
+From the table, rather large variations in the measured times are
+observed.  The variations in $t_{s}$ can be ascribed to variations in
+the number of times the octopus jumps into the pupil lake without
+recognizing the location where it settles as a pupil point.  For image
+(e), the particularly long time needed to locate a pupil point is
+attributed to its having a relatively small pupil lake\footnote{With
+  lake level $T_{l}=18$, that is, cf.\ Section~\ref{algo:seek:idea}.},
+actually forcing the octopus to settle at a location where it hs one
+of its arms in a pond on the shore of the pupil lake (cf.\ 
+Section~\ref{algo:seek:octopus}).  For $t_{p}$, the variations can be
+ascribed to the varying number of iterations necessary to arrive at a
+final estimate.  The fact that the times constitute the averages of
+2000 performances of the algorithm implies that some of the images
+require more iterations for a final estimate to be arrived at than do
+others.
+
+\begin{table}[tb]
+  \begin{center}
+    \begin{tabular}{|l||c|c|c|c|c|c|}                      \hline
+              & (a)  & (b)  & (c)  & (d)  & (e)  & (f)  \\ \hline\hline
+      $t_{s}$ & 0.28 & 0.22 & 0.24 & 0.36 & 0.22 & 0.19 \\ \hline
+      $t_{p}$ & 2.89 & 0.98 & 1.61 & 1.40 & 3.05 & 1.30 \\ \hline
+      $t$     & 3.17 & 1.20 & 1.85 & 1.76 & 3.27 & 1.49 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{\label{tab:time}Time consumption of the {\octopus}
+    eye-tracking algorithm.  All times are in ms.}
+\end{table}
 
 \subsection{Improving the Algorithm}
 \label{algo:eval:improve}

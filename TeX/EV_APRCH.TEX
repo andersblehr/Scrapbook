@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 25 04:25:48 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Apr  3 14:44:21 1993
+%%% Last Modified On: Tue Apr  6 12:27:11 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,17 +102,17 @@ algorithm.
 From the above, it is clear that one approach to reducing the number
 of pixels having to be considered is to use region growing and only
 include non-edge points during the growing process.  This, however,
-would have to be implemented recursively, which implementation by
-nature is rather expensive.  In addition, to keep track of the pixels
-that have been visited and those that have not, it would be necessary
-to maintain a large data structure of size similar to that of the
-image.  Each time a pixel is to be tested for inclusion, this
-structure has to be consulted as to whether it already {\em has\/}
-been tested, which implies a large number of unnecessary comparisons.
-And, perhaps most importantly, this approach requires that {\em all\/}
-pixels in the pupil be tested as to whether they are to be included in
-the growing region or not.  The number of pixels in the pupil is not
-large compared to the total number of pixels in the image, but an even
+would have to be implemented recursively, which by nature is rather
+expensive.  In addition, to keep track of the pixels that have been
+visited and those that have not, it would be necessary to maintain a
+large data structure of size similar to that of the image.  Each time
+a pixel is to be tested for inclusion, this structure has to be
+consulted as to whether it already {\em has\/} been tested, which
+implies a large number of unnecessary comparisons.  And, perhaps most
+importantly, this approach requires that {\em all\/} pixels in the
+pupil be tested as to whether they are to be included in the growing
+region or not.  The number of pixels in the pupil is not large
+compared to the total number of pixels in the image, but an even
 better solution would be one with which only a subset of the pixels in
 the pupil has to be considered.
 
@@ -127,37 +127,37 @@ An algorithm of which the above region growing procedure is but an
 implementation is the edge detection based algorithm referred to in
 the list in Section~\ref{eval:approach:aspect}, and described in
 Section~\ref{eval:eval:edge}.  The basis of this algorithm is that the
-pupil-iris edge can be unambigously recognized as such by letting it
-be the first edge that an edge detecting algorithm encounters.  The
-algorithm operates by proceeding, from a point positively classified
-as a pupil point (the {\em origin of operation\/}), in different
-directions, applying some edge detecting operator successively on
-every pixel encountered in each direction, and, if an edge point is
-recognized, registering the coordinates of this point.  Since the
-pupil-iris edge can be assumed to be the first edge encountered when
-moving in any direction from a point within the pupil, the points thus
-detected represent the extent of the pupil.  A line passing through
-the origin of operation and traversing the entire extent of the pupil
-in some direction will hereafter be referred to as a {\em detection
-  line\/}.  To compute the position of the centre of the pupil, it is
-necessary to know the coordinates of the oppositely positioned edge
-points along two perpendicular detection lines.  The procedure is
-illustrated in Fig.~\ref{fig:compute}.  $(x_{o},y_{o})$ designates the
-origin of operation, and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge
-points detected along the two detection lines.  The centre points
-$(x',y')$ and $(x'',y'')$ of the two lines with respect to the extent
-of the pupil are given by the relations
+pupil-iris edge can be recognized as such by letting it be the first
+edge that an edge detecting algorithm encounters.  The algorithm
+operates by proceeding, from a point positively classified as a pupil
+point (the {\em origin of operation\/}), in different directions,
+applying some edge detecting operator successively on every pixel
+encountered in each direction, and, if an edge point is recognized,
+registering the coordinates of this point.  Since the pupil-iris edge
+can be assumed to be the first edge encountered when moving in any
+direction from a point within the pupil, the points thus detected
+represent the extent of the pupil.  A line passing through the origin
+of operation and traversing the entire extent of the pupil in some
+direction will hereafter be referred to as a {\em detection line\/}.
+To compute the position of the centre of the pupil, it is necessary to
+know the coordinates of the oppositely positioned edge points along
+two perpendicular detection lines.  The procedure is illustrated in
+Fig.~\ref{fig:compute}.  $(x_{o},y_{o})$ designates the origin of
+operation, and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge points
+detected along the two detection lines.  The centre points $(x',y')$
+and $(x'',y'')$ of the two lines with respect to the extent of the
+pupil are given by the relations
 $(x',y')=(\frac{1}{2}\{x_{1}+x_{4}\},\frac{1}{2}\{y_{1}+y_{4}\})$ and
 $(x'',y'')=(\frac{1}{2}\{x_{2}+x_{3}\},\frac{1}{2}\{y_{2}+y_{3}\})$,
 thus yielding the following expressions for the centre coordinates
 $x_{c}$ and $y_{c}$ of the pupil:
 \begin{equation}
 \label{eq:centre:x}
-  x_{c}=x'+x''-2x_{o}
+  x_{c}=x'+x''-x_{o}
 \end{equation}
 \begin{equation}
 \label{eq:centre:y}
-  y_{c}=y'+y''-2y_{o}\mbox{.}
+  y_{c}=y'+y''-y_{o}\mbox{.}
 \end{equation}
 In other words, to compute an estimate of the position of the pupil on
 the basis of an already known pupil point, the origin of operation
@@ -189,7 +189,7 @@ image of the eye consists of two separate steps:
 
 \begin{description}
 \item[Step 1:] Apply a search strategy employing some sort of pixel
-  filter to locate a point that can be unambigously classified as a
+  filter to locate a point which unambigously can be classified as a
   pupil point.
 \item[Step 2:] Assign the pupil point returned by the search strategy
   to the origin of operation, and use line oriented edge detection

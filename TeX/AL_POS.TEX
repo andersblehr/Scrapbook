@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Apr  5 20:37:19 1993
+%%% Last Modified On: Tue Apr  6 17:09:26 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -212,28 +212,48 @@ set $r_{d}=0$.
   sought pupil contour will not be found.}{0.3}
 
 \subsubsection{Skipping Lake Pixels}
+\label{pg:skiplakepixels}
 
 A way of reducing the time required for one iteration of the above
 procedure even further, assuming that the pupil lake does not extend
-beyond the actual pupil contour, is during the process of moving along
-the detection line to investigate whether or not the pixel {\em in
-  front\/} of the current pixel is wet.  If it is wet, there is no
-need to apply the edge detection operator at the corresponding
-location, since the pupil contour will not be detected at a location
-where both the pixel at the location and the pixel in front of it in
-the direction of movement are wet.  Thus the number of locations at
-which the relatively costly edge detection operator has to be applied
-is drastically reduced.
+beyond the actual pupil contour, is, during the process of moving
+along the detection line, to investigate whether or not the pixel {\em
+  in front\/} of the current pixel is wet.  If it is dry, the edge
+detection operator is applied at the corresponding location.  However,
+if it is wet, there is no need to apply the edge detection operator at
+this location, since the pupil contour will not be detected at a
+location where both the pixel at the location and the pixel in front
+of it in the direction of movement are wet.  The pixel at the given
+location is known to be wet since, with this technique, every pixel in
+the direction of movement is tested for wetness, so that when testing
+a given pixel for wetness, it is known that all pixels preceding it
+are wet.  After a dry pixel has been detected, the edge detection
+operator is applied to every pixel along the remaining portion of the
+detection line, until the pupil contour is detected.
 
-It should be noted that with this technique, {\em every\/} pixel in
-the direction of movement is tested for wetness until a dry pixel is
-detected.  Thus the chance of crossing the actual pupil contour
-without detecting it during this process is non-existent, assuming
-that the above requirement of having the entire pupil lake contained
-in the actual pupil is satisfied.
+Evidently, the number of locations at which the relatively costly edge
+detection operator has to be applied is drastically reduced by
+employing this technique.  The largest impact of the technique is
+obtained when the number of islands encountered along the detection
+lines is minimal, so that the first dry pixel detected is in the
+proximity of the actual pupil contour.  This corresponds to having
+relatively high-contrast images with correspondingly deep pupil lakes.
+However, also with the low-quality test images, the effect of applying
+this technique was notable, and for the few images without islands in
+the pupil lake (cf.\ Fig.~\ref{fig:lake}), the effect can be
+characterized as dramatic.  Assuming relatively high image quality,
+this effect can be attributed to the fact that the number of locations
+at which the edge detection operator has to be applied is more or less
+independent of the resolution $N$ of the image, whereas the number of
+locations whose pixels are tested for wetness along the detection
+line, a computationally cheap operation, is $O(N)$.
 
 \subsection{Edge Detection Operators}
 \label{algo:pos:operators}
+
+\inserteps{profile}{\label{fig:profile}(a) The profile of a pixel row 
+  in an image. (b) The result of applying the mask in
+  Fig.~\protect\ref{fig:sobelop}(b) to this profile.}
 
 In the basic algorithm formulation in
 Section~\ref{eval:approach:algo}, it was said that, based on the
@@ -251,10 +271,6 @@ appropriately thresholding the output from the Sobel operators, the
 pupil contour can be detected.
 
 \subsubsection{Characteristics of the Sobel Operators}
-
-\inserteps{profile}{\label{fig:profile}(a) The profile of a pixel row 
-  in an image. (b) The result of applying the mask in
-  Fig.~\protect\ref{fig:sobelop}(b) to this profile.}
 
 Before deciding to employ the Sobel operators directly as they are
 depicted in Fig.~\ref{fig:sobelop}, it is necessary to examine their
@@ -311,12 +327,12 @@ row/column of the masks lessen their sensitivity to spurious noise
 from neighbouring rows/columns which intercept the column/row along
 which the mask moves.
 
-\subsubsection{Tailoring the Sobel Masks}
-
 \insertepswidth{masks}{\label{fig:masks}Eight masks that can be used 
   to detect the pupil contour along the four detection lines in
   Fig.~\protect\ref{fig:lines}.  The central point represents the
   origin of operation.}{0.4}
+
+\subsubsection{Tailoring the Sobel Masks}
 
 The primary difference between the usual manner in which the Sobel
 operators are applied, as described above, and the manner in which
@@ -462,15 +478,15 @@ Furthermore, choosing $T_{e}$ too low would cause the edges of the
 islands in the pupil lake to be recognized as representing the pupil
 contour.  As is seen from the figure, the interval of appropriate
 values for $T_{e}$ can be very narrow, depending on the image
-quality\footnote{With the given test images, it was impossible to
-  choose a value for $T_{e}$ which was appropriate for all images.
-  $T_{e}=5$ was found to be the best overall choice.  However, as is
-  seen from the Fig.~\ref{fig:myprofile}(b), this value caused
-  unwanted results in some images.}.  However, if the image quality
-and in particular the contrast is relatively high, so that the number
-of islands in the pupil lake is reduced to a minimum and the slope of
-the pupil contour is relatively steep, it ought to be possible to
-choose an overall satisfactory value for $T_{e}$.
+quality\footnote{\label{pg:TEproblems}With the given test images, it
+  was impossible to choose a value for $T_{e}$ which was appropriate
+  for all images.  $T_{e}=5$ was found to be the best overall choice.
+  However, as is seen from the Fig.~\ref{fig:myprofile}(b), this value
+  caused unwanted results in some images.}.  However, if the image
+quality and in particular the contrast is relatively high, so that the
+number of islands in the pupil lake is reduced to a minimum and the
+slope of the pupil contour is relatively steep, it ought to be
+possible to choose an overall satisfactory value for $T_{e}$.
 
 Note that the standard deviation of the error in the obtained position
 estimate caused by the given value for $T_{e}$ apparantly being
@@ -499,4 +515,8 @@ $n$ of iterations necessary to arrive at a final overall position
 estimate, in addition to being limited upwards, generally satisfies
 the relation $n\ll N$, it can be concluded that the position
 determining part of the {\octopus} eye-tracking algorithm performs in
-$O(N)$ time.
+$O(N)$ time.  It should be noted, however, that, by applying the
+technique of skipping lake pixels, described in
+Section~\ref{algo:pos:operation}, p.~\pageref{pg:skiplakepixels}, the
+number of locations in the image at which the edge detection operators
+have to applied is reduced to $O(1)$.
