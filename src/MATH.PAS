@@ -32,7 +32,13 @@ function realMin(x1,x2 : real) : real;
 
 function realMax(x1,x2 : real) : real;
 
-function sign(aNumber : real) : shortInt;
+function odd(x : integer) : boolean;
+
+function even(x : integer) : boolean;
+
+function high(x : real) : integer;
+
+function sign(x : real) : shortInt;
 
 function invertBits(x : word; numberOfBits : byte) : word;
 
@@ -156,10 +162,39 @@ begin
 end;
 
 
-function sign(aNumber : real) : shortInt;
+function odd(x : integer) : boolean;
 
 begin
-  if (aNumber>=0) then
+  odd:=(not even(x))
+end;
+
+
+function even(x : integer) : boolean;
+
+begin
+  even:=((x/2)=(x div 2))
+end;
+
+
+function high(x : real) : integer;
+
+begin
+  if (x>=0) then
+    if (trunc(x)=0) then
+      high:=1
+    else if ((x/trunc(x))=1) then
+      high:=trunc(x)
+    else
+      high:=succ(trunc(x))
+  else
+    high:=-high(-x)
+end;
+
+
+function sign(x : real) : shortInt;
+
+begin
+  if (x>=0) then
     sign:=1
   else
     sign:=-1
