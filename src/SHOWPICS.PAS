@@ -14,7 +14,7 @@ begin
         begin
           new(eyeImage,initStoredImage(paramStr(i+1)));
           eyeImage^.setPixelSize(1);
-          eyeImage^.drawImage(i mod 3,i div 3);
+          eyeImage^.drawImage(i div 3,i mod 3);
           dispose(eyeImage,done)
         end;
       readKey;
