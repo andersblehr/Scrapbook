@@ -102,11 +102,10 @@ end;
 
 procedure treatLines;
 
-type  sobelLinePtr              = ^sobelLine;
-      sobelLine                 = array[1..maxSize] of word;
+type  sobelLine                 = array[1..maxSize] of word;
 
-var   ascendingLine             : sobelLinePtr;
-      descendingLine            : sobelLinePtr;
+var   ascendingLine             : sobelLine;
+      descendingLine            : sobelLine;
 
       ascendingLineLeftSize     : word;
       ascendingLineRightSize    : word;
@@ -178,18 +177,16 @@ var   ascendingLine             : sobelLinePtr;
         descendingLineRightSize:=getLineSize(north,east);
         ascendingLineSize:=ascendingLineLeftSize+ascendingLineRightSize-2;
         descendingLineSize:=descendingLineLeftSize+descendingLineRightSize-2;
-        getMem(ascendingLine,ascendingLineSize);
-        getMem(descendingLine,descendingLineSize);
         minSobel:=255;
         maxSobel:=0;
-        ascendingLine^[1]:=1;
-        ascendingLine^[ascendingLineSize]:=1;
-        descendingLine^[1]:=1;
-        descendingLine^[descendingLineSize]:=1;
+        ascendingLine[1]:=1;
+        ascendingLine[ascendingLineSize]:=1;
+        descendingLine[1]:=1;
+        descendingLine[descendingLineSize]:=1;
         for i:=-(ascendingLineLeftSize-2) to (ascendingLineRightSize-2) do
-          ascendingLine^[ascendingLineLeftSize+i]:=applySobelMaskAt(x+i,y+i,ascendingMask);
+          ascendingLine[ascendingLineLeftSize+i]:=applySobelMaskAt(x+i,y+i,ascendingMask);
         for i:=-(descendingLineLeftSize-2) to (descendingLineRightSize-2) do
-          descendingLine^[descendingLineLeftSize+i]:=applySobelMaskAt(x+i,y-i,descendingMask)
+          descendingLine[descendingLineLeftSize+i]:=applySobelMaskAt(x+i,y-i,descendingMask)
       end;
     sobelExtent:=maxSobel-minSobel
   end;
@@ -291,17 +288,17 @@ var   ascendingLine             : sobelLinePtr;
       for i:=2 to ascendingLineSize do
         line(leftStart+round(ascendingUnit*(i-2)),
              sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*ascendingLine^[i-1]),
+                 round(unitSobelAxis*ascendingLine[i-1]),
              leftStart+round(ascendingUnit*(i-1)),
              sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*ascendingLine^[i]));
+                 round(unitSobelAxis*ascendingLine[i]));
       for i:=2 to descendingLineSize do
         line(rightStart+round(descendingUnit*(i-2)),
              sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*descendingLine^[i-1]),
+                 round(unitSobelAxis*descendingLine[i-1]),
              rightStart+round(descendingUnit*(i-1)),
              sobelLinesY+round(minSobel*unitSobelAxis)-
-                 round(unitSobelAxis*descendingLine^[i]))
+                 round(unitSobelAxis*descendingLine[i]))
     end;
 
 
