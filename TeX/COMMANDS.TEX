@@ -6,8 +6,13 @@
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : Unknown, Use with caution!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% History 		
+%%% 23-Feb-1993		blehr	
+%%%    Tok bort \hentps og \henpsbredde, siden dvips ikke forstaar
+%%%    psfig.  La til \inserteps og \insertepswidth istedet.  Begge
+%%%    disse krever Encapsulated PostScript (.eps).
 
-\input{psfig}
+\input{epsf}
 
 \newcommand{\nit}{NTH}
 
@@ -37,25 +42,39 @@
   {\large\it  #1\hspace{1cm} #2 \hfill {\bf #3}}
 \begin{quote}}{\end{quote}}
 
+%%
+%% Kommandoer for importering av EPS-filer (Encapsulated PostScript).
+%%
 
-% Hente PS-bilder. Bredde = 0.8\textwidth
 %
-% Bruksm}te :
-%   \hentps{mintegning}{Forklarende tekst til figuren}
+% \inserteps[2]
 %
-\newcommand{\hentps}[2] {\hentpsbredde{#1}{#2}{0.8}}
+% Bruksmaate:
+%   \inserteps{filnavn}{figurtekst\label{fig:labref}}
+%
+% X-utstrekningen til figuren settes til 0.8 ganger tekstbredden.
+%
 
-% Bruksm}te:
-%  \hentpsbredde{mintegning}{Forklarende tekst \label{labref}}{tall}
+\newcommand{\inserteps}[2]{\insertepswidth{#1}{#2}{0.8}}
+
 %
-%  'tall' er et tall mellom 0 og 1 som angir br|kdel av tekstbredden.
+% \insertepswidth[3]
 %
-\newcommand{\hentpsbredde}[3]
+% Bruksmaate:
+%   \insertepswidth{filnavn}{figurtekst\label{fig:labref}}{bredde}
+%
+% `bredde' er et tall mellom 0 og 1 som angir broekdel av
+% tekstbredden som figuren skal ha.
+%
+
+\newcommand{\insertepswidth}[3]
 {
-   \begin{figure}[htb]
-   \begin{centering}
-      \mbox{\psfig{figure=c:/user/blehr/fag/diplom/rapport/figurer/#1.ps,width=#3\textwidth}}
+  \begin{figure}[htb]
+    \leavevmode
+    \epsfxsize #3\textwidth
+    \begin{centering}
+      \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#1.eps}
       \caption{#2}
     \end{centering}
-   \end{figure}
+  \end{figure}
 }
