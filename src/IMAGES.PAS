@@ -55,7 +55,7 @@ const xSobelMask                : maskArray = (-1,-2,-1,
 
 IMPLEMENTATION
 
-uses crt,graph,paths,auxil,math,SVGA;
+uses crt,graph,auxil,math,SVGA;
 
 
 (**************************************************************************
@@ -222,8 +222,8 @@ var   i,j                       : word;
 
   begin
     aGrayLevel:=abs(aGrayLevel);
-    if (aGrayLevel>31) then
-      conform:=31
+    if (aGrayLevel>63) then
+      conform:=63
     else
       conform:=aGrayLevel
   end;
