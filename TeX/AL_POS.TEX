@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Apr  5 15:17:03 1993
+%%% Last Modified On: Mon Apr  5 20:37:19 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,16 +136,17 @@ available time interval of 20 ms to be exceeded without having arrived
 at a final overall position estimate.  To avoid this happening, an
 upper limit to the number of iterations can be determined.  This
 number has to determined on the basis of the time required to perform
-one iteration\footnote{In the current implementation, this number was
-  set to 15.  However, it never happened that the iteration process
-  had to be interrupted before a final position estimate had been
-  obtained}.  If it should happen that the allowed number of
-iterations has been carried out without having arrived at a final
-overall estimate, the current estimate has to be returned.  Clearly,
-the estimate thus returned would hardly satisfy the requirement of
-accuracy.  However, assuming a relatively good image quality and thus
-minimizing the spatial distribution of the intermediate estimates, the
-probability of this happening will practically be zero.
+one iteration\footnote{In the current implementation, this number is
+  set to 75, given that each iterations requires $\sim 0.25$ ms.  The
+  lowest number of iterations required to arrive at a final overall
+  estimate for all test images is 5.}.  If it should happen that the
+allowed number of iterations has been carried out without having
+arrived at a final overall estimate, the current estimate has to be
+returned.  Clearly, the estimate thus returned would hardly satisfy
+the requirement of accuracy.  However, assuming a relatively good
+image quality and thus minimizing the spatial distribution of the
+intermediate estimates, the probability of this happening will
+practically be zero.
 
 Note that, when combining an intermediate position estimate with the
 current overall estimate to obtain an improved overall estimate, the
@@ -209,6 +210,27 @@ set $r_{d}=0$.
   portion of the pupil lake, and the white circle designates the
   ``dead region'' about the origin of operation, inside which the
   sought pupil contour will not be found.}{0.3}
+
+\subsubsection{Skipping Lake Pixels}
+
+A way of reducing the time required for one iteration of the above
+procedure even further, assuming that the pupil lake does not extend
+beyond the actual pupil contour, is during the process of moving along
+the detection line to investigate whether or not the pixel {\em in
+  front\/} of the current pixel is wet.  If it is wet, there is no
+need to apply the edge detection operator at the corresponding
+location, since the pupil contour will not be detected at a location
+where both the pixel at the location and the pixel in front of it in
+the direction of movement are wet.  Thus the number of locations at
+which the relatively costly edge detection operator has to be applied
+is drastically reduced.
+
+It should be noted that with this technique, {\em every\/} pixel in
+the direction of movement is tested for wetness until a dry pixel is
+detected.  Thus the chance of crossing the actual pupil contour
+without detecting it during this process is non-existent, assuming
+that the above requirement of having the entire pupil lake contained
+in the actual pupil is satisfied.
 
 \subsection{Edge Detection Operators}
 \label{algo:pos:operators}
@@ -472,6 +494,9 @@ along two perpendicular detection lines, is determined by the number
 of pixels from the origin of operation to the pupil contour, along the
 given detection line.  On the average, this number equals the radius
 of the pupil in pixels, which in turn depends on the horizontal and
-vertical resolution $N$ of the $N\times N$ image.  Consequently, the
-position determining part of the {\octopus} eye-tracking algorithm
-performs in $O(N)$ time.
+vertical resolution $N$ of the $N\times N$ image.  Since the number
+$n$ of iterations necessary to arrive at a final overall position
+estimate, in addition to being limited upwards, generally satisfies
+the relation $n\ll N$, it can be concluded that the position
+determining part of the {\octopus} eye-tracking algorithm performs in
+$O(N)$ time.

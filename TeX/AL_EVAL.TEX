@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:28:57 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Apr  5 13:41:51 1993
+%%% Last Modified On: Mon Apr  5 17:37:14 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,6 +13,18 @@
 
 \subsection{Overall Number of Operations}
 \label{algo:eval:O}
+
+In Section~\ref{algo:seek:O}, it was shown that the swimming octopus
+search algorithm, described in Section~\ref{algo:seek} and
+implementing Step 1 in the basic algorithm formulation given in
+Section~\ref{eval:approach:algo}, performs in $O(N)$ time when applied
+to an $N\times N$ image.  In Section~\ref{algo:pos:O} it was shown
+that the position determining algorithm described in
+Section~\ref{algo:pos}, implementing Step 2 of the basic algorithm
+formulation, performs in $O(N)$ time.  Thus it can be concluded that
+the {\octopus} eye-tracking algorithm, being composed of the given
+implementations of Steps 1 and 2 of the basic algorithm formulations,
+performs in $O(N)$ time.
 
 \subsection{Test Results}
 \label{algo:eval:test}
