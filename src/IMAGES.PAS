@@ -6,11 +6,11 @@ INTERFACE
 
 const maxRowPixels              = 512;
 
-      center                    = 0;
-      left                      = 1;
+      left                      = 0;
+      center                    = 1;
       right                     = 2;
-      top                       = 3;
-      bottom                    = 4;
+      top                       = 0;
+      bottom                    = 2;
 
 type  bufferType                = array[1..512] of char;
 
@@ -393,9 +393,9 @@ var   x,y                       : word;
 
   begin
     case where of
-      left   : xPosition:=(getMaxX div 4)-(xSize div 2)*pixelSize;
+      left   : xPosition:=1;
       center : xPosition:=(getMaxX div 2)-(xSize div 2)*pixelSize;
-      right  : xPosition:=3*(getMaxX div 4)-(xSize div 2)*pixelSize
+      right  : xPosition:=getMaxX-xSize*pixelSize
     end
   end;
 
@@ -404,9 +404,9 @@ var   x,y                       : word;
 
   begin
     case where of
-      top    : yPosition:=(getMaxY div 4)-(ySize div 2)*pixelSize;
+      top    : yPosition:=1;
       center : yPosition:=(getMaxY div 2)-(ySize div 2)*pixelSize;
-      bottom : yPosition:=3*(getMaxY div 4)-(ySize div 2)*pixelSize
+      bottom : yPosition:=getMaxY-ySize*pixelSize
     end
   end;
 

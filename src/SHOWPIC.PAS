@@ -1,16 +1,24 @@
 program showEye;
 
-uses  crt,graph,images,SVGA;
+uses  crt,graph,auxil,defs,images,SVGA;
 
 var   eyeImage                  : imageOPtr;
 
 begin
-  initSVGAGraphics;
-  setBlackAndWhitePalette;
-  new(eyeImage,initStoredImage('eye'));
-  eyeImage^.setPixelSize(2);
-  eyeImage^.drawImage(center,center);
-  readKey;
-  dispose(eyeImage,done);
-  closeGraph
+  if (paramCount>0) then
+    if fileExists(pictureFile(paramStr(1))) then
+      begin
+        initSVGAGraphics;
+        setBlackAndWhitePalette;
+        new(eyeImage,initStoredImage(paramStr(1)));
+        eyeImage^.setPixelSize(1);
+        eyeImage^.drawImage(center,center);
+        readKey;
+        dispose(eyeImage,done);
+        closeGraph
+      end
+    else
+      fatalError('picture file not found: '+pictureFile(paramStr(1)))
+  else
+    fatalError('Usage: showeye <file name (no extension)>')
 end.
