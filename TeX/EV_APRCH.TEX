@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 25 04:25:48 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Apr  1 04:42:17 1993
+%%% Last Modified On: Fri Apr  2 02:15:16 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,15 +136,17 @@ every pixel encountered in each direction, and, if an edge point is
 recognized, registering the coordinates of this point.  Since the
 pupil-iris edge can be assumed to be the first edge encountered when
 moving in any direction from a point within the pupil, the points thus
-detected represent the extent of the pupil.  To compute the position
-of the centre of the pupil, it is necessary to know the coordinates of
-the oppositely positioned edge points of two perpendicular lines
-intercepting at the origin of operation.  The procedure is illustrated
-in Fig.~\ref{fig:compute}.  $(x_{o},y_{o})$ designates the origin of
-operation, and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge points
-detected along the two intercepting and perpendicular lines.  The
-centre points $(x',y')$ and $(x'',y'')$ of the two lines with respect
-to the extent of the pupil are given by the relations
+detected represent the extent of the pupil.  A line passing through
+the origin of operation and traversing the entire extent of the pupil
+in some direction will hereafter be referred to as a {\em detection
+  line\/}.  To compute the position of the centre of the pupil, it is
+necessary to know the coordinates of the oppositely positioned edge
+points along two perpendicular detection lines.  The procedure is
+illustrated in Fig.~\ref{fig:compute}.  $(x_{o},y_{o})$ designates the
+origin of operation, and $(x_{i},y_{i})$, $1\leq i\leq 4$, the edge
+points detected along the two detection lines.  The centre points
+$(x',y')$ and $(x'',y'')$ of the two lines with respect to the extent
+of the pupil are given by the relations
 $(x',y')=(\frac{1}{2}\{x_{1}+x_{4}\},\frac{1}{2}\{y_{1}+y_{4}\})$ and
 $(x'',y'')=(\frac{1}{2}\{x_{2}+x_{3}\},\frac{1}{2}\{y_{2}+y_{3}\})$,
 thus yielding the following expressions for the centre coordinates
@@ -158,15 +160,14 @@ $x_{c}$ and $y_{c}$ of the pupil:
   y_{c}=y'+y''-2y_{o}\mbox{.}
 \end{equation}
 In other words, to compute an estimate of the position of the pupil on
-the basis of an already known pupil point with coordinates $x_{o}$ and
-$y_{o}$, one needs to (1) detect the extent of the pupil along two
-perpendicular lines intercepting at this point, and (2) combine the
-coordinates of the interception points of the lines with the
-pupil-iris contour to compute $x_{c}$ and $y_{c}$, using
-Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}).  This method of
-detecting the extent of the pupil along straight lines intercepting at
-a point inside the pupil will in the following be referred to as {\em
-  line oriented edge detection\/}.  
+the basis of an already known pupil point, the origin of operation
+with coordinates $x_{o}$ and $y_{o}$, one needs to (1) detect the
+extent of the pupil along two detection lines relative to this point,
+and (2) combine the coordinates of the interception points of the
+lines with the pupil-iris contour to compute $x_{c}$ and $y_{c}$,
+using Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}).  This method
+of detecting the extent of the pupil along detection lines will in the
+following be referred to as {\em line oriented edge detection\/}.
 
 Obviously, the estimate obtained by performing the above procedure on
 only one pair of lines is not very accurate with respect to the actual
@@ -191,20 +192,23 @@ image of the eye consists of two separate steps:
   filter to locate a point that can be unambigously classified as a
   pupil point.
 \item[Step 2:] Assign the pupil point returned by the search strategy
-  to the origin of operation, and use line oriented edge detection on
-  as high a number of line pairs as allowed by the time available, in
-  order to obtain as accurate an estimate of the centre position of
-  the pupil as possible.
+  to the origin of operation, and use line oriented edge detection
+  iteratively on different pairs of perpendicular detection lines to
+  compute new estimates of the pupil position.  Repeat this process
+  until the overall position estimate, given as the average of the
+  individual estimates, no longer changes from one iteration to the
+  next.
 \end{description}
 
 In order to minimize the probability of returning a non-pupil point as
 input to Step 2, care has to be taken when chosing the search strategy
 in Step 1.  Also, the fraction of the total time for the algorithm
 spent searching for a pupil point has to be minimized, in order to
-have as much time as possible available for Step 2, thus maximizing
-the accuracy of the algorithm.  In addition, a reasonable choice has
-to be made as to the edge detection operator(s) to be employed in Step
-2.  From the list of promising aspects given in
+have as much time as possible available for Step 2, since it is not
+known at the outset of the procedure how many iterations will be
+needed to arrive at a final estimate.  In addition, a reasonable
+choice has to be made as to the edge detection operator(s) to be
+employed in Step 2.  From the list of promising aspects given in
 Section~\ref{eval:approach:aspect}, it is clear that some sort of
 first-order gradient operator would be best suited for this task,
 considering the superior response of the Sobel-operators to the
