@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Apr  3 13:31:30 1993
+%%% Last Modified On: Sun Apr  4 14:57:29 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,7 +39,7 @@ pixels with values above $T_{l}$ retain their old values.  The effect
 of applying thresholding of this sort to an image can be illustrated
 by picturing the image as a three-dimensional landscape, as depicted
 in Fig.~\ref{fig:landscape}.  The negative peaks correspond to the
-abovementioned spots, whereas the positive peak in the left of the
+aforementioned spots, whereas the positive peak in the left of the
 image represents an actual bright point (compare
 Fig.~\ref{fig:testimages}(b)).  When the image is thresholded, $T_{l}$
 can be viewed as representing the surface level of a mostly
@@ -51,7 +51,8 @@ Fig.~\ref{fig:lake}.  Note that, although the pupil is hardly
 discernable in Fig~\ref{fig:landscape}, it is clearly visible as
 forming the largest pond, or {\em lake\/}, after thresholding.  Note
 also that a number of relatively large lakes are formed by non-pupil
-portions of the eye.
+portions of the eye.  This form of thresholding will hereafter be
+referred to as {\em lake-thresholding\/}.
 
 The principle idea behind the search algorithm is that, bearing the
 above notation in mind, every pixel in a given image can be classified

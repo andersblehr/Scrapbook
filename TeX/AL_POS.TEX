@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:27:59 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Apr  3 19:32:36 1993
+%%% Last Modified On: Sun Apr  4 19:15:11 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,8 +220,185 @@ Normally, assuming the image origin to be the upper left corner of the
 image, the Sobel operators are applied to an image in two passes, one
 vertical, applying the mask Fig.~\ref{fig:sobelop}(a) column by column
 to every pixel in a top-down manner, and one horizontal, applying the
-mask in Fig.~\ref{fig:sobelop}(b) row by row to every pixel in a left
-to right manner.
+mask in Fig.~\ref{fig:sobelop}(b) row by row to every pixel in a
+left-to-right manner.  In Fig.~\ref{fig:profile}(b), the result of
+applying the horizontal Sobel operator to a single row in an image is
+shown\footnote{The image in question is the one depicted in
+  Fig.~\ref{fig:testimages}(b).  The selected row passes horizontally
+  through the approximate middle of the pupil (cf.\ 
+  Fig.~\ref{fig:landscape}).  Note that the highest gray level in both
+  profiles is 63, and that the darkest gray level in the unprocessed
+  profile is 15, as pointed out earlier.  Note also that the
+  horizontal contrast is relatively good in the image.  It was a
+  general trend with the given test images that the horizontal
+  contrast was much better than the vertical (cf.\ 
+  Fig.~\ref{fig:landscape}).}.  The profile of the row itself is
+depicted in Fig.~\ref{fig:profile}(a).  Note that the processed
+profile in (b) also contains information about the neighbouring rows
+to the row in (a).  As is seen from the figure, the operator responds
+to positive as well as negative edges.  Note in particular the high
+peaks caused by the two edges of the reflex occupying the left portion
+of the pupil.  The lack of differentiation between positive and
+negative edges is due to the returned response being computed as the
+magnitude of the {\em actual\/} response (corresponding to the partial
+gradients $G_{x}$ and $G_{y}$, cf.\ Eq.~(\ref{eq:gradient:abs}),
+p.~\pageref{eq:gradient:abs}).  It should be noted that the pupil by
+no means constitutes a flat surface in the image landscape.  Moreover,
+the irregularities present in the pupil are interpreted as edges,
+however small, by the Sobel operators, as is evident from the figure.
+Thus one cannot assume the pupil contour to be the {\em first\/} edge
+encountered along the detection lines.  Instead it has to be assumed
+that the pupil contour constitutes the first edge encountered which
+causes a response higher than or equal to a threshold value $T_{e}$.
+The magnitude of $T_{e}$ is discussed below.
+
+By examining the two masks in Fig.~\ref{fig:sobelop} and keeping in
+mind that the mask in (a) proceeds in a top-down manner and the one in
+(b) in a left-to-right manner, it is seen that a positive edge causes
+a positive actual response, whereas a negative edge causes a negative
+actual response.  Lastly, two points should be noted about the
+coefficients employed in the masks.  For one, the 2's cause intensity
+transitions in the column/row along which the mask moves to contribute
+more to the overall response than transitions in the neighbouring
+columns/rows.  This is clearly desirable from a line oriented edge
+detection viewpoint.  Secondly, the ``empty'' (i.e., filled with 0's)
+row/column of the masks lessen their sensitivity to spurious noise
+from neighbouring rows/columns which intercept the column/row along
+which the mask moves.
+
+\insertepswidth{profile}{\label{fig:profile}(a) The profile of a pixel
+  row in an image. (b) The result of applying the mask in
+  Fig.~\protect\ref{fig:sobelop}(b) to this profile.}{0.5}
+
+\subsubsection{Tailoring the Sobel Masks}
+
+The primary difference between the usual manner in which the Sobel
+operators are applied, as described above, and the manner in which
+they would be applied in line oriented edge detection, is the
+direction of movement.  They would no longer move in only two
+directions, top-down and left-to-right, but in eight different
+directions corresponding to the four detection lines depicted in
+Fig.~\ref{fig:lines}.  Evidently, the vertical mask would be well
+suited to detect the northern and southern pupil edges, and the
+horizontal mask would be equally well suited to detect the western and
+eastern edges.  They would both be equally but not particularly well
+suited to detect the diagonal edges, and thus at least two new masks
+have to be designed that are better suited to this task.
+
+Before proceeding to design the new masks, it should be noted that,
+when moving from a point inside the pupil, the pupil contour will
+always constitute a positive edge.  Accordingly, approximately half of
+the edges encountered along the detection lines can be discarded,
+namely those that are negative.  It was pointed aout above that the
+lack of differentiation between the responses to positive and negative
+edges was due to the returned response being computed as the magnitude
+of the actual response.  Thus, by not taking the magnitude of the
+actual response and discarding all negative responses, only positive
+edges will be detected.
+
+By discarding all negative responses, the two masks in
+Fig.~\ref{fig:sobelop}(a) and (b) can only be applied to detect the
+southern and eastern pupil edge, respectively, since the northern and
+western edges would cause negative responses and thus be discraded.
+However, by mirroring the mask in Fig~\ref{fig:sobelop}(a) about the
+horizontal axis and the one in (b) about the vertical axis, two masks
+are obtained that would return positive responses to the northern and
+western pupil edges, respectively.  The diagonal masks are obtained
+analogously, and the entire set of eight masks, two for each detection
+line, is shown in Fig.~\ref{fig:masks}.
+
+\insertepswidth{masks}{\label{fig:masks}Eight masks that can be used 
+  to detect the pupil contour along the four detection lines in
+  Fig.~\protect\ref{fig:lines}.  The central point represents the
+  origin of operation.}{0.4}
+
+\subsubsection{Reducing the Sensitivity to Noise}
+
+As has been stated earlier, the given test images have low contrast
+and are also infected with additive, spurious noise.  Particularly
+should the dark ``spots'' dispersed throughout the images be noted
+(cf.\ Section~\ref{algo:intro:images})\footnote{These ``spots'' can be
+  seen as negative peaks in the image landscape in
+  Fig.~\ref{fig:landscape}, and are also visible in the images
+  themselves, cf.\ Fig.~\ref{fig:testimages}.}.  Since the combination
+of low contrast and spurious noise may cause edges to be detected
+where no edge should be detected, it is important to reduce the
+spurious noise in the image as much as possible, at least inside the
+pupil, since this is where the edge detection takes place.
+In particular must the dark ``spots'' be more or less eliminated,
+since these would cause the Sobel operators to detect veritable
+``walls'' if they should happen to be located along or next to the
+detection lines.
+
+An obvious approach to more or less eliminating the irregularities
+inside the pupil, as well as the spots, is to process the
+lake-thresholded image instead of the raw image itself.  As stated
+earlier (cf.\ Section~\ref{algo:seek:idea}), lake-thresholding an
+image causes sub-lake landscape features to be eliminated, whereas the
+features of non-lake regions are preserved.  By appropriately choosing
+the lake-threshold value $T_{l}$, the probability of having the pupil
+lake extend beyond the actual pupil contour can be reduced to a
+minimum, albeit with thus low-quality images it cannot entirely be
+eliminated.  Consequently, all sub-lake ``edges'' will be ignored by
+the edge detection operators, and the first edge detected will
+correspond to the shore of the pupil lake, alternatively to the shores
+of an island in the lake.  By appropriately thresholding the output
+from the operators, it is possible to differentiate between these
+edges and the actual pupil edge, assuming that the pupil edge is the
+most prominent of these.  Most importantly, the dark ``spots'' will
+also be ``filled'', and thus either form small, one-pixel ponds of
+their own, or be part of larger lakes.
+
+With the given test images, the number of islands in the pupil lake 
+was on the average relatively large, and on occasions fooled the edge
+detection operators into believing that the pupil edge had been
+detected.  A way of reducing the operators' sensitivity to this kind
+of regional noise is to enlarge the neighbourhood over which they
+compute the gradient.  That is, the $3\times 3$ neighbourhoods in
+Fig.~\ref{fig:masks} are extended to (e.g.) $5\times 5$ masks by
+inserting two rows and two columns containing only 0's between the
+three existing rows and columns.  Since the inserted 0's do not
+contribute to the computation, doing this does not increase the number
+of operations needed to compute the gradient at a given location, but,
+since pixel values are gathered from a larger neighbourhood, it
+reduces the sensitivity of the masks to islands in the pupil lake, as
+well as to spurious noise in general.  The result of applying the
+``extended'' versions of the diagonal masks in Fig.~\ref{fig:masks} to
+the image in Fig.~\ref{fig:testimages}(e), applying each mask
+according to which quadrant of the image relative to the origin of
+operation the pixel in questions belongs to, is shown in
+Fig.~\ref{fig:mysobel}(a), together with the result of applying the
+standard Sobel masks of Fig.~\ref{fig:sobelop} to the same image (b).
+Note that the pupil contour is more predominant in (a) than in (b),
+and also that negative edges as seen from the origin of operation are
+not visible (note in particular the far side of the reflex).
+
+\inserttwoeps{dtctbl05}{soblbl05}{\label{fig:mysobel}(a) The result of
+  applying the ``extended'' versions of the diagonal masks in
+  Fig.~\protect\ref{fig:masks} to the image in
+  Fig.~\protect\ref{fig:testimages}(e). (b) The result of applying the
+  ``normal'' Sobel masks to the same image.}
+
+\subsubsection{Thresholding the Output from the Sobel Operators}
+
+Evidently, the ability to differentiate between the pupil edge and
+spurious intensity variations in the proximity of the pupil edge
+depends on how the output from the employed Sobel operators is
+thresholded.  With the given test images, the S/N ratio is so low that
+it often is difficult on the basis of an image profile visually to
+determine where the actual pupil contour is.  This is clearly
+demonstrated in Fig.~\ref{fig:myprofile}(a), which shows the profile 
+of the image in Fig.~\ref{fig:testimages}(d) along a southeastwards
+detection line passing through the pupil.  Although the pupil lake is
+clearly identifiable, it should be noted that the height above the
+lake level of the northwest shore of the lake is only 1 
+
+\insertepswidth{myprofil}{\label{fig:myprofile}(a) The profile of the
+  image in Fig.~\protect\ref{fig:testimages}(d) along a southeastwards
+  detection line passing through the pupil. (b) The result of applying
+  the NW (left) and SE (right) Sobel mask of
+  Fig.~\protect\ref{fig:masks} to this profile.  $O_{O}$ designates 
+  the origin of operation.}{0.5}
 
 \subsection{Number of Operations}
 \label{algo:pos:O}
