@@ -4,6 +4,10 @@ unit math;
 INTERFACE
 
 
+const positive                  = 1;
+      negative                  = -1;
+
+
 function exp2(x : real) : real;
 
 function intExp2(x : byte) : word;
@@ -20,9 +24,15 @@ function potenceOf2(x : word) : boolean;
 
 function rad(angleAsDegrees : real) : real;
 
-function min(x1,x2 : integer) : integer;
+function intMin(x1,x2 : integer) : integer;
 
-function max(x1,x2 : integer) : integer;
+function intMax(x1,x2 : integer) : integer;
+
+function realMin(x1,x2 : real) : real;
+
+function realMax(x1,x2 : real) : real;
+
+function sign(aNumber : real) : shortInt;
 
 function invertBits(x : word; numberOfBits : byte) : word;
 
@@ -106,23 +116,53 @@ begin
 end;
 
 
-function min(x1,x2 : integer) : integer;
+function intMin(x1,x2 : integer) : integer;
 
 begin
   if (x1<x2) then
-    min:=x1
+    intMin:=x1
   else
-    min:=x2
+    intMin:=x2
 end;
 
 
-function max(x1,x2 : integer) : integer;
+function intMax(x1,x2 : integer) : integer;
 
 begin
   if (x1>x2) then
-    max:=x1
+    intMax:=x1
   else
-    max:=x2
+    intMax:=x2
+end;
+
+
+function realMin(x1,x2 : real) : real;
+
+begin
+  if (x1<x2) then
+    realMin:=x1
+  else
+    realMin:=x2
+end;
+
+
+function realMax(x1,x2 : real) : real;
+
+begin
+  if (x1>x2) then
+    realMax:=x1
+  else
+    realMax:=x2
+end;
+
+
+function sign(aNumber : real) : shortInt;
+
+begin
+  if (aNumber>=0) then
+    sign:=1
+  else
+    sign:=-1
 end;
 
 
