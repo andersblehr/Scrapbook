@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 14 06:43:21 1993
+%%% Last Modified On: Mon Mar 15 07:09:40 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,8 +82,8 @@ Fourier spectrum,
 \end{equation}
 is called the {\em power spectrum\/} of $f(x)$.
 
-The term {\em frequency plane\/} stems from the fact that the
-exponential term of Ec.~\ref{eq:fourier:def} can be expressed in the
+The term {\em frequency domain\/} stems from the fact that the
+exponential term of Eq.~\ref{eq:fourier:def} can be expressed in the
 form
 \begin{equation}
   e^{-j\pi ux}=\cos 2\pi ux-j\sin 2\pi ux\mbox{,}
@@ -138,15 +138,15 @@ apart, its {\em discrete\/} Fourier transform is given by\footnote{For
   a proof of these results, see for instance~\cite{brigham}}
 \begin{equation}
 \label{eq:fourier:discrete}
-  F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{\frac{-j2\pi ux}{N}}
+  F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{-\frac{j2\pi ux}{N}}
 \end{equation}
-for $u=0,1,2,\ldots,N-1$, where the discrete meaning of $f(x)$ is
-given by
+for $u=0,1,2,\ldots,N-1$, where $f(x)$ is given by
 \begin{equation}
   f(x)=f(x_{0}+x\Delta x)\mbox{.}
 \end{equation}
 Analogously, the inverse discrete Fourier transform is given by
 \begin{equation}
+\label{eq:fourier:discrete:inverse}
   f(x)=\sum_{u=0}^{N-1}F(u)e^{\frac{j2\pi ux}{N}}
 \end{equation}
 for $x=0,1,2,\ldots,N-1$.
@@ -196,12 +196,12 @@ Eq.~\ref{eq:fourier:discrete} in the form
 where
 \begin{equation}
 \label{eq:fft:W_N}
-  W_{N}=e^{\frac{-j2\pi}{N}}\mbox{,}
+  W_{N}=e^{-\frac{j2\pi}{N}}\mbox{,}
 \end{equation}
 and $N=2^{n}$, $n>0$.  Based on this, $N$ can be expressed as
 \begin{equation}
 \label{eq:fft:N=2M}
-  N=2M\mbox{, $M>0$.}
+  N=2M\mbox{.}
 \end{equation}
 Substitution of Eq.~\ref{eq:fft:N=2M} into Eq.~\ref{eq:fft}
 yields 
@@ -252,29 +252,54 @@ interval is thus performed by computing the two $N/2$-point transforms
 $F_{\even}(u)$ and $F_{\odd}(u)$, as defined in
 Eqs.~\ref{eq:fft:F_even} and~\ref{eq:fft:F_odd}, and then applying
 Eq.~\ref{eq:fft:Fevenodd} to the results to form $F(u)$ for $u$ in
-$[0,M-1]$.  The values of $F(u)$ for $u$ in $[M,N-1]$ then follows
-directly from Eq.~\ref{eq:fft:doubling}.  Computation of
-$F_{\even}(u)$ and $F_{\odd}(u)$ is carried out in the exact same
-manner, by dividing each of them into two, and proceeding as described
-above.  This process is carried on recursively downwards until the
-transforms to be computed are $1$-point transforms, which correspond
-to the samples themselves.  These are then promoted upwards to form
-intermediate results on all levels, until finally, on the top level,
-the overall transform has been computed.  This process is referred to
-as {\em successive doubling\/}.
+$[0,M-1]$.  The values of $F(u)$ for $u$ in $[M,N-1]$ follow directly
+from Eq.~\ref{eq:fft:doubling}.  Computation of $F_{\even}(u)$ and
+$F_{\odd}(u)$ is carried out in the exact same manner, by dividing
+each of them into two, and proceeding as described above.  This
+process is carried on recursively downwards until the transforms to be
+computed are $1$-point transforms, which correspond to the samples
+themselves.  These are then promoted upwards to form intermediate
+results on all levels, until finally, on the top level, the overall
+transform has been computed.  This process is referred to as {\em
+  successive doubling\/}.
+
+The inverse Fourier transform is easily implemented using the {\fft}
+algorithm presented above.  To see this, consider
+Eqs.~\ref{eq:fourier:discrete} and~\ref{eq:fourier:discrete:inverse},
+which are repeated below:
+\begin{equation}
+\label{eq:fourier:discrete:2}
+  F(u)=\frac{1}{N}\sum_{x=0}^{N-1}f(x)e^{-\frac{j2\pi ux}{N}}
+\end{equation}
+\begin{equation}
+\label{eq:fourier:discrete:inverse:2}
+  f(x)=\sum_{u=0}^{N-1}F(u)e^{\frac{j2\pi ux}{N}}\mbox{.}
+\end{equation}
+Taking the complex conjugate of
+Eq.~\ref{eq:fourier:discrete:inverse:2} and dividing both sides by $N$
+yields 
+\begin{equation}
+\label{eq:fft:inverse}
+  \frac{1}{N}f^{\ast}(x)=\frac{1}{N}\sum_{u=0}^{N-1}F^{\ast}(u,v)
+  e^{-\frac{j2\pi ux}{N}}\mbox{.}
+\end{equation}
+The right side of Eq.~\ref{eq:fft:inverse} is in the form of the
+forward Fourier transform in Eq.~\ref{eq:fourier:discrete:2}.  Thus,
+if $F^{\ast}(u)$ is input into an algorithm computing the forward
+transform, the result will be the quantity $f^{\ast}(x)/N$.  Taking
+the complex conjugate and multiplying by $N$ yields the inverse
+Fourier transform $f(x)$.
 
 As mentioned above, this algorithm performs in $O(N\log_{2}N)$ time.
 For a proof of this result, see for instance~\cite{brigham}
-or~\cite{digim}.
+or~\cite{digim}.  Note also that this formulation is for the
+one-dimensional case.  The {\fft} in the two-dimensional case is
+computed by applying the above formulation on a line-to-line basis.
+The number of operations for applying the {\fft} on an $N\times N$
+image is then $O(N^{2}\log_{2}N)$.
 
-Note that this formulation is for the one-dimensional case.  The
-{\fft} in the two-dimensional case is computed by applying the above
-formulation on a line-to-line basis.  It is also worth noting then,
-that the number of operations for applying the {\fft} on an $N\times
-N$ image is $O(N^{2}\log_{2}N)$.
-
-\insertepswidth{convolut}{\label{fig:convolution}Graphical
-  illustration of convolution}{0.7}
+\inserteps{convolut}{\label{fig:convolution}Graphical illustration of
+  convolution}
 
 \subsection{The Convolution Theorem}
 \label{image:frequency:convolution}
@@ -340,10 +365,10 @@ hold:
 An analogous result is that convolution in the frequency domain
 reduces to multiplication in the spatial domain:
 \begin{equation}
-  {\cal F}\{F(x)\ast G(x)\}=f(u)g(u)
+  {\cal F}\{f(x)g(x)\}=F(u)\ast G(u)
 \end{equation}
 \begin{equation}
-  {\cal F}^{-1}\{f(u)g(u)\}=F(x)\ast G(x)\mbox{.}
+  {\cal F}^{-1}\{F(u)\ast G(u)\}=f(x)g(x)\mbox{.}
 \end{equation}
 These to results, formally stated as
 \begin{equation}
@@ -407,6 +432,7 @@ With these definitions in mind, the discrete two-dimensional
 convolution of $f(x,y)$ and $g(x,y)$ is expressed in terms of
 $f_{e}(x,y)$ and $g_{e}(x,y)$:
 \begin{equation}
+\label{eq:convolution:discrete}
   f_{e}(x,y)\ast g_{e}(x,y)=\sum_{m=0}^{M-1}\sum_{n=0}^{N-1}
   f_{e}(m,n)g_{e}(x-m,y-n)
 \end{equation}
@@ -421,7 +447,7 @@ the extended functions $f_{e}(x,y)$ and $h_{e}(x,y)$.
 \subsection{Image Processing in the Frequency Domain}
 \label{image:frequency:image}
 
-The foundation of frequency-domain techniques is the convolution
+The foundation of frequency domain techniques is the convolution
 theorem described in the previous section.  Let $g(x,y)$ be an image
 that is the result of convolving an image $f(x,y)$ with a
 position-invariant operator $h(x,y)$\footnote{A position-invariant
@@ -429,6 +455,7 @@ position-invariant operator $h(x,y)$\footnote{A position-invariant
   $f(x,y)$ at a given point in the image, not on the location of the
   point.}:
 \begin{equation}
+\label{eq:convolution:operator}
   g(x,y)=h(x,y)\ast f(x,y)\mbox{.}
 \end{equation}
 From the convolution theorem (Eq.~\ref{eq:convolution:2Da}), we then
@@ -447,3 +474,107 @@ trying to choose a transfer function $H$ such that the resulting image
   g(x,y)={\cal F}^{-1}\{H(u,v)F(u,v)\}
 \end{equation}
 exhibits some desired property.
+
+\subsubsection{Highpass and Lowpass Filtering}
+
+In the Fourier transform $F$ of an image $f$, the high frequency
+content is to a large extent caused by edges and other sharp
+transitions in the gray levels of the image (such as noise).
+Correspondingly, the low frequency content of $F$ corresponds to
+contiguous regions in $f$ with little or no gray level transitions.
+Often, one is interested in only the high-frequency or low-frequency
+components of a given image.  This can be accomplished in both cases
+by attenuating the opposite end of the frequency spectrum.  This is
+known as {\em highpass\/} and {\em lowpass filtering\/}, respectively.
+
+Lowpass filtering is achieved by convolving the original image $f$
+with an operator $h$ whose Fourier transform $H$ has the property of
+either completely ({\em ideal\/} filter) or partly ({\em
+  Butterworth\/} filter) filtering out the low frequency content of
+$F$.  The resulting image, given by
+\begin{equation}
+  g(x,y)={\cal F}^{-1}\{G(u,v)\}={\cal F}^{-1}\{H(u,v)F(u,v)\}\mbox{,}
+\end{equation}
+then exhibits the desired properties.  Cross sections of an ideal
+lowpass filter and a Butterwoth lowpass filter are shown in
+Fig.~\ref{fig:lowpass}, $D(u,v)$ being the distance from the point
+$(u,v)$ to the origin of the frequency plane, and $D_{0}$ being the
+{\em cut-off frequency\/}.
+
+\inserteps{lowpass}{\label{fig:lowpass}Cross section of an ideal
+  lowpass filter (a) and a Butterworth lowpass filter (b).}
+
+Since the high-frequency content of an image corresponds to edges and
+other abrupt gray level transitions, lowpass filtering has the effect
+of {\em blurring\/} the original image.  On the other hand, if the
+image has been distorted by noise, which is also high frequency in
+content, the effect is one of noise reduction.
+
+Highpass filtering is carried out analogously to lowpass filtering,
+using either an ideal highpass filter or a Butterworth highpass
+filter, as shown in Fig.~\ref{fig:highpass}.
+
+\inserteps{highpass}{\label{fig:highpass}Cross section of an ideal
+  highpass filter (a) and a Butterworth highpass filter (b).}
+
+If the low-frequency content of an image is severely attenuated, the
+resulting image will be one in which the edges between areas of
+different gray levels are predominant.  If the intent is to sharpen
+the edges without loss of low-frequency information, a constant $c$ is
+often added to the highpass filter transfer function, as shown in
+Fig.~\ref{fig:homomorphic}, by choosing $\gamma_{L}=c$ and
+$\gamma_{H}=1+c$.  This is known as {\em high frequency emphasis\/}.
+
+\insertepswidth{homomorp}{\label{fig:homomorphic}A homomorphic filter
+  transfer function.}{0.5}
+
+High frequency emphasis is actually a special case of what is known as
+{\em homomorphic filtering\/}.  Homomorphic filtering is based on an
+{\em image model\/} saying that an image $f(x,y)$ is composed of an
+{\em illumination component\/} $i(x,y)$ and a {\em reflection
+  component\/} $r(x,y)$ according to the equation
+\begin{equation}
+  f(x,y)=i(x,y)r(x,y)\mbox{.}
+\end{equation}
+
+The illumination component of an image is generally characterized by
+slow spatial variation, and is thus of low frequency content.  The
+reflection, on the other hand, depends on the nature of the objects of
+which the image is composed, and tends to vary abruptly, thus being
+high frequency in content.  Assuming that $\gamma_{L}$ and
+$\gamma_{H}$ are chosen so that $\gamma_{L}<1$ and $\gamma_{H}>1$, the
+filter function in Fig.~\ref{fig:homomorphic} affects the low and high
+frequency components of an image differently, attenuating the low
+frequencies and amplifying the high frequencies.  The net result is
+simultaneous dynamic range compression and contrast enhancement.  On
+pp.\ 192-193 in~\cite{digpic} is shown the result of applying the
+filter in Fig.~\ref{fig:homomorphic} with $\gamma_{L}=0.5$ and
+$\gamma_{H}=2.0$ on an image with little contrast.
+
+\subsubsection{Spatial Masks as Convolution Masks}
+
+From a practical point of view it is often more convenient to compute
+the discrete convolution of an image $f$ with an operator $h$ in the
+frequency domain instead of using Eq.~\ref{eq:convolution:discrete}
+directly.  This is done by computing the Fourier transforms $F$ and
+$H$ using an {\fft} algorithm, multiplying the Fourier transforms to
+obtain $G$, and then applying the inverse Fourier transform to obtain
+the desired image $g$.  Brigham shows, however, in~\cite{brigham},
+that for one-dimensional arrays, the {\fft} approach is faster only if
+the number of points id greater than 32.  Thus, when applying small
+operators, it would be convenient to be able to perform the
+convolution in the spatial domain.
+
+A useful observation in that respect is that the convolution of an
+image $f$ with an operator $h$, as expressed by
+Eq.~\ref{eq:convolution:operator}, describes a spatial process
+analogous to the use of masks described in
+Section~\ref{image:spatial}.  In fact, the discrete convolution as
+expressed by Eq.~\ref{eq:convolution:discrete} represents a
+mathematical description of the mask-shifting process illustrated in
+Fig.~\ref{fig:neighbour}.  On pp.\ 186-190 in~\cite{digim}, a method
+is described for obtaining small spatial masks that approximate a
+given $H(u,v)$ in a least-square-error sense.  For this reason,
+spatial masks are often referred to as {\em spatial convolution
+  masks\/}, and the process of applying a mask to an image is
+described as {\em convolving\/} the image with the mask.

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:24:49 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 14 02:08:02 1993
+%%% Last Modified On: Mon Mar 15 07:01:30 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : Unknown, Use with caution!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,11 +34,11 @@ within this neighbourhood.
 
 The principle approach used in defining a neighbourhood about $(x,y)$
 is to use an $n\times n$ subimage of $f$, centred at $(x,y)$, as shown
-in Fig.~\ref{fig:neighbour}.  Other shapes are also
-possible, but square arrays are by far the most predominant, due to
-their ease of implementation.  The centre of the subimage is moved
-from pixel to pixel, applying the operator at each location $(x,y)$
-in $f$ to yield the value of $g$ at that location.
+in Fig.~\ref{fig:neighbour}.  Other shapes are also possible, but
+square arrays are by far the most predominant, due to their ease of
+implementation.  The centre of the subimage is moved from pixel to
+pixel, applying the operator at each location $(x,y)$ in $f$ to yield
+the value of $g$ at that location.
 
 When the size $n$ of the square neighbourhood is 1, $T$ reduces to a
 gray-level {\em transformation function\/}, where the value of $g$ at
@@ -46,8 +46,9 @@ $(x,y)$ only depends on the value of $f$ at this location.  One widely
 used gray-level transformation function is
 \begin{equation}
 \label{eq:threshold}
-g(x,y)=\left\{ \begin{array}{ll} 1 & \mbox{if $f(x,y)\in Z$} \\ 0 &
-\mbox{otherwise,}
+  g(x,y)=\left\{ \begin{array}{ll} 
+                   1 & \mbox{if $f(x,y)\in Z$} \\ 
+                   0 & \mbox{otherwise,}
                  \end{array} \right.
 \end{equation}
 where $Z$ is a defined set of distinct gray levels, and 0 and 1
@@ -59,6 +60,9 @@ Section~\ref{image:pattern}.
 
 \insertepswidth{mask}{\label{fig:mask}(a) Sub-area of image. (b) A
   $3\times 3$ mask with general coefficients.}{0.5}
+
+\subsubsection{Spatial Masks}
+\label{pg:image:spatial:mask}
 
 One of the principle approaches to the formulation in
 Eq.~\ref{eq:spatial_operator} is the use of so-called {\em masks\/}.
@@ -72,13 +76,15 @@ location is given by the relation
 \label{eq:mask}
 g(x,y)=T[f(x)]=w_{1}f(x-1,y-1)+w_{2}f(x,y-1)+\cdots+w_{9}f(x+1,y+1)\mbox{.}
 \end{equation}
-The coefficients $w_{i}$ are chosen to detect given properties in an
-image.  For example, if all $w_{i}$ are chosen to be 1/9, the gray
-level of each pixel of the resulting image $g$ would be the average of
-the the gray levels of the corresponding pixel in $f$ and its 8
-immediate neighbours ({\em 8-neighbours\/}).  This is known as {\em
-  averaging\/}, and the effect is one of {\em blurring\/} the original
-image.
+To compute the transformed image $g$, the mask is moved from pixel to
+pixel in the same manner as for the neighbourhood operator shown in
+Fig.~\ref{fig:neighbour}.  The coefficients $w_{i}$ of the mask are
+chosen to detect given properties in an image.  For example, if all
+$w_{i}$ are chosen to be 1/9, the gray level of each pixel of the
+resulting image $g$ would be the average of the the gray levels of the
+corresponding pixel in $f$ and its 8 immediate neighbours ({\em
+  8-neighbours\/}).  This is known as {\em averaging\/}, and the
+effect is one of {\em blurring\/} the original image.
 
 Averaging is only one of several possible mask operations.  By
 properly selecting the coefficients, it is possible to perform a
