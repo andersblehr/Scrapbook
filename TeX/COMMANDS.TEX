@@ -3,10 +3,16 @@
 %%% Author          : Anders Blehr
 %%% Created On      : Sat Apr 25 17:54:59 1992
 %%% Last Modified By: blehr
+%%% Last Modified On: Sat Mar 20 00:25:32 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : Subjected to continuous change....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% History 		
+%%% 20-Mar-1993		blehr	
+%%%    La til \inserttwoeps, som setter inn to EPS-filer ved siden av
+%%%    hverandre, kaller dem (a) hhv. (b), og gir dem en felles
+%%%    \caption.  Skiller ogsaa mellom mine og Anders' saker - Anders'
+%%%    er plassert nederst i filen.
 %%% 23-Feb-1993		blehr	
 %%%    Tok bort \hentps og \henpsbredde, siden dvips ikke forstaar
 %%%    psfig.  La til \inserteps og \insertepswidth istedet.  Begge
@@ -74,16 +80,12 @@
 \newcommand{\inserttwoeps}[3] {
   \begin{figure}[htb]
     \epsfxsize 0.3\textwidth
-    \leavevmode
-    \begin{centering}
-      \parbox{0.49\textwidth}{
- 	\hspace*{0.14\textwidth}
-        \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#1.eps}}
-      \parbox{0.49\textwidth}{
-	\hspace*{0.04\textwidth}
-        \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#2.eps}}
-      \caption{#3}
-    \end{centering}
+    \makebox[0.45\textwidth][r]{
+      \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#1.eps}}
+    \makebox[0.4\textwidth][r]{
+      \epsfbox{c:/user/blehr/fag/diplom/rapport/figurer/eps/#2.eps}}\\
+    \hspace*{0.28\textwidth}(a)\hspace*{0.38\textwidth}(b)
+    \caption{#3}
   \end{figure}
   }
 
