@@ -3,11 +3,77 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 28 02:27:12 1993
+%%% Last Modified On: Mon Mar 29 06:41:11 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Finding a Pupil Point}
+\section{Finding a Pupil Point -- The Swimming Octopus}
 \label{algo:seek}
+
+In this section, the {\em swimming octopus\/} search algorithm is
+described.  As pointed out in the previous section, the aim of the
+algorithm is to locate a point in a given image that unambigously can
+be classified as a pupil point.  The reason for the name is that the
+performance of the algorithm can be compared to an octopus looking for
+the sea, as will become clear below.  The basic idea behind the
+algorithm is described in Section~\ref{algo:seek:idea}, whereas
+Section~\ref{algo:seek:filter} suggests a pixel filter to be used by
+it.  In Section~\ref{algo:seek:IQ}, the swimming octopus itself is
+presented, and the overall search strategy is described in
+Section~\ref{algo:seek:strategy}.  Throughout this section, {\em the
+  algorithm\/} will be used to refer to the swimming octopus, and not
+to the overall algorithm, {\octopus}.
+
+\subsection{The Basic Idea}
+\label{algo:seek:idea}
+
+\inserteps{landscap}{\label{fig:landscape}An image of the eye depicted
+  as a three-dimensional landscape.}
+
+The foundation of the algorithm is a variant of thresholding in which
+all pixels with values (gray levels) below or equal to the threshold
+value $T$ have their old values replaced by $T$, and all pixels with
+values above $T$ retain their old values.  The effect of applying
+thresholding of this sort to an image can be illustrated by picturing
+the image as a three-dimensional landscape, as depicted in
+Fig.~\ref{fig:landscape} (compare Fig.~\ref{fig:testimages}(b)).  When
+the image is thresholded, $T$ can be viewed as representing the
+surface level of a mostly subterranean lake under this landscape.
+Wherever the landscape descends below $T$, this lake comes to the
+surface, forming ponds whose sizes depend on the extent of the
+corresponding sub-lake portion of the landscape.  This is illustrated
+in Fig.~\ref{fig:lake}.  Note that, although the pupil is hardly
+discernable in Fig~\ref{fig:landscape}, it is clearly visible as
+forming the largest pond, or {\em lake\/}, after thresholding.  Note
+also that a number of relatively large lakes are formed by non-pupil
+portions of the eye.  Thus the pixel filter has to be designed so that
+only lakes having an extent approximately of the same order as the
+average pixel radius are recognized as constituting pupil lakes.
+
+The principle
+
+With images having as low contrast as these, much care has to be taken
+when choosing $T$.  For the images which I have used during my thesis
+work, it was found that $T=18$ ensures relatively large pupil lakes
+and sufficiently small non-pupil lakes.  $T=17$ tends to make the
+image completely ``dry'', whereas $T=19$ tends to ``drown'' large
+portions of it.  It is evident that, if the final system were to
+employ equally low-contrast images, only a small change in light
+conditions would destroy this extremely frail balance.  However,
+employing a frame grabber supplying images whose gray levels occupy a
+large portion of the desired gray level range (256) would by far
+eliminate this problem.
+
+\inserteps{lake18}{\label{fig:lake}The image in
+  Fig.~\protect\ref{fig:landscape} after thresholding with $T=18$.}
+
+\subsection{A Possible Pixel Filter}
+\label{algo:seek:filter}
+
+\subsection{The ``Intelligent'' Octopus}
+\label{algo:seek:IQ}
+
+\subsection{The Search Strategy}
+\label{algo:seek:strategy}
 
