@@ -34,9 +34,9 @@ var   fileName                  : string;
 	thisParameter             : string;
 
 
-    function getParameterValue(parameterString : string) : word;
+    function getParameterValue(parameterString : string) : real;
 
-    var   value                     : word;
+    var   value                     : real;
 	  result                    : integer;
 
     begin
@@ -55,11 +55,13 @@ var   fileName                  : string;
 	if (thisParameter[1]='-') then
 	  case thisParameter[2] of
 	    'd' : showSearch:=true;
-            'l' : lakeLevel:=getParameterValue(thisParameter);
-	    'r' : filterRadiusFraction:=getParameterValue(thisParameter);
-	    's' : sobelThreshold:=getParameterValue(thisParameter);
-	    'q' : nonSearchRadius:=getParameterValue(thisParameter);
-	    'n' : nIterations:=getParameterValue(thisParameter)
+            'l' : lakeLevel:=trunc(getParameterValue(thisParameter));
+	    'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
+	    's' : sobelThreshold:=trunc(getParameterValue(thisParameter));
+	    'q' : nonSearchRadius:=trunc(getParameterValue(thisParameter));
+            'w' : wetFraction:=getParameterValue(thisParameter);
+            'a' : nAdjustments:=trunc(getParameterValue(thisParameter));
+	    'n' : nIterations:=trunc(getParameterValue(thisParameter))
 	  else
 	    fatalError('Illegal option: -'+thisParameter[2])
 	  end
@@ -78,7 +80,7 @@ var   fileName                  : string;
     ySize:=(word(buffer[3]) shl 8)+buffer[4];
     startX:=round(getMaxX/2-xSize/2);
     startY:=round(getMaxY/2-ySize/2);
-    initGlobals(xSize,ySize)
+    initGlobals
   end;
 
 
@@ -111,7 +113,7 @@ begin
 	fatalError('Image file not found: '+picturePath(fileName))
     end
   else
-    fatalError('Usage: eyepos [-dlrsqn] file[.pic]')
+    fatalError('Usage: eyepos [-adlonqsw] file[.pic]')
 end;
 
 
