@@ -1,9 +1,9 @@
 program runFilter;
 
-uses crt,graph,auxil,ADT,SVGA;
+uses crt,graph,defs,auxil,ADT,SVGA;
 
 const maxSize                   = 512;
-      filterRadius              = 8;
+      filterRadius              = 0;
       threshold                 = 15;
       fileName                  = 'abeye02';
 
@@ -29,8 +29,9 @@ var   xSize                     : word;
       pictureMatrix             : pixelMatrixPtr;
       pointList                 : doubleListOPtr;
       lowestFilterValue         : byte;
+      highestFilterValue        : byte;
       throughputCount           : word;
-      middleValue               : byte;
+      middleValue               : real;
 
 
 (***************************************************************************
@@ -84,24 +85,32 @@ var   pictureFile               : file;
       i,j                       : word;
 
 begin
-  initSVGAGraphics;
-  setBlackAndWhitePalette;
-  new(pointList,init);
-  assign(pictureFile,'c:\user\blehr\fag\diplom\bilder\'+fileName+'.pic');
-  reset(pictureFile,1);
-  blockRead(pictureFile,buffer,4);
-  xSize:=(word(ord(buffer[1])) shl 8)+ord(buffer[2]);
-  ySize:=(word(ord(buffer[3])) shl 8)+ord(buffer[4]);
-  startX:=(getMaxX div 2)-(xSize div 2);
-  startY:=(getMaxY div 2)-(ySize div 2);
-  getMem(pictureMatrix,4*ySize);
-  for i:=1 to ySize do
-    begin
-      blockRead(pictureFile,buffer,xSize);
-      getMem(pictureMatrix^[i],xSize);
-      for j:=1 to xSize do
-        pictureMatrix^[i]^[j]:=ord(buffer[j])
-    end
+  if (paramCount<>0) then
+    if (fileExists(picturePath(paramStr(1)))) then
+      begin
+        initSVGAGraphics;
+        setBlackAndWhitePalette;
+        new(pointList,init);
+        assign(pictureFile,picturePath(paramStr(1)));
+        reset(pictureFile,1);
+        blockRead(pictureFile,buffer,4);
+        xSize:=(word(ord(buffer[1])) shl 8)+ord(buffer[2]);
+        ySize:=(word(ord(buffer[3])) shl 8)+ord(buffer[4]);
+        startX:=(getMaxX div 2)-(xSize div 2);
+        startY:=(getMaxY div 2)-(ySize div 2);
+        getMem(pictureMatrix,4*ySize);
+        for i:=1 to ySize do
+          begin
+            blockRead(pictureFile,buffer,xSize);
+            getMem(pictureMatrix^[i],xSize);
+            for j:=1 to xSize do
+              pictureMatrix^[i]^[j]:=ord(buffer[j])
+          end
+      end
+    else
+      fatalError('Picture file not found!')
+  else
+    fatalError('Usage: filter <file name (no extension)>')
 end;
 
 
@@ -159,6 +168,7 @@ begin
   outTextXY(startX,startY+ySize+50,
             'Filter radius: '+intString(filterRadius));
   lowestFilterValue:=64;
+  highestFilterValue:=0;
   throughputCount:=0;
   sum:=0;
   for yPos:=filterRadius+1 to ySize-filterRadius-1 do
@@ -171,7 +181,9 @@ begin
             begin
               beep(600,10);
               lowestFilterValue:=filterValue
-            end;
+            end
+          else if (filterValue>highestFilterValue) then
+            highestFilterValue:=filterValue;
           if (filterValue<=threshold) then
             begin
               inc(throughputCount);
@@ -182,7 +194,7 @@ begin
       for xPos:=filterRadius to xSize-filterRadius do
         putPixel(startX+xPos-1,startY+yPos-1,pictureMatrix^[yPos]^[xPos])
     end;
-  middleValue:=round(sum/(xSize*ySize))
+  middleValue:=sum/(longInt(xSize)*longInt(ySize))
 end;
 
 
@@ -195,8 +207,8 @@ procedure markPoints;
     with aPoint^ do
       putPixel(startX+x,startY+y,63)
 {      begin
-        line(startX+x,startY+y-5,startX+x,startY+y+5);
-        line(startX+x-5,startY+y,startX+x+5,startY+y);
+        line(startX+x,startY+y-3,startX+x,startY+y+3);
+        line(startX+x-3,startY+y,startX+x+3,startY+y);
       end}
   end;
 
@@ -223,14 +235,16 @@ begin
   outTextXY(startX,startY+ySize+64,
             'Lowest filter value: '+intString(lowestFilterValue));
   outTextXY(startX,startY+ySize+74,
+            'Highest filter value: '+intString(highestFilterValue));
+  outTextXY(startX,startY+ySize+84,
             'Position of first point let through: ('+
             intString(currentPoint^.x)+','+
             intString(currentPoint^.y)+')');
-  outTextXY(startX,startY+ySize+84,
-            'Number of points let through: '+intString(throughputCount));
   outTextXY(startX,startY+ySize+94,
-            'Middle filter value: '+intString(middleValue));
-  outTextXY(startX,startY+ySize+114,'Press any key to exit....');
+            'Number of points let through: '+intString(throughputCount));
+  outTextXY(startX,startY+ySize+104,
+            'Middle filter value: '+realString(middleValue));
+  outTextXY(startX,startY+ySize+124,'Press any key to exit....');
   readKey
 end;
 
