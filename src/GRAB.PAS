@@ -180,13 +180,23 @@ begin
 end;
 
 
+procedure beep;
+
+begin
+  sound(4000);
+  delay(20);
+  noSound
+end;
+
+
 procedure save_pcx;
 var
   x, y, z     : integer;
   anz, b1, b2 : byte;
   label pcx1, pcx2, pcx3, pcx4, pcx5, pcx8, pcx9, pcx10, savepal;
 begin
-
+  beep;
+  beep;
   filename:='c:\user\blehr\fag\diplom\bilder\pcx\image'+imageNumber+'.pcx';
   assign (fi,filename);
   rewrite(fi,1);
@@ -251,6 +261,12 @@ begin
   savepal:
   blockwrite(fi,pal,sizeof(pal));
   close(fi);
+  beep;
+  delay(600);
+  beep;
+  delay(600);
+  beep;
+  delay(4500)
 end;
 
    { * * * Hauptprogramm * * * }
@@ -293,17 +309,20 @@ begin
 
  {Jetzt kommt die Hauptroutine}
   taste:=' ';
+  beep;
+  delay(4500);
   repeat
     if not keypressed then
     begin
       write_mem;                             {lese BAS Signal}
       draw_picture;              {Bild auf den Schirm bringen}
-      sound(4000);delay(20);nosound;
+      beep
     end
     else
     begin
       taste:=upcase(readkey);
-      sound(3000);delay(25);nosound;
+      beep;
+      beep;
       if taste = '+' then inc(hori);
       if taste = '-' then dec(hori); if hori = 0 then hori:=0;
       if taste = 'S' then save_pcx;
