@@ -3,8 +3,8 @@ program runFilter;
 uses crt,graph,defs,auxil,ADT,SVGA;
 
 const maxSize                   = 512;
-      filterRadius              = 0;
-      threshold                 = 15;
+      defaultFilterRadius       = 0;
+      defaultThreshold          = 1;
       fileName                  = 'abeye02';
 
 type  bufferArray               = array[1..maxSize] of char;
@@ -28,6 +28,8 @@ var   xSize                     : word;
       startY                    : word;
       pictureMatrix             : pixelMatrixPtr;
       pointList                 : doubleListOPtr;
+      filterRadius              : byte;
+      threshold                 : byte;
       lowestFilterValue         : byte;
       highestFilterValue        : byte;
       throughputCount           : word;
@@ -80,37 +82,84 @@ end;
 
 procedure init;
 
-var   pictureFile               : file;
+var   parameter                 : string;
+      radiusSet                 : boolean;
+      thresholdSet              : boolean;
+      fileName                  : string;
+      pictureFile               : file;
       buffer                    : bufferArray;
       i,j                       : word;
 
-begin
-  if (paramCount<>0) then
-    if (fileExists(picturePath(paramStr(1)))) then
+
+  function getParameterValue(parameterString : string;
+                         var flag            : boolean) : byte;
+
+  var   value                     : byte;
+        result                    : integer;
+
+  begin
+    val(copy(parameterString,3,length(parameterString)-2),value,result);
+    if (result=0) then
       begin
-        initSVGAGraphics;
-        setBlackAndWhitePalette;
-        new(pointList,init);
-        assign(pictureFile,picturePath(paramStr(1)));
-        reset(pictureFile,1);
-        blockRead(pictureFile,buffer,4);
-        xSize:=(word(ord(buffer[1])) shl 8)+ord(buffer[2]);
-        ySize:=(word(ord(buffer[3])) shl 8)+ord(buffer[4]);
-        startX:=(getMaxX div 2)-(xSize div 2);
-        startY:=(getMaxY div 2)-(ySize div 2);
-        getMem(pictureMatrix,4*ySize);
-        for i:=1 to ySize do
-          begin
-            blockRead(pictureFile,buffer,xSize);
-            getMem(pictureMatrix^[i],xSize);
-            for j:=1 to xSize do
-              pictureMatrix^[i]^[j]:=ord(buffer[j])
-          end
+        flag:=true;
+        getParameterValue:=value
       end
     else
-      fatalError('Picture file not found!')
+      fatalError('Illegal parameter value!')
+  end;
+
+
+begin
+  radiusSet:=false;
+  thresholdSet:=false;
+  if (paramCount<>0) then
+    begin
+      for i:=1 to paramCount do
+        begin
+          parameter:=paramStr(i);
+          if (parameter[1]='-') then
+            case parameter[2] of
+              'r' : filterRadius:=getParameterValue(parameter,radiusSet);
+              't' : threshold:=getParameterValue(parameter,thresholdSet)
+            else
+              fatalError('Illegal option: -'+parameter[2])
+            end
+          else
+            begin
+              fileName:=picturePath(paramStr(i));
+              i:=paramCount
+            end
+        end;
+      if (not radiusSet) then
+        filterRadius:=defaultFilterRadius;
+      if (not thresholdSet) then
+        threshold:=defaultThreshold;
+      if (fileExists(fileName)) then
+        begin
+          initSVGAGraphics;
+          setBlackAndWhitePalette;
+          new(pointList,init);
+          assign(pictureFile,fileName);
+          reset(pictureFile,1);
+          blockRead(pictureFile,buffer,4);
+          xSize:=(word(ord(buffer[1])) shl 8)+ord(buffer[2]);
+          ySize:=(word(ord(buffer[3])) shl 8)+ord(buffer[4]);
+          startX:=(getMaxX div 2)-(xSize div 2);
+          startY:=(getMaxY div 2)-(ySize div 2);
+          getMem(pictureMatrix,4*ySize);
+          for i:=1 to ySize do
+            begin
+              blockRead(pictureFile,buffer,xSize);
+              getMem(pictureMatrix^[i],xSize);
+              for j:=1 to xSize do
+                pictureMatrix^[i]^[j]:=ord(buffer[j])
+            end
+        end
+      else
+        fatalError('Picture file not found!')
+    end
   else
-    fatalError('Usage: filter <file name (no extension)>')
+    fatalError('Usage: filter [options] file (no extension)')
 end;
 
 
