@@ -3,11 +3,46 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:37:29 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Thu Mar 11 06:10:45 1993
+%%% Last Modified On: Thu Mar 11 23:26:50 1993
 %%% RCS revision    : $Revision$ $Locker$
-%%% Status          : Unknown, Use with caution!
+%%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
 \label{image:intro}
 
+The general field of automated image processing may be divided into
+four main categories~(\cite{digim}):
+
+\begin{description}
+\item[Image digitization:] Converting continous (real) images into
+  discrete (digitized) form.
+\item[Image enhancement and restoration:] Improving degraded (blurred,
+  noisy) images.
+\item[Image encoding:] Techniques for representing an image, or the
+  information contained in the image, with fewer bits than was needed
+  for the ``raw'' image.
+\item[Image segmentation, representation, and description:] Image
+  segmentation is the process that subdivides an image into its
+  constituents regions or objects.  Image representation and
+  description are important processes in the implementation of
+  autonomous image processing and analysis systems.
+\end{description}
+
+{\em Digital\/} image processing deals with the latter three of these
+categories, in that it requires already digitized images as input.  In
+this chapter, an introduction is given to the fields of {\em image
+  enhancement and restoration\/}, and {\em image segmentation\/}, with
+an inclination towards the problem at hand, namely recognition and
+location of the pupil within a digital image of the eye.  For a
+thorough problem definition, see Section~\ref{algo:problem}.
+
+The structure of the chapter is as follows:
+Section~\ref{image:domains} gives an introduction to image analysis in
+the frequency plane; Section~\ref{image:noise} addresses the problem
+of noise reduction; Section~\ref{image:enhance} discusses image
+enhancement techniques; in Section~\ref{image:pattern}, the problem of
+pattern recognition is presented, and in Section~\ref{image:edge},
+some edge detection approaches are discussed.  In
+Section~\ref{image:concl}, a conclusion is drawn as to which technique
+to choose for the problem at hand.
