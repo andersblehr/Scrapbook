@@ -5,19 +5,26 @@ uses auxil;
 const maxSize                   = 1024;
       PCXHeaderSize             = 128;
 
-type  bufferType                = array[0..maxSize-1] of byte;
+type  pixelLinePtr              = ^pixelLine;
+      pixelLine                 = array[0..maxSize-1] of byte;
+      pixelMatrixPtr            = ^pixelMatrix;
+      pixelMatrix               = array[0..maxSize-1] of pixelLinePtr;
+      bufferType                = array[0..maxSize-1] of byte;
 
-var   fileName                  : string;
-      PICFile                   : file;
+var   image                     : pixelMatrixPtr;
       PCXFile                   : file;
-      PICBuffer                 : bufferType;
       PCXBuffer                 : bufferType;
       xSize                     : word;
       ySize                     : word;
+      imageSize                 : longInt;
 
 
 procedure init;
 
+var   fileName                  : string;
+      PICFile                   : file;
+      PICBuffer                 : bufferType;
+      i,j                       : word;
 
 begin
   if (paramCount=1) then
@@ -31,7 +38,17 @@ begin
           rewrite(PCXFile,1);
           blockRead(PICFile,PICBuffer,4);
           xSize:=(word(PICbuffer[0]) shl 8)+PICbuffer[1];
-          ySize:=(word(PICbuffer[2]) shl 8)+PICbuffer[3]
+          ySize:=(word(PICbuffer[2]) shl 8)+PICbuffer[3];
+          imageSize:=longInt(xSize)*longInt(ySize);
+	  getMem(image,4*ySize);
+	  for i:=0 to (ySize-1) do
+	    begin
+	      blockRead(PICFile,PICBuffer,xSize);
+	      getMem(image^[i],xSize);
+	      for j:=0 to (xSize-1) do
+                image^[i]^[j]:=4*PICBuffer[j]
+	    end;
+	  close(PICFile);
         end
       else
         fatalError('Picture file not found: '+paramStr(1)+'.pic')
@@ -48,7 +65,7 @@ var   i                         : byte;
 begin
   PCXBuffer[ 0]:=10;
   PCXBuffer[ 1]:=5;
-  PCXBuffer[ 2]:=0;
+  PCXBuffer[ 2]:=1;
   PCXBuffer[ 3]:=8;
   PCXBuffer[ 4]:=0;
   PCXBuffer[ 5]:=0;
@@ -58,10 +75,10 @@ begin
   PCXBuffer[ 9]:=lo(xSize-1);
   PCXBuffer[10]:=hi(ySize-1);
   PCXBuffer[11]:=lo(ySize-1);
-  PCXBuffer[12]:=hi(300);
-  PCXBuffer[13]:=lo(300);
-  PCXBuffer[14]:=hi(300);
-  PCXBuffer[15]:=lo(300);
+  PCXBuffer[12]:=lo(xSize);
+  PCXBuffer[13]:=hi(xSize);
+  PCXBuffer[14]:=lo(ySize);
+  PCXBuffer[15]:=hi(ySize);
   for i:=0 to 15 do
     begin
       PCXBuffer[16+3*i  ]:=i;
@@ -70,10 +87,10 @@ begin
     end;
   PCXBuffer[64]:=0;
   PCXBuffer[65]:=1;
-  PCXBuffer[66]:=hi(xSize);
-  PCXBuffer[67]:=lo(xSize);
-  PCXBuffer[68]:=hi(2);
-  PCXBuffer[69]:=lo(2);
+  PCXBuffer[66]:=lo(xSize);
+  PCXBuffer[67]:=hi(xSize);
+  PCXBuffer[68]:=lo(2);
+  PCXBuffer[69]:=hi(2);
   for i:=0 to 57 do
     PCXBuffer[70+i]:=0;
   blockWrite(PCXFile,PCXBuffer,PCXHeaderSize)
@@ -82,16 +99,86 @@ end;
 
 procedure mainLoop;
 
-var   i,j                       : word;
+var   nPixelsWritten            : longInt;
+      bufferCount               : word;
+      currentX                  : word;
+      currentY                  : word;
+      nEqualPixels              : byte;
+      currentPixelValue         : byte;
+
+
+  function countEqualPixels(var pixelValue : byte) : byte;
+
+  var   pixelCount                : byte;
+
+
+    function nextX(var x,y : word) : word;
+
+    begin
+      if (x<xSize-1) then
+        inc(x)
+      else
+        begin
+          x:=0;
+          inc(y)
+        end;
+      nextX:=x
+    end;
+
+
+  begin
+    pixelCount:=1;
+    pixelValue:=image^[currentY]^[currentX];
+    while ((image^[currentY]^[nextX(currentX,currentY)]=pixelValue) and
+           (pixelCount<=64) and (nPixelsWritten<imageSize)) do
+      inc(pixelCount);
+    countEqualPixels:=pixelCount
+  end;
+
+
+  function countPixel(aValue : byte) : boolean;
+
+  begin
+    countPixel:=(((aValue shr 6) and $03)=$03)
+  end;
+
+
+  procedure addToBuffer(aValue : byte);
+
+  begin
+    if (bufferCount=maxSize-1) then
+      begin
+        blockWrite(PCXFile,PCXBuffer,maxSize);
+        bufferCount:=0
+      end;
+    PCXBuffer[bufferCount]:=aValue;
+    inc(bufferCount)
+  end;
+
 
 begin
-  for i:=0 to (ySize-1) do
+  nPixelsWritten:=0;
+  bufferCount:=0;
+  currentX:=0;
+  currentY:=0;
+  while (nPixelsWritten<imageSize) do
     begin
-      blockRead(PICFile,PICBuffer,xSize);
-      for j:=0 to (xSize-1) do
-        PCXBuffer[i]:=PICBuffer[i];
-      blockWrite(PCXFile,PCXBuffer,xSize)
-    end
+      nEqualPixels:=countEqualPixels(currentPixelValue);
+      if (nEqualPixels=1) then
+        begin
+          if countPixel(currentPixelValue) then
+            addToBuffer($C0 or $01);
+          addToBuffer(currentPixelValue);
+          inc(nPixelsWritten)
+        end
+      else
+        begin
+          addToBuffer($C0 or nEqualPixels);
+          addToBuffer(currentPixelValue)
+        end
+    end;
+  if (bufferCount>0) then
+    blockWrite(PCXFile,PCXBuffer,bufferCount+1)
 end;
 
 
@@ -116,16 +203,22 @@ end;
 
 procedure finishOff;
 
+var   i                         : word;
+
 begin
   close(PCXFile);
-  close(PICFile)
+  for i:=0 to (ySize-1) do
+    freeMem(image^[i],xSize);
+  freeMem(image,4*ySize)
 end;
 
 
 begin
   init;
+  write('Converting.... ');
   writePCXHeader;
   mainLoop;
   writePalette;
+  writeLn('done');
   finishOff
 end.
