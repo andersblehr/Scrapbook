@@ -12,42 +12,21 @@
 %%%    psfig.  La til \inserteps og \insertepswidth istedet.  Begge
 %%%    disse krever Encapsulated PostScript (.eps).
 
+%%
+%%  Mine saker
+%%
+
 \input{epsf}
 
+\newcommand{\octopus}{OCTOPUS}
 \newcommand{\odd}{\mbox{\scriptsize odd}}
 \newcommand{\even}{\mbox{\scriptsize even}}
 \newcommand{\fft}{FFT}
 \newcommand{\nit}{NTH}
 
-% Et tastetrykk, eller en kombinasjon av to taster.
-\newcommand{\tast}[1]{\fbox{\rule{0mm}{1.5ex}{\tt #1}}}
-\newcommand{\totast}[2]{\tast{#1}-\tast{#2}}
-
-% Binder en taste-sekvens mot en kommando.
-\newcommand{\keybinding}[2]{#1 executes {\em #2}. See Section~\ref{#2-func}.}
-
-% Kommando som definerer ny funksjon.
-% Parameter 1 : Funksjonsnavn, Kommer til venstre under en strek.
-%           2 : Parametre. Kommer til h|yre for navnet i kursiv
-%           3 : Command|Function|Variable    Kommer til hoyre.
-%           4 : Forklaringen. Den quote's.
-
-% \newenvironment{params}{{\large Parameters:}\begin{description}}{\end{description}}
-
-\newcommand{\returns}[1]{
-        \begin{description}
-          \item [Returns : ]#1
-        \end{description}}
-
-% Dette er environmentet som brukes ved forklaring av funksjoner,
-% programmer eller variable.
-\newenvironment{func}[3]{\pagebreak[3] \label{#1-func} %
-  {\large\it  #1\hspace{1cm} #2 \hfill {\bf #3}}
-\begin{quote}}{\end{quote}}
-
-%%
-%% Kommandoer for importering av EPS-filer (Encapsulated PostScript).
-%%
+%
+% Kommandoer for importering av EPS-filer (Encapsulated PostScript).
+%
 
 %
 % \inserteps[2]
@@ -81,3 +60,34 @@
     \end{centering}
   \end{figure}
 }
+
+%%
+%%  Torp's saker
+%%
+
+% Et tastetrykk, eller en kombinasjon av to taster.
+\newcommand{\tast}[1]{\fbox{\rule{0mm}{1.5ex}{\tt #1}}}
+\newcommand{\totast}[2]{\tast{#1}-\tast{#2}}
+
+% Binder en taste-sekvens mot en kommando.
+\newcommand{\keybinding}[2]{#1 executes {\em #2}. See Section~\ref{#2-func}.}
+
+% Kommando som definerer ny funksjon.
+% Parameter 1 : Funksjonsnavn, Kommer til venstre under en strek.
+%           2 : Parametre. Kommer til h|yre for navnet i kursiv
+%           3 : Command|Function|Variable    Kommer til hoyre.
+%           4 : Forklaringen. Den quote's.
+
+% \newenvironment{params}{{\large Parameters:}\begin{description}}{\end{description}}
+
+\newcommand{\returns}[1]{
+        \begin{description}
+          \item [Returns : ]#1
+        \end{description}}
+
+% Dette er environmentet som brukes ved forklaring av funksjoner,
+% programmer eller variable.
+\newenvironment{func}[3]{\pagebreak[3] \label{#1-func} %
+  {\large\it  #1\hspace{1cm} #2 \hfill {\bf #3}}
+\begin{quote}}{\end{quote}}
+

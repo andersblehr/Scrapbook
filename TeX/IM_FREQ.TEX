@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 14 01:27:54 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 15 07:09:40 1993
+%%% Last Modified On: Tue Mar 16 06:45:57 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -395,7 +395,7 @@ The two-dimensional convolution theorem is given by the relations
   f(x,y)g(x,y)\Leftrightarrow F(u,v)\ast G(u,v)\mbox{.}
 \end{equation}
 For a graphical illustration of the two-dimensional convolution, see
-for example~\cite{digim}, p.\ 88.
+for example~\cite{digim}, p.\ 89.
 
 \subsubsection{Convolution in the Discrete Case}
 
@@ -496,13 +496,13 @@ $F$.  The resulting image, given by
   g(x,y)={\cal F}^{-1}\{G(u,v)\}={\cal F}^{-1}\{H(u,v)F(u,v)\}\mbox{,}
 \end{equation}
 then exhibits the desired properties.  Cross sections of an ideal
-lowpass filter and a Butterwoth lowpass filter are shown in
+lowpass filter and a lowpass Butterworth filter are shown in
 Fig.~\ref{fig:lowpass}, $D(u,v)$ being the distance from the point
 $(u,v)$ to the origin of the frequency plane, and $D_{0}$ being the
 {\em cut-off frequency\/}.
 
 \inserteps{lowpass}{\label{fig:lowpass}Cross section of an ideal
-  lowpass filter (a) and a Butterworth lowpass filter (b).}
+  lowpass filter (a) and a lowpass Butterworth filter (b).}
 
 Since the high-frequency content of an image corresponds to edges and
 other abrupt gray level transitions, lowpass filtering has the effect
@@ -511,11 +511,11 @@ image has been distorted by noise, which is also high frequency in
 content, the effect is one of noise reduction.
 
 Highpass filtering is carried out analogously to lowpass filtering,
-using either an ideal highpass filter or a Butterworth highpass
+using either an ideal highpass filter or a highpass Butterworth
 filter, as shown in Fig.~\ref{fig:highpass}.
 
 \inserteps{highpass}{\label{fig:highpass}Cross section of an ideal
-  highpass filter (a) and a Butterworth highpass filter (b).}
+  highpass filter (a) and a highpass Butterworth filter (b).}
 
 If the low-frequency content of an image is severely attenuated, the
 resulting image will be one in which the edges between areas of
@@ -526,7 +526,7 @@ Fig.~\ref{fig:homomorphic}, by choosing $\gamma_{L}=c$ and
 $\gamma_{H}=1+c$.  This is known as {\em high frequency emphasis\/}.
 
 \insertepswidth{homomorp}{\label{fig:homomorphic}A homomorphic filter
-  transfer function.}{0.5}
+  transfer function.}{0.4}
 
 High frequency emphasis is actually a special case of what is known as
 {\em homomorphic filtering\/}.  Homomorphic filtering is based on an
