@@ -3,10 +3,12 @@ unit search;
 
 INTERFACE
 
-uses auxil;
+uses graph,auxil;
 
 const maxSize                   = 512;
-      numberOfGrayLevels        = 64;
+      nGrayLevels               = 64;
+
+      nLeapsMax                 = 10;
 
       west                      = -1;
       east                      = 1;
@@ -41,23 +43,31 @@ type  variableRPtr              = ^variableR;
       pixelMatrixPtr            = ^pixelMatrix;
       pixelMatrix               = array[1..maxSize] of pixelLinePtr;
 
-      mapType                   = array[0..numberOfGrayLevels] of byte;
+      mapType                   = array[0..nGrayLevels-1] of byte;
+      wetType                   = array[0..nGrayLevels-1] of boolean;
 
-const filterRadius              : byte = 0;
-      filterThreshold           : byte = 1;
-      lakeLevel                 : byte = 0;
+      point                     = record
+        x                         : word;
+        y                         : word;
+        visited                   : boolean
+      end;
+
+      pointArrayPtr             = ^pointArray;
+      pointArray                = array[0..maxSize-1] of point;
+
+      priAreasType              = array[1..3] of word;
+
+const lakeLevel                 : byte = 0;
       sobelThreshold            : byte = 5;
       nonSearchRadius           : byte = 0;
 
-      minPupilRadiusFraction    : byte = 5;   (* Per cent *)
-      maxPupilRadiusFraction    : byte = 20;  (* Per cent *)
+      minPupilRadiusFraction    : real = 10;  (* Per cent *)
+      maxPupilRadiusFraction    : real = 20;  (* Per cent *)
 
-      searchAreaLeftFraction    : byte = 0;   (* Per cent *)
-      searchAreaRightFraction   : byte = 100; (* Per cent *)
-      searchAreaTopFraction     : byte = 0;   (* Per cent *)
-      searchAreaBottomFraction  : byte = 100; (* Per cent *)
+      filterRadiusFraction      : real = 8;   (* Per cent *)
+      wetFraction               : real = 0.8; (* 0 < wetFraction <= 1 *)
 
-      numberOfIterations        : word = 1;
+      nIterations               : word = 1;
 
       startX                    : word = 0;
       startY                    : word = 0;
@@ -65,32 +75,38 @@ const filterRadius              : byte = 0;
       showSearch                : boolean = false;
 
 var   image                     : pixelMatrixPtr;
-      map                       : mapType;
 
-      searchAreaLeft            : word;
-      searchAreaTop             : word;
-      xSizeSearchArea           : word;
-      ySizeSearchArea           : word;
-      minSearchStep             : word;
+      xSize                     : word;
+      ySize                     : word;
+
+      map                       : mapType;
+      wet                       : wetType;
 
       minPupilRadius            : word;
+      filterRadius              : byte;
+      inSeaThreshold            : word;
+
+      startingPoints            : pointArrayPtr;
+      priAreas                  : priAreasType;
 
 
 function applySobelMask(x,y                     : word;
                         northOrSouth,eastOrWest : shortInt) : integer;
 
-function findPupilPoint(pupilPoint : pointPtr) : boolean;
+function findPupilPoint(var pupilPoint : pointType) : boolean;
 
-procedure findPosition(pupilPoint,position : pointPtr);
+procedure findPosition(var pupilPoint,position : pointType);
 
 procedure initGlobals(xSize,ySize : word);
 
 procedure markPosition(x,y : word; asWhat : byte);
 
+procedure closeSearch;
+
 
 IMPLEMENTATION
 
-uses crt,graph;
+uses crt,math;
 
 const whiteSpace                = [#9,#32];
 
@@ -115,11 +131,7 @@ begin
         variable:=nextVariable;
         while (variable<>nil) do
           begin
-            if (variable^.name='filterRadius') then
-              filterRadius:=variable^.value
-            else if (variable^.name='filterThreshold') then
-              filterThreshold:=variable^.value
-            else if (variable^.name='lakeLevel') then
+            if (variable^.name='lakeLevel') then
               lakeLevel:=variable^.value
             else if (variable^.name='sobelThreshold') then
               sobelThreshold:=variable^.value
@@ -129,16 +141,10 @@ begin
               minPupilRadiusFraction:=variable^.value
             else if (variable^.name='maxPupilRadiusFraction') then
               maxPupilRadiusFraction:=variable^.value
-            else if (variable^.name='searchAreaLeftFraction') then
-              searchAreaLeftFraction:=variable^.value
-            else if (variable^.name='searchAreaRightFraction') then
-              searchAreaRightFraction:=variable^.value
-            else if (variable^.name='searchAreaTopFraction') then
-              searchAreaTopFraction:=variable^.value
-            else if (variable^.name='searchAreaBottomFraction') then
-              searchAreaBottomFraction:=variable^.value
-            else if (variable^.name='numberOfIterations') then
-              numberOfIterations:=variable^.value;
+            else if (variable^.name='filterRadiusFraction') then
+              filterRadiusFraction:=variable^.value
+            else if (variable^.name='nIterations') then
+              nIterations:=variable^.value;
             variable:=nextVariable
           end
       end;
@@ -285,90 +291,168 @@ end;
  **************************************************************************)
 
 
-function findPupilPoint(pupilPoint : pointPtr) : boolean;
+function findPupilPoint(var pupilPoint : pointType) : boolean;
+
+var   pupilFound                : boolean;
+      priLevel                  : byte;
+      nInvestigated             : word;
+      startingPoint             : pointType;
+      seaPointer                : pointType;
+      previousPos               : pointType;
+      lastPos                   : pointType;
+      i                         : word;
 
 
-  function getFilterValue(x,y : word) : byte;
+  procedure getStartingPoint(var aPoint : pointType);
 
-  var   filterSum                 : longInt;
-        i                         : word;
+  var   i                         : word;
 
   begin
-    filterSum:=map[image^[searchAreaTop+y]^[searchAreaLeft+x]];
-    for i:=1 to (filterRadius div 2) do
-      filterSum:=filterSum+
-          map[image^[searchAreaTop+y]^[searchAreaLeft+x-2*i]]+
-          map[image^[searchAreaTop+y]^[searchAreaLeft+x+2*i]]+
-          map[image^[searchAreaTop+y-2*i]^[searchAreaLeft+x]]+
-          map[image^[searchAreaTop+y+2*i]^[searchAreaLeft+x]];
-    getFilterValue:=round(filterSum/(2*filterRadius+1))
+    repeat
+      i:=random(priAreas[priLevel])
+    until (not startingPoints^[i].visited);
+    aPoint.x:=startingPoints^[i].x;
+    aPoint.y:=startingPoints^[i].y;
+    startingPoints^[i].visited:=true
   end;
 
 
-  function ySearch(y,currentYSize : word) : boolean;
-
-  var   newYStep                  : word;
+  function octopusSwims(pos : pointType; depth : byte) : boolean;
 
 
-    function xSearch(x,currentXSize : word) : boolean;
+    procedure locateSea(pos : pointType; var seaPointer : pointType);
 
-    var   newXStep                  : word;
+
+      function feelNArm(offset : word) : word;
+
+      begin
+        while ((not wet[image^[pos.y-offset]^[pos.x]]) and (offset>0)) do
+          offset:=offset-1;
+        feelNArm:=offset
+      end;
+
+
+      function feelSArm(offset : word) : word;
+
+      begin
+        while ((not wet[image^[pos.y+offset]^[pos.x]]) and (offset>0)) do
+          offset:=offset-1;
+        feelSArm:=offset
+      end;
+
+
+      function feelEArm(offset : word) : word;
+
+      begin
+        while ((not wet[image^[pos.y]^[pos.x+offset]]) and (offset>0)) do
+          offset:=offset-1;
+        feelEArm:=offset
+      end;
+
+
+      function feelWArm(offset : word) : word;
+
+      begin
+        while ((not wet[image^[pos.y]^[pos.x-offset]]) and (offset>0)) do
+          offset:=offset-1;
+        feelWArm:=offset
+      end;
 
 
     begin
-      if (getFilterValue(x,y)<=filterThreshold) then
+      seaPointer.x:=feelEArm(filterRadius)-feelWArm(filterRadius);
+      seaPointer.y:=feelSArm(filterRadius)-feelNArm(filterRadius)
+    end;
+
+
+    function octopusInSea(pos : pointType) : boolean;
+
+    var   pixelsInSea               : word;
+          probablyInSea             : boolean;
+          i                         : integer;
+
+    begin
+      probablyInSea:=(wet[image^[pos.y]^[pos.x-filterRadius]] and
+                      wet[image^[pos.y-filterRadius]^[pos.x]]);
+      if probablyInSea then
         begin
-          pupilPoint^.x:=searchAreaLeft+x;
-          pupilPoint^.y:=searchAreaTop+y;
-          xSearch:=true
+          pixelsInSea:=0;
+          for i:=-pred(filterRadius) to pred(filterRadius) do
+            begin
+              if wet[image^[pos.y]^[pos.x+i]] then
+                pixelsInSea:=pixelsInSea+1;
+              if wet[image^[pos.y+i]^[pos.x]] then
+                pixelsInSea:=pixelsInSea+1
+            end;
+          if (pixelsInSea>=inSeaThreshold) then
+            begin
+              pupilPoint:=pos;
+              octopusInSea:=true
+            end
+          else
+            octopusInSea:=false
         end
       else
-        begin
-          newXStep:=round(currentXSize/2);
-          if (newXStep>minSearchStep) then
-            xSearch:=(xSearch(x-newXStep,newXStep) or
-                      xSearch(x+newXStep,newXStep))
-          else
-            xSearch:=false
-        end
+        octopusInSea:=false
     end;
 
 
   begin
-    if xSearch(xSizeSearchArea div 2,xSizeSearchArea div 2) then
-      ySearch:=true
+    previousPos:=lastPos;
+    lastPos:=pos;
+    locateSea(pos,seaPointer);
+    if ((seaPointer.x=0) and (seaPointer.y=0)) then
+      octopusSwims:=octopusInSea(pos)
     else
       begin
-        newYStep:=round(currentYSize/2);
-        if (newYStep>minSearchStep) then
-          ySearch:=(ySearch(y-newYStep,newYStep) or
-                    ySearch(y+newYStep,newYStep))
+        pos.x:=pos.x+seaPointer.x;
+        pos.y:=pos.y+seaPointer.y;
+        if (((pos.x=previousPos.x) and (pos.y=previousPos.y)) or
+            (depth>=nLeapsMax)) then
+          octopusSwims:=false
         else
-          ySearch:=false
+          octopusSwims:=octopusSwims(pos,succ(depth))
       end
   end;
 
 
 begin
-  findPupilPoint:=ySearch(ySizeSearchArea div 2,ySizeSearchArea div 2)
+  pupilFound:=false;
+  priLevel:=1;
+  nInvestigated:=0;
+  lastPos.x:=maxInt;
+  lastPos.y:=maxInt;
+  repeat
+    repeat
+      getStartingPoint(startingPoint);
+      pupilFound:=octopusSwims(startingPoint,0);
+      nInvestigated:=nInvestigated+1
+    until (pupilFound or (nInvestigated=priAreas[priLevel]));
+    priLevel:=priLevel+1
+  until (pupilFound or (priLevel=4));
+  for i:=0 to (priAreas[3]-1) do
+    startingPoints^[i].visited:=false;
+  findPupilPoint:=pupilFound
 end;
 
 
-procedure findPosition(pupilPoint,position : pointPtr);
+procedure findPosition(var pupilPoint,position : pointType);
 
-var   ascendingCenter           : pointPtr;
-      descendingCenter          : pointPtr;
+var   ascendingCenter           : pointType;
+      descendingCenter          : pointType;
 
 
   procedure getMiddlePoint(x,y         : word;
                            direction   : shortInt;
-                           middlePoint : pointPtr);
+                       var middlePoint : pointType);
 
-  var   leftPoint                 : pointPtr;
-        rightPoint                : pointPtr;
+  var   leftPoint                 : pointType;
+        rightPoint                : pointType;
 
 
-    procedure searchEdge(x,y : word; dX,dY : shortInt; edgePoint : pointPtr);
+    procedure searchEdge(x,y       : word;
+                         dX,dY     : shortInt;
+                     var edgePoint : pointType);
 
     begin
       inc(x,dX*nonSearchRadius+1);
@@ -378,39 +462,30 @@ var   ascendingCenter           : pointPtr;
         inc(y,dY);
         if showSearch then
           markPosition(x,y,asPoint);
-        if ((x<=searchAreaLeft) or (x>=searchAreaLeft+xSizeSearchArea) or
-            (y<=searchAreaTop ) or (y>=searchAreaTop +ySizeSearchArea)) then
+        if ((x<=1) or (x>=xSize) or (y<=1) or (y>=ySize)) then
           fatalError('searchEdge: No edge found!')
       until (applySobelMask(x,y,dY,dX)>=sobelThreshold);
-      makePoint(x,y,edgePoint)
+      edgePoint.x:=x;
+      edgePoint.y:=y
     end;
 
 
   begin
-    new(leftPoint);
-    new(rightPoint);
     searchEdge(x,y,west,-direction,leftPoint);
     searchEdge(x,y,east,direction,rightPoint);
-    makePoint(leftPoint^.x+round((rightPoint^.x-leftPoint^.x)/2),
-              leftPoint^.y+round(integer(rightPoint^.y-leftPoint^.y)/2),
-              middlePoint);
-    dispose(rightPoint);
-    dispose(leftPoint)
+    middlePoint.x:=leftPoint.x+round((rightPoint.x-leftPoint.x)/2);
+    middlePoint.y:=leftPoint.y+round((rightPoint.y-leftPoint.y)/2)
   end;
 
 
 begin
-  new(ascendingCenter);
-  new(descendingCenter);
-  with pupilPoint^ do
+  with pupilPoint do
     begin
       getMiddlePoint(x,y,south,ascendingCenter);
       getMiddlePoint(x,y,north,descendingCenter);
-      position^.x:=ascendingCenter^.x+descendingCenter^.x-x;
-      position^.y:=ascendingCenter^.y+descendingCenter^.y-y
-    end;
-  dispose(descendingCenter);
-  dispose(ascendingCenter)
+      position.x:=ascendingCenter.x+descendingCenter.x-x;
+      position.y:=ascendingCenter.y+descendingCenter.y-y
+    end
 end;
 
 
@@ -457,17 +532,152 @@ procedure initGlobals(xSize,ySize : word);
 
 var   i                         : byte;
 
+
+  procedure initPointMatrix;
+
+  var   xCenter                   : word;
+        yCenter                   : word;
+        xRadius                   : word;
+        yRadius                   : word;
+        nHorizontal               : word;
+        nVertical                 : word;
+        xStart                    : word;
+        yStart                    : word;
+        leftOffset                : word;
+        priArea1xRadius            : word;
+        priArea1yRadius            : word;
+        priArea2xRadius            : word;
+        priArea2yRadius            : word;
+        priCount                  : priAreasType;
+        pri                       : byte;
+        priOffset                 : word;
+        currentX                  : word;
+        currentY                  : word;
+        i,j                       : word;
+
+
+    procedure initVariables;
+
+    var   i                         : byte;
+
+
+      function nPointsInRectangle(x,y : word) : word;
+
+      begin
+        if even(trunc(x/2)+trunc(y/2)) then
+          nPointsInRectangle:=high(0.5*x*y)
+        else
+          nPointsInRectangle:=trunc(0.5*x*y)
+      end;
+
+
+    begin
+      xCenter:=xSize div 2;
+      yCenter:=ySize div 2;
+      xRadius:=trunc((xCenter-minPupilRadius)/minPupilRadius);
+      yRadius:=trunc((yCenter-minPupilRadius)/minPupilRadius);
+      nHorizontal:=2*xRadius+1;
+      nVertical:=2*yRadius+1;
+      xStart:=xCenter-xRadius*minPupilRadius;
+      yStart:=yCenter-yRadius*minPupilRadius;
+      currentX:=xStart;
+      currentY:=yStart;
+      if ((even(xRadius) and even(yRadius)) or
+          (odd(xRadius)  and odd(yRadius) )) then
+        leftOffset:=0
+      else
+        leftOffset:=minPupilRadius;
+      priArea1xRadius:=xRadius div 3;
+      priArea1yRadius:=yRadius div 3;
+      priArea2xRadius:=trunc((2/3)*xRadius);
+      priArea2yRadius:=trunc((2/3)*yRadius);
+      priAreas[1]:=nPointsInRectangle(2*priArea1xRadius+1,2*priArea1yRadius+1);
+      priAreas[2]:=nPointsInRectangle(2*priArea2xRadius+1,2*priArea2yRadius+1);
+      priAreas[3]:=nPointsInRectangle(nHorizontal,nVertical);
+      for i:=1 to 3 do
+        priCount[i]:=0;
+      getMem(startingPoints,priAreas[3]*sizeOf(point));
+    end;
+
+
+    function getPriority(x,y : word) : byte;
+
+
+      function inRectangle(x,y,rX,rY : word) : boolean;
+
+      begin
+        inRectangle:=((x>=xCenter-rX*minPupilRadius) and
+                      (x<=xCenter+rX*minPupilRadius) and
+                      (y>=yCenter-rY*minPupilRadius) and
+                      (y<=yCenter+rY*minPupilRadius))
+      end;
+
+
+    begin
+      if inRectangle(x,y,priArea1xRadius,priArea1yRadius) then
+        getPriority:=1
+      else if inRectangle(x,y,priArea2xRadius,priArea2yRadius) then
+        getPriority:=2
+      else
+        getPriority:=3
+    end;
+
+
+    function getPriOffset(i : byte) : word;
+
+    begin
+      case (i=1) of
+        true  : getPriOffset:=0;
+        false : getPriOffset:=priAreas[i-1]
+      end
+    end;
+
+
+    procedure toggleLeftOffset;
+
+    begin
+      case (leftOffset=minPupilRadius) of
+        true  : leftOffset:=0;
+        false : leftOffset:=minPupilRadius
+      end
+    end;
+
+
+  begin
+    initVariables;
+    repeat
+      pri:=getPriority(currentX+leftOffset,currentY);
+      priOffset:=getPriOffset(pri);
+      startingPoints^[priOffset+priCount[pri]].x:=currentX+leftOffset;
+      startingPoints^[priOffset+priCount[pri]].y:=currentY;
+      startingPoints^[priOffset+priCount[pri]].visited:=false;
+      inc(priCount[pri]);
+      inc(currentX,2*minPupilRadius);
+      if (currentX+leftOffset>xCenter+xRadius*minPupilRadius) then
+        begin
+          inc(currentY,minPupilRadius);
+          currentX:=xStart;
+          toggleLeftOffset
+        end
+    until (currentY>yStart+2*yRadius*minPupilRadius)
+  end;
+
+
 begin
-  searchAreaLeft:=round(xSize*searchAreaLeftFraction/100);
-  searchAreaTop:=round(ySize*searchAreaTopFraction/100);
-  xSizeSearchArea:=round(xSize*searchAreaRightFraction/100)-searchAreaLeft;
-  ySizeSearchArea:=round(ySize*searchAreaBottomFraction/100)-searchAreaTop;
   minPupilRadius:=round(xSize*minPupilRadiusFraction/100);
-  minSearchStep:=round(minPupilRadius/8);
+  filterRadius:=round(xSize*filterRadiusFraction/100);
+  inSeaThreshold:=round(4*wetFraction*pred(filterRadius))+2;
+  initPointMatrix;
   for i:=0 to lakeLevel do
-    map[i]:=lakeLevel;
-  for i:=(lakeLevel+1) to (numberOfGrayLevels-1) do
-    map[i]:=i
+    begin
+      map[i]:=lakeLevel;
+      wet[i]:=true
+    end;
+  for i:=(lakeLevel+1) to (nGrayLevels-1) do
+    begin
+      map[i]:=i;
+      wet[i]:=false
+    end
 end;
 
 
@@ -486,6 +696,18 @@ begin
     asCircle :
       circle(startX+x,startY+y,2)
   end
+end;
+
+
+procedure closeSearch;
+
+var   i                         : word;
+
+begin
+  freeMem(startingPoints,priAreas[3]*sizeOf(point));
+  for i:=1 to ySize do
+    freeMem(image^[i],xSize);
+  freeMem(image,4*ySize)
 end;
 
 
