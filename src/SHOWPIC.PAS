@@ -1,4 +1,4 @@
-program showEye;
+program showPicture;
 
 uses  crt,graph,auxil,defs,images,SVGA;
 
