@@ -181,6 +181,17 @@ var   x,y                       : word;
 
   procedure drawRectangle(x,y : word);
 
+
+    function isWet(x,y : word) : boolean;
+
+    begin
+      isWet:=((map[image^[y  ]^[x  ]]=lakeLevel) and
+	      (map[image^[y+1]^[x  ]]=lakeLevel) and
+	      (map[image^[y+1]^[x+1]]=lakeLevel) and
+	      (map[image^[y  ]^[x+1]]=lakeLevel))
+    end;
+
+
   begin
     makePoint(gr3D_x(x  ,y  ,map[image^[y  ]^[x  ]]),
 	      gr3D_y(x  ,y  ,map[image^[y  ]^[x  ]]),thisRectangle[1]);
@@ -190,6 +201,10 @@ var   x,y                       : word;
 	      gr3D_y(x+1,y+1,map[image^[y+1]^[x+1]]),thisRectangle[3]);
     makePoint(gr3D_x(x+1,y  ,map[image^[y  ]^[x+1]]),
 	      gr3D_y(x+1,y  ,map[image^[y  ]^[x+1]]),thisRectangle[4]);
+    if isWet(x,y) then
+      setFillStyle(solidFill,blue)
+    else
+      setFillStyle(solidFill,white);
     fillPoly(4,thisRectangle)
   end;
 
