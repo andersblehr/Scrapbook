@@ -3,9 +3,9 @@ program runFilter;
 uses crt,graph,auxil,ADT,SVGA;
 
 const maxSize                   = 512;
-      filterRadius              = 14;
-      threshold                 = 1;
-      fileName                  = 'EYE';
+      filterRadius              = 8;
+      threshold                 = 15;
+      fileName                  = 'abeye02';
 
 type  bufferArray               = array[1..maxSize] of char;
 
@@ -29,7 +29,7 @@ var   xSize                     : word;
       pictureMatrix             : pixelMatrixPtr;
       pointList                 : doubleListOPtr;
       lowestFilterValue         : byte;
-      throughputCount               : word;
+      throughputCount           : word;
       middleValue               : byte;
 
 
@@ -87,7 +87,7 @@ begin
   initSVGAGraphics;
   setBlackAndWhitePalette;
   new(pointList,init);
-  assign(pictureFile,'c:\user\blehr\diplom\bilder\'+fileName+'.pic');
+  assign(pictureFile,'c:\user\blehr\fag\diplom\bilder\'+fileName+'.pic');
   reset(pictureFile,1);
   blockRead(pictureFile,buffer,4);
   xSize:=(word(ord(buffer[1])) shl 8)+ord(buffer[2]);
@@ -143,12 +143,12 @@ var   sum                       : longInt;
 
   begin
     filterSum:=pictureMatrix^[yPos]^[xPos];
-    for i:=1 to filterRadius div 2 do
+    for i:=1 to (filterRadius div 2) do
       filterSum:=filterSum+pictureMatrix^[yPos]^[xPos-2*i]+
                            pictureMatrix^[yPos]^[xPos+2*i]+
                            pictureMatrix^[yPos-2*i]^[xPos]+
                            pictureMatrix^[yPos+2*i]^[xPos];
-    getFilterValue:=round(filterSum/(4*filterRadius+1))
+    getFilterValue:=round(filterSum/(2*filterRadius+1))
   end;
 
 
@@ -161,9 +161,9 @@ begin
   lowestFilterValue:=64;
   throughputCount:=0;
   sum:=0;
-  for yPos:=filterRadius to ySize-filterRadius do
+  for yPos:=filterRadius+1 to ySize-filterRadius-1 do
     begin
-      for xPos:=filterRadius to xSize-filterRadius do
+      for xPos:=filterRadius+1 to xSize-filterRadius-1 do
         begin
           filterValue:=getFilterValue;
           putPixel(startX+xPos-1,startY+yPos-1,63);
