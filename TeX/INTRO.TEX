@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Mon Jan 18 10:34:12 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 14 23:24:12 1993
+%%% Last Modified On: Sun Mar 21 07:45:51 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -14,9 +14,9 @@
 \section{Synchronization and Cognition}
 \label{intro:synch}
 
-{\em Synchronization and Cognition\/} ({\em SC\/}) is a cooperation
-project initiated by R.\ Eckhorn and R.\ Bauer of the Biophysics Group
-and F.\ R\"{o}sler of the Physiologic Psychology Group at the
+{\em Synchronization and Cognition\/} (SC) is a cooperation project
+initiated by R.\ Eckhorn and R.\ Bauer of the Biophysics Group and F.\ 
+R\"{o}sler of the Physiological Psychology Group at the
 Philipps-Universit\"{a}t Marburg, Germany.
 
 The basis of the current work is observations done by R.\ Eckhorn and
@@ -27,20 +27,27 @@ organize in peripheral visual areas in the brain of drugged cats.  The
 spatial distribution of these assemblies, but not their frequencies,
 depend on the supplied visual stimulus.
 
-The goal of the {\em SC\/} project is, through the use of
-microelectrodes (monkeys) and EEG recordings (humans), to show that
-coherent neurological activations ({\em synchronizations\/}) in the
-visual cortex, relating to coherent visual stimuli, is a requirement
-for the coherent perception of these stimuli.  In addition, the
-time-space {\em synchronization dynamics\/} in peripheral and central,
-as well as in intermediate cortex areas, are to be investigated as to
-how they relate to the cognitive tasks being performed.
+The goal of the SC project is, through the use of microelectrodes
+(monkeys) and EEG recordings (humans), to show that coherent
+neurological activations ({\em synchronizations\/}) in the visual
+cortex, relating to coherent visual stimuli, is a requirement for the
+coherent perception of these stimuli.  In addition, the time-space
+{\em synchronization dynamics\/} in peripheral and central, as well as
+in intermediate cortex areas, are to be investigated as to how they
+relate to the cognitive tasks being performed.
 
-For a further description of the {\em SC\/} project,
-see~\cite{antrag}.  Some of the publications by R.\ Eckhorn {\em et
-  al.\/} concerning the discovery and implications of synchronizations
-in the visual cortex of cats and monkeys
-are~\cite{eckhorn1},~\cite{eckhorn2},~\cite{cat} and~\cite{eckhorn3}.
+For a further description of the SC project, see~\cite{antrag}.  Some
+of the publications by R.\ Eckhorn {\em et al.\/} concerning the
+discovery and implications of synchronizations in the visual cortex of
+cats and monkeys are~\cite{eckhorn1},~\cite{eckhorn2},~\cite{cat}
+and~\cite{eckhorn3}.
+
+The only group of the SC project with which I have interacted during
+my thesis work, is the group of R.\ Eckhorn and R.\ Bauer.
+Accordingly, I will in the following refer to the {\em monkey\/} and
+the {\em subject\/} interchangeably.  The general principles, however,
+when referring to the monkey, can be assumed also to apply to the work
+done by the group of F.\ R\"{o}sler.
 
 \section{Thesis Motivation}
 \label{intro:motivation}
@@ -53,29 +60,42 @@ experimental results that the exact eye position of the subject be
 known at a given time.  Otherwise the danger exists of registering
 neurological responses whose variations are not the result of the
 assigned cognitive task, but of the subject's incorrect gaze
-direction.
+direction.  
 
-To gain absolute certainty about where the subject at a given time
+In the part of the SC project carried out by the Eckhorn group, the
+visual stimuli are generated on a computer monitor placed in front of
+the monkey, sometimes referred to as the {\em inducing monitor\/}
+(this term stems from the fact that the neural activity in the visual
+cortex of the monkey is {\em induced\/} by the visual patterns on the
+monitor).  The monkey has been trained to focus on a bright point,
+called the reference point, on the monitor, across which various
+geometrical shapes move in different directions.  When the monkey does
+not focus on the reference point, it is said to be {\em drifting\/}.
+
+To gain absolute certainty about where the monkey at a given time
 focuses, it is necessary to have a system which continuously tracks
-the movements of the subject's eyes.  For our purpose it was decided
+the movements of the monkey's eyes.  For our purpose it was decided
 that a system complying to the following requirements would suffice:
-\begin{itemize}
+\begin{enumerate}
 \item The position-analyzing method of the system may in no way
-  interfere with recordings being made from the visual cortex of a
-  subject, be it man or monkey.
-\item A position measuring rate of 50 Hz.  Thus every 20 ms a
-  coordinate pair corresponding as closesly as possible to the actual
-  gaze direction has to be made available.  When the subject is {\em
-    drifting\/}, that is, it does not focus where it should, a warning
-  signal has to be given.
-\item The error in the position returned by the system should be less
-  than or equal to $\pm 0.25^{\circ}$.
-\item The measuring range of the system should be at least $\pm
-  20^{\circ}$.
-\item The system should be relatively easy to configure to comply with
-  the specific needs of an experiment.
-\item The price of the complete system may not exceed DM 12.000.
-\end{itemize}
+  interfere with recordings being made from the visual cortex of the
+  monkey.
+\item\label{req:first}A position measuring rate of 50 Hz.  Thus every
+  20 ms, hereafter referred to as a {\em pass\/}, a coordinate pair
+  relative to a reference point on the inducing monitor, corresponding
+  to the point on the monitor on which the monkey had its focus at the
+  beginning of the pass, has to be made available.  When the monkey is
+  drifting, a warning signal has to be given with each pass as long as
+  it continues to drift.
+\item\label{req:2} The error in the position returned by the system
+  should be less than or equal to $\pm 0.25^{\circ}$.
+\item\label{req:3}The measuring range of the system should be at least
+  $\pm 20^{\circ}$.
+\item\label{req:4}The system should be relatively easy to configure to
+  comply with the specific needs of an experiment.
+\item\label{req:last}The price of the complete system may not exceed
+  DM 12.000.
+\end{enumerate}
 
 There exist several commercially available eye tracking systems, some
 of which are described in Section~\ref{back:track}.  For reasons

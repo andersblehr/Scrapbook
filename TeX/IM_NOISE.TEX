@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:38:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sat Mar 20 05:58:52 1993
+%%% Last Modified On: Sun Mar 21 02:28:35 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,19 +108,16 @@ levels in a neighbourhood of that pixel, instead of by the average, as
 was the case in the previous section.  The median of a set of values
 is the value that is such that half of the values in the set is
 smaller than or equal to it, and the other half is greater than or
-equal to it.  For exampel, suppose that a $3\times 3$ {\em median
-  filter\/} covers a neighbourhood having values as shown in
-Fig.~\ref{fig:median}.
-
-\insertepswidth{median}{\label{fig:median}A $3\times 3$ neighbourhood
-  in an image.}{0.15}
-
-The value of the central pixel corresponds to a single-pixel spike,
-and can be assumed to represent a noise point.  The values of the
-neighbourhood are sorted as $(47,49,49,50,50,51,52,53,98)$.  The
-median value of this set is seen to be $50$, and thus the pixel
-corresponding to the spike is assigned the gray level 50 by the
-filter.
+equal to it.  For exampel, suppose that a $3\times 3$ neighbourhood at
+location $(x,y)$ (Fig.~\ref{fig:neighbour}) has the values
+$(51,49,47,53,98,50,51,52,49)$, where $98$ is the value at $(x,y)$.
+This value corresponds to a single-pixel spike, and can be assumed to
+represent a noise point.  A {\em median filter\/} placed at $(x,y)$
+sorts the pixel values in this neighbourhood and assigns to the pixel
+at $(x,y)$ the median of this sorted set of values.  In the example,
+the values are sorted as $(47,49,49,50,50,51,52,53,98)$.  The median
+is seen to be $50$, and thus the pixel corresponding to the spike is
+assigned the value 50 by the filter.
 
 The effect of median filtering is one of forcing points with very
 distinct gray levels to be more like their neighbours, thus
