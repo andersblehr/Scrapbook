@@ -6,7 +6,7 @@ var   eyeImage                  : imageOPtr;
 
 begin
   if (paramCount>0) then
-    if fileExists(pictureFile(paramStr(1))) then
+    if fileExists(picturePath(paramStr(1))) then
       begin
         initSVGAGraphics;
         setBlackAndWhitePalette;
@@ -18,7 +18,7 @@ begin
         closeGraph
       end
     else
-      fatalError('picture file not found: '+pictureFile(paramStr(1)))
+      fatalError('picture file not found: '+picturePath(paramStr(1)))
   else
     fatalError('Usage: showeye <file name (no extension)>')
 end.
