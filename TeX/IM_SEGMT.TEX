@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 11 05:40:23 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Sun Mar 28 00:01:43 1993
+%%% Last Modified On: Tue Mar 30 00:16:02 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,15 +28,14 @@ image.  However, in Section~\ref{image:edge}, the problem of {\em edge
 \label{image:segment:threshold}
 
 The foundation of the segmentation technique known as {\em
-  thresholding\/} is the presupposition that objects in an image can
-be segmented out on the basis of their gray levels.  For example, if
-the image consists of a bright object on a dark background, the
-foreground object may be segmented out by classifying all pixels in
-the image whose gray levels are above a certain {\em threshold
-  value\/} $T$ as belonging to it, and all other pixels (i.e., those
-whose gray levels are below the threshold) as belonging to the
-background.  The threshold is said to divide the gray scale into two
-{\em bands\/}.
+  thresholding\/} is the presumption that objects in an image can be 
+segmented out on the basis of their gray levels.  For example, if the 
+image consists of a bright object on a dark background, the foreground 
+object may be segmented out by classifying all pixels in the image 
+whose gray levels are above a certain {\em threshold value\/} $T$ as 
+belonging to it, and all other pixels (i.e., those whose gray levels 
+are below the threshold) as belonging to the background.  The 
+threshold is said to divide the gray scale into two {\em bands\/}.
 
 Generally, thresholding may be viewed as an image operation that
 involves tests against a {\em thresholding function\/} $T$ of the form
@@ -131,7 +130,7 @@ does not belong to the region of interest, since single pixels outside
 the region of interest may share properties with it.  Thus it is
 important to equip the search strategy with a very tight stop
 criterion, in order to minimize the chance of erroneously choosing a
-non-region seed point (confer Section~\ref{eval:eval:segment}).
+non-region seed point (cf.\ Section~\ref{eval:eval:segment}).
 
 A usual similarity criterion for the inclusion of new points during
 the growing process is that the gray level of a pixel to be included

@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 18 04:05:10 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 29 05:36:01 1993
+%%% Last Modified On: Mon Mar 29 23:58:29 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,12 +28,12 @@ repeated here:
 
 \paragraph{Problem definition:}
 Design, implement and, as extensively as possible, test an algorithm
-to, on the basis of a given image of the eye, decide the position of
-the (centre of the) pupil, relative to some given reference point.
+to, on the basis of a given image of the eye, determine the position
+of the (centre of the) pupil, relative to some given reference point.
 The algorithm must to be fast enough to run in the CPU of the
 computer, and has to satisfy the following requirements:
 \begin{itemize}
-\item The position of the pupil is to be decided with an accuracy
+\item The position of the pupil is to be determined with an accuracy
   corresponding to 1 pixel in the digitized image.
 \item Whenever the pupil cannot be found (due to blinking,
   disturbances, etc.), an error signal is to be returned.
@@ -51,7 +51,7 @@ the entire image.
 \noindent Some vague points in this definition have to be clarified
 before continuing the presentation of the algorithm.  These are:
 \begin{description}
-\item[Reference point:] ``{\em\ldots decide the position\ldots
+\item[Reference point:] ``{\em\ldots determine the position\ldots
     relative to some reference point\ldots\/}'' The upper left corner
   of the image has been used as reference point, having coordinates
   $(0,0)$.
@@ -121,14 +121,14 @@ appearance.  Three factors contribute to the bad quality:
   so-called {\em monkey laboratory\/}; that is, where the
   neurophysiological experiments of the Eckhorn-Bauer group take
   place.  ``Normal'' light conditions mean {\em non-experimental\/};
-  that is, the light stems from ordinary light bulbs\typeout{--> Ikke
-    lyspaerer, men *lysstoffroer*!!} in the ceiling of the laboratory.
-  The reflections in the images are of illuminated artifacts in the
-  near surroundings of the monkey.  Note that in all images the
-  reflections cover part of the pupil, thus making the pupil-contour
-  non-elliptic.  Since reflections in an image are of a non-additive
-  nature, and thus completely remove information about the regions
-  they cover, they cannot be filtered out.
+  that is, the light stems from ordinary fluorescent lamps in the
+  ceiling of the laboratory.  The reflections in the images are of
+  illuminated artifacts in the near surroundings of the monkey.  Note
+  that in all images the reflections cover part of the pupil, thus
+  making the pupil-contour non-elliptic.  Since reflections in an
+  image are of a non-additive nature, and thus completely remove
+  information about the regions they cover, they cannot be filtered
+  out.
 \item[The frame-grabber:] The ``flat'' appearance of the images is due
   to relatively low contrast.  This is a consequence of a bug in the
   frame-grabber, where increasing the contrast induces spurious dark

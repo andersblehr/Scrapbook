@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:25:13 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 29 06:41:11 1993
+%%% Last Modified On: Tue Mar 30 05:55:00 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,36 +33,62 @@ to the overall algorithm, {\octopus}.
 
 The foundation of the algorithm is a variant of thresholding in which
 all pixels with values (gray levels) below or equal to the threshold
-value $T$ have their old values replaced by $T$, and all pixels with
-values above $T$ retain their old values.  The effect of applying
-thresholding of this sort to an image can be illustrated by picturing
-the image as a three-dimensional landscape, as depicted in
-Fig.~\ref{fig:landscape} (compare Fig.~\ref{fig:testimages}(b)).  When
-the image is thresholded, $T$ can be viewed as representing the
-surface level of a mostly subterranean lake under this landscape.
-Wherever the landscape descends below $T$, this lake comes to the
-surface, forming ponds whose sizes depend on the extent of the
-corresponding sub-lake portion of the landscape.  This is illustrated
-in Fig.~\ref{fig:lake}.  Note that, although the pupil is hardly
+value $T_{l}$ have their old values replaced by $T_{l}$, and all
+pixels with values above $T_{l}$ retain their old values.  The effect
+of applying thresholding of this sort to an image can be illustrated
+by picturing the image as a three-dimensional landscape, as depicted
+in Fig.~\ref{fig:landscape}.  The negative peaks correspond to the
+abovementioned spots, whereas the positive peak in the left of the
+image represents an actual bright point (compare
+Fig.~\ref{fig:testimages}(b)).  When the image is thresholded, $T_{l}$
+can be viewed as representing the surface level of a mostly
+subterranean lake underneath this landscape.  Wherever the landscape
+descends below $T_{l}$, this lake comes to the surface, forming
+``ponds'' whose sizes depend on the extent of the corresponding
+sub-lake portion of the landscape.  This is illustrated in
+Fig.~\ref{fig:lake}.  Note that, although the pupil is hardly
 discernable in Fig~\ref{fig:landscape}, it is clearly visible as
 forming the largest pond, or {\em lake\/}, after thresholding.  Note
 also that a number of relatively large lakes are formed by non-pupil
-portions of the eye.  Thus the pixel filter has to be designed so that
-only lakes having an extent approximately of the same order as the
-average pixel radius are recognized as constituting pupil lakes.
+portions of the eye.
 
-The principle
+The principle idea behind the search algorithm is that, bearing the
+above notation in mind, every pixel in a given image can be classified
+as being either {\em wet\/} or {\em dry\/}, wet pixels having values
+below or equal to $T_{l}$, and dry pixels having values above $T_{l}$.
+The advantage of this approach is that the darkest regions in the
+image, of which the pupil is assumed to constitute the largest, are
+assigned a unique value, $T_{l}$, which becomes {\em the\/} darkest
+gray level of the thresholded image, whereas non-lake regions in the
+image are left untouched.  Thus, sub-lake landscape features, which
+characterize regions of which one is primarily interested in knowing
+that they belong to the set of the darkest regions, are eliminated,
+whereas the features of non-lake regions are preserved.  Using a wet
+pixel as origin of operation (see Section~\ref{eval:approach:edge}),
+for the moment not heeding whether or not this pixel is a pupil point,
+it is clear that, in all directions, the first edge which is
+encountered corresponds to either the {\em shore\/} of the lake of
+which the pixel is a part, or to the shore of an {\em island\/} in
+this lake.  Assuming that $T_{l}$ has been chosen so that the shores
+of the {\em pupil lake\/} in an image correspond as closely as
+possible to the actual pupil contour, and that the contrast of the
+image is such that the pupil lake is relatively {\em deep\/}, thus
+minimizing the probability of having islands in it, this approach
+ensures minimum (zero) image noise between the origin of operation and
+the pupil contour.
 
-With images having as low contrast as these, much care has to be taken
-when choosing $T$.  For the images which I have used during my thesis
-work, it was found that $T=18$ ensures relatively large pupil lakes
-and sufficiently small non-pupil lakes.  $T=17$ tends to make the
-image completely ``dry'', whereas $T=19$ tends to ``drown'' large
+With images having as low contrast as the given test images,
+particular care has to be taken when choosing $T_{l}$.  For the images
+I have used during my thesis work, I found that $T=18$ ensures
+``optimal'' pupil lakes and sufficiently small non-pupil lakes.
+However, due to the low contrast, the probability of encountering
+islands in the pupil lake is by no means ignorable.  $T=17$ tends to
+make the image completely dry, whereas $T=19$ tends to ``drown'' large
 portions of it.  It is evident that, if the final system were to
-employ equally low-contrast images, only a small change in light
+employ equally low-contrasted images, only a small change in light
 conditions would destroy this extremely frail balance.  However,
 employing a frame grabber supplying images whose gray levels occupy a
-large portion of the desired gray level range (256) would by far
+large portion of the desired gray level range (256) would by and large
 eliminate this problem.
 
 \inserteps{lake18}{\label{fig:lake}The image in
@@ -71,9 +97,128 @@ eliminate this problem.
 \subsection{A Possible Pixel Filter}
 \label{algo:seek:filter}
 
+From the above, it is clear that the first requirement that an actual
+pupil point has to satisfy in order to be recognized as such, is that
+it be wet.  However, as is seen from Fig.~\ref{fig:lake}, the number
+of wet non-pupil points in an image cannot be assumed to be zero.
+Thus, to avoid classifying a non-pupil point as a pupil point, some
+sort of neighbourhood filtering has to be done.  In
+Section~\ref{eval:eval:segment} it was stated that, by means of
+carefully thresholding the value resulting from some sort of
+neighbourhood averaging, it is possible to design a pixel filter which
+only lets points through that are actual pupil points.  In the
+following, the pixel filter employed by the search algorithm is
+described.
+
+The pupil lake is assumed to constitute the largest lake in an image
+(if this is not the case, $T_{l}$ has been badly chosen).  Thus a point
+can safely be classified as a pupil point if it is known to be part of
+a lake whose size is in the order of the average pupil size.  More
+precisely, the neighbourhood about the candidate pixel over which the
+filtering is made must have a radius slightly smaller than the minimum
+radius of the pupil.  
+
+The pixel filter, hereafter referred to as the {\em octopus\/} (not to
+be confused with {\octopus}, the name of the entire eye-tracking
+algorithm), has the shape of a four-armed octopus viewed from above,
+with its {\em arms\/} stretched in the {\em north\/}, {\em east\/},
+{\em south\/} and {\em west\/} directions, respectively.  North is
+defined to be upwards in the image.  See Fig.~\ref{fig:octopus}.  The
+radius $r_{o}$ of the octopus (actually the length of its arms) is in
+the current implementation set to be 80\% of the minimum pupil radius,
+which, in the case of the given test images, is estimated to be
+approximately 10\% of the horizontal image size.  The arms of the
+octopus are viewed as consisting of {\em sensors\/}.  When applied at
+a given location $(x,y)$ in an image, each sensor registers and
+reports whether or not the pixel it covers is wet.  The {\em first
+  swim-requirement\/} that has to be satisfied for the octopus to
+report that it is (hence the name) {\em swimming\/}, that is, that it
+has found the pupil lake, is that its central sensor, covering the
+pixel at $(x,y)$, as well as its hands, that is, the outermost sensors
+of each arm, report wetness.  If this requirement is satisfied, the
+octopus starts to count how many of its sensors that report wetness.
+If this number is higher than a given fraction $T_{s}$ of the total
+number of sensors, the octopus is swimming and consequently reports
+that the pixel at location $(x,y)$ represents a pupil point.  This
+last requirement will be referred to as the {\em second
+  swim-requirement\/}.
+
+\insertepswidth{octopus}{\label{fig:octopus}The {\em octopus\/} pixel
+  filter.  $r_{o}$ is its radius i pixels.}{0.33}
+
+The probability that the point which the octopus reports to be a pupil
+point actually is a non-pupil point depends on the threshold value
+$T_{s}$.  With the current test images, which contain large and dark
+non-pupil regions, and where the pupil is hardly discernable, I found
+that the octopus returned no non-pupil points if $T_{s}$ was set to
+0.8.  With better images, having higher contrast and not so large and
+dark non-pupil regions, it ought to be possible to choose a lower
+value for $T_{s}$ and still have the octopus return only pupil points,
+particularly since it then would be hard finding a non-pupil point
+satisfying the first swim-requirement, that the centre and extremities
+of the octopus report wetness.
+
+A last point which requires some elaboration, is that, with the given
+test images, lower values for $T_{s}$ made the search algorithm run
+faster.  This can be attributed to the poor image quality, and in
+particular to the low contrast.  The average gray level of the pupil
+lakes in the images was found to be 17, making the average depth of
+any pupil lake 1 (given that $T_{l}=18$).  Thus local variations in
+the pupil with positive amplitudes of 2 and more cause islands to
+appear in the pupil lake.  Hence, if the octopus actually {\em is\/}
+in the pupil sea, the probability that one or more of its arms cross
+at least one island, thus reducing the number of sensors reporting
+wetness, is relatively large.  Accordingly, the probability $p$ that
+the second swim-requirement will not be satisfied at a given location
+is higher than it would be if there were none or few islands in the
+pupil lake.  Evidently, $p$ is inversly proportional to $T_{s}$.
+Since, in addition, the number $n$ of points in the image that have to
+be filtered in order to land at a point satisfying the
+swim-requirements is inversely proportional to $p$, it follows that
+$n$ is directly proportional to $T_{s}$.  Thus, when $T_{s}$ is
+reduced, the time required to find a point satisfying the
+swim-requirements is also reduced.  If the image quality were better,
+however, there would seldom be islands in the pupil lake, and
+accordingly a pupil point would be recognized as such more or less
+independently of $T_{s}$.
+
 \subsection{The ``Intelligent'' Octopus}
 \label{algo:seek:IQ}
 
+One approach to finding a pupil point would be to apply the octopus as
+described above to every pixel in the image, say, starting in the
+upper left corner (the reference point), until a pupil point had been
+detected.  This would, however, not be a very time-efficient solution.
+Another approach would be to define a grid covering the image and only
+apply the octopus to the grid points, using some strategy as to the
+order in which the points are subjected to filtering.  With this
+approach, the time needed to detect a pupil point would depend on two
+factors: The grid spacing, and the application strategy.  An even
+better approach would be to incorporate into the octopus some sort of
+mechanism indicating, from its current location, the most probable
+direction in which to find the pupil lake.  This is the approach taken
+in {\octopus}.
+
+\subsubsection{Algorithmic Overview}
+
+The principle of operation for the ``intelligent'' octopus can be
+summarized as follows:
+\begin{enumerate}
+\item Define a subset of all the pixels in the image to form a set
+  {\SS} of {\em starting pixels\/}.  The pixels belonging this set
+  ought to be evenly distributed over the entire image, and their
+  number should depend on the fraction of the image occupied by the
+  pupil, not on the image resolution.  Mark all members of {\SS} {\sl
+    not visited\/}.
+\item Pick an unvisited starting pixel from {\SS} and mark its entry
+  in {\SS} {\sl visited\/}.
+\end{enumerate}
+
+\subsubsection{Detailed Description}
+
 \subsection{The Search Strategy}
 \label{algo:seek:strategy}
+
+\subsection{Number of Operations}
+\label{algo:seek:O}
 
