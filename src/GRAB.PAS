@@ -159,7 +159,7 @@ begin
   res_read;
 end;
 
-function getpix(var x,y : integer): byte;
+function getpix(var x,y : word): byte;
 begin
   regs.cx:=x; regs.dx:=y; regs.ah:=$0d; regs.bh:=0;
   intr($10,regs); getpix:=regs.al and $3f;
@@ -189,26 +189,59 @@ begin
 end;
 
 
+procedure save_pic;
+
+type  bufferType                = array[1..512] of byte;
+
+var   fileName                  : string;
+      pictureFile               : file;
+      buffer                    : bufferType;
+      i,j                       : word;
+
+begin
+  fileName:='c:\user\blehr\fag\diplom\bilder\image'+imageNumber+'.pic';
+  assign(pictureFile,fileName);
+  rewrite(pictureFile,1);
+  buffer[1]:=hi(hori);
+  buffer[2]:=lo(hori);
+  buffer[3]:=hi(verti_pixels);
+  buffer[4]:=lo(verti_pixels);
+  blockWrite(pictureFile,buffer,4);
+  for i:=1 to verti_pixels do
+    begin
+      for j:=1 to hori do
+        buffer[j]:=getPix(j,i);
+      blockWrite(pictureFile,buffer,hori)
+    end;
+  close(pictureFile)
+end;
+
+
 procedure save_pcx;
 var
-  x, y, z     : integer;
+  x, y, z     : word;
   anz, b1, b2 : byte;
   label pcx1, pcx2, pcx3, pcx4, pcx5, pcx8, pcx9, pcx10, savepal;
 begin
-  beep;
-  beep;
   filename:='c:\user\blehr\fag\diplom\bilder\pcx\image'+imageNumber+'.pcx';
   assign (fi,filename);
   rewrite(fi,1);
 
   {PCX - Header generieren und speichern}
-  pcx_hdr.indent    :=$0a;     pcx_hdr.version:=5;
-  pcx_hdr.compress  :=1;       pcx_hdr.bpp    :=8;
-  pcx_hdr.xmin      :=0;       pcx_hdr.ymin   :=0;
-  pcx_hdr.xmax      :=hori-1;  pcx_hdr.ymax   :=verti_pixels-1;
-  pcx_hdr.h_dpi     :=300;     pcx_hdr.v_dpi  :=300;
-  pcx_hdr.res       :=0;       pcx_hdr.planes :=1;
-  pcx_hdr.b_per_line:=hori;    pcx_hdr.pal_type :=1;
+  pcx_hdr.indent:=$0a;
+  pcx_hdr.version:=5;
+  pcx_hdr.compress:=1;
+  pcx_hdr.bpp:=8;
+  pcx_hdr.xmin:=0;
+  pcx_hdr.ymin:=0;
+  pcx_hdr.xmax:=hori-1;
+  pcx_hdr.ymax:=verti_pixels-1;
+  pcx_hdr.h_dpi:=300;
+  pcx_hdr.v_dpi:=300;
+  pcx_hdr.res:=0;
+  pcx_hdr.planes:=1;
+  pcx_hdr.b_per_line:=hori;
+  pcx_hdr.pal_type:=1;
   for c:=1 to 48 do pcx_hdr.colpal[c]:=0;
   for c:=1 to 58 do pcx_hdr.paldummy[c]:=0;
   blockwrite(fi,pcx_hdr,sizeof(pcx_hdr));
@@ -261,12 +294,6 @@ begin
   savepal:
   blockwrite(fi,pal,sizeof(pal));
   close(fi);
-  beep;
-  delay(600);
-  beep;
-  delay(600);
-  beep;
-  delay(4500)
 end;
 
    { * * * Hauptprogramm * * * }
@@ -325,7 +352,7 @@ begin
       beep;
       if taste = '+' then inc(hori);
       if taste = '-' then dec(hori); if hori = 0 then hori:=0;
-      if taste = 'S' then save_pcx;
+      if taste = 'S' then save_pic;
       if taste = 'H' then hell_offset:=hell_offset+4;
       if taste = 'D' then hell_offset:=hell_offset-4;
     end;
