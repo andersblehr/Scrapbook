@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Tue Mar  9 03:58:22 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Mon Mar 22 03:15:12 1993
+%%% Last Modified On: Thu Apr  8 19:40:35 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,16 +12,14 @@
 \label{back:eye}
 
 In this section, an introduction is given to some of the terms
-relating to the eye, as well as to its structure.  Since the subjects
-may be human as well as monkeys, both kinds of eyes are described.
-The human eye is given the most thorough presentation in
-Section~\ref{back:eye:human}, and in Section~\ref{back:eye:monkey},
-properties of the monkey's eye demanding special concern are
-described.  Section~\ref{back:eye:visual} describe som useful visual
-properties of the eye, from an image processing point of view.
+relating to the eye, as well as to its structure.  Although the
+subjects may be human as well as monkeys, only the human eye is
+described, given that the terms also apply to the monkey's eye.  Also,
+some, from an image processing point of view, useful visual properties
+of the eye are described.
 
 \subsection{The Structure of the Human Eye}
-\label{back:eye:human}
+\label{back:eye:structure}
 
 In Fig.~\ref{fig:back:eye:human}, a horizontal cross section of the
 human eye is shown.  The shape of the eye is nearly spherical, and its
@@ -44,8 +42,9 @@ divided into the iris and the {\em ciliary body\/}.  The {\em ciliary
   muscles\/} allows the iris to contract or expand to control the
 amount of light entering the eye through its central opening, the
 pupil.  The pupil is variable in diameter from approximately 2 mm up
-to 8 mm.  The front of the iris contains the visible pigment of the
-eye, whereas the back contains a black pigment.
+to 8 mm, corresponding to an area range of 3--50 mm$^{2}$.  The front
+of the iris contains the visible pigment of the eye, whereas the back
+contains a black pigment.
 
 \insertepswidth{eye}{\label{fig:back:eye:human}A simplified diagram of
   a cross section of the human eye.
@@ -83,15 +82,48 @@ to colour, but much more sensitive to low levels of illumination than
 the cones.  Rod vision is known as {\em scotopic\/} or dim-light
 vision.
 
-\subsection{The Monkey's Eye}
-\label{back:eye:monkey}
-
-\subsection{Visual Properties of the Eye}
+\subsection{Optical Properties of the Eye}
 \label{back:eye:visual}
 
-The most obvious visual property of the eye, both in man and monkey,
-is the contrast between the relatively bright iris and the dark pupil.
+In Fig.~\ref{fig:scaneye} is shown a relatively high-quality image of
+a monkey's eye.  From an eye-tracking point of view, the most
+interesting optical property noted is the relatively sharp transistion
+in brightness between the dark pupil and the comparably bright iris.
+It is noted, however, that the iris of the monkey appears to be darker
+than that of man, thus reducing the difference in gray level between
+the pupil and the iris.  Note also that the pupil does not constitute
+the only dark region in the image.  In fact, in the given image there
+appears to be large regions outside the pupil with gray levels in the
+proximity of those of the pupil.  Evidently, an eye-tracking system
+has to take this into consideration in order to be able to
+differentiate between the pupil and other dark regions in an image.
 
-Pupillen syns bedre i infrar\o dt.
+Another thing to be noted is that the pupil appears to approximate a
+circle relatively well.  However, although it is known to be circular
+physically, the appearance of the pupil is circular only when the
+subject looks straight into the camera.  If it looks to the side, the
+pupil appears as an ellipse whose major axis is vertical; if it looks
+up or down, the major axis of the pupil ellipse is horizontal; if it
+looks up or down as well as to the side, the major axis of the pupil
+ellipse has either a positive or negative angle with respect to the
+horizontal plane.  The deviation in the pupil's appearance from the
+circular shape depends on the gaze angle relative to the camera.  When
+the angle is relatively small, i.e., in the approximate range $\pm
+15^{\circ}$, the deviation is less than 4\%, but when the angle
+increases, the elliptic appearance becomes more dominant and is apt to
+cause errors in eye-tracking systems assuming that the pupil always
+constitutes a circle in an image.
 
-Ellipse vs.\ sirkel (s.\ 15, monitor)
+Note also the bright spot at the upper extremity of the pupil.  This
+is called to as the {\em first Purkinje image\/}, and constitutes the
+reflection of the illuminating source from the anterior surface of the
+cornea.  
+
+A last point of interest is that the iris appears brighter under
+infrared illumination than in visible light (\cite{template}), which
+is yet another incentive for choosing infrared illumination of the eye
+for the final eye-tracking system (cf.\ Section~\ref{intro:problem}).
+
+\insertepswidth{scaneye}{\label{fig:scaneye}An image of a monkey's
+  eye.}{0.4}
+

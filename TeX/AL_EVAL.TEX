@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Sun Mar 28 02:28:57 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Wed Apr  7 18:33:14 1993
+%%% Last Modified On: Thu Apr  8 18:51:05 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,10 +90,13 @@ In the following, the focus will be on the final formulation of
 {\octopus} as given in the previous sections, and on its ability to
 satisfy the requirements listed in the algorithmic problem definition
 given in Section~\ref{intro:problem}.  Three points will be addressed,
-accuracy, linearity as pertaining to accuracy, and time consumption.
-The relatively low resolution of the test images ($\sim 100\times
-100$) should be kept in mind when evaluating the results, particularly
-with respect to the time measures obtained.
+accuracy, distortion of the pupil's appearance, and time consumption.
+With respect to the requirement that {\octopus} give an error signal
+whenever the pupil cannot be found in a given image, refer to
+Section~\ref{algo:intro:problem}.  The relatively low resolution of
+the test images ($\sim 100\times 100$) should be kept in mind when
+evaluating the results, particularly with respect to the time measures
+obtained.
 
 \subsubsection{Accuracy}
 
@@ -379,13 +382,14 @@ univocally land at a position estimate for a given image.
 
 An accuracy aspect which has not been touched upon thus far is the
 fact that the shape of the pupil equals a circle only when the subject
-looks straight into the camera.  If it looks to the side, the pupil
-forms an ellipse whose major axis is vertical; if it looks up or down,
-the major axis of the pupil ellipse is horizontal; if it looks up or
-down as well as to the side, the major axis of the pupil ellipse has
-either a positive or negative angle relative to the horizontal plane.
-The relations used to compute an intermediate position estimate, given
-in Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}), apply only to the
+looks straight into the camera (cf.\ Section~\ref{back:eye:visual}).
+If it looks to the side, the pupil forms an ellipse whose major axis
+is vertical; if it looks up or down, the major axis of the pupil
+ellipse is horizontal; if it looks up or down as well as to the side,
+the major axis of the pupil ellipse has either a positive or negative
+angle with respect to the horizontal plane.  The relations used to
+compute an intermediate position estimate, given in
+Eqs.~(\ref{eq:centre:x}) and~(\ref{eq:centre:y}), apply only to the
 case when the pupil is circular.  However, since the vital requirement
 the complete eye-tracking system has to satisfy is that it be able to
 determine whether or not the subject is drifting (cf.\ 

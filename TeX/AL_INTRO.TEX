@@ -3,7 +3,7 @@
 %%% Author          : blehr
 %%% Created On      : Thu Mar 18 04:05:10 1993
 %%% Last Modified By: blehr
-%%% Last Modified On: Tue Apr  6 11:12:52 1993
+%%% Last Modified On: Thu Apr  8 11:30:32 1993
 %%% RCS revision    : $Revision$ $Locker$
 %%% Status          : In writing....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,9 +56,10 @@ before continuing the presentation of the algorithm.  These are:
   of the image has been used as reference point, having coordinates
   $(0,0)$.
 \item[Error signal:] ``{\em\ldots an error signal is to be
-    returned\ldots\/}'' The procedure to determine the position of the
-  pupil has been implemented as a boolean function, returning {\em
-    false\/} if the pupil cannot be found in an image.
+    returned\ldots\/}'' The procedure implementing Step 1 of the basic
+  algorithm formulation given in Section~\ref{eval:approach:algo} has
+  been implemented as a boolean function, returning {\em false\/} if
+  a pupil point cannot be found in an image.
 \item[Resolution:] ``{\em Preferably, the image should have a
     resolution of 512$\times$512 pixels with 256 gray levels, and the
     eye should fill the entire image.\/}'' The frame-grabber that was
