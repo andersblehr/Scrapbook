@@ -3,8 +3,6 @@ unit graph3D;
 
 INTERFACE
 
-uses graph,math;
-
 type  point3D                   = record
 	x                         : real;
 	y                         : real;
@@ -16,9 +14,9 @@ function gr3D_x(x,y,z : real) : word;
 
 function gr3D_y(x,y,z : real) : word;
 
-procedure gr3D_drawCoordSystem(theRadius,theFrontAngle,theTopAngle : real);
+procedure gr3D_initCoordSystem(xMin,xMax,yMin,yMax,zScaling,a_H,a_V : real);
 
-procedure gr3D_initCoordSystem(theRadius,theFrontAngle,theTopAngle : real);
+procedure gr3D_drawCoordSystem(xMin,xMax,yMin,yMax,zMin,zMax,zScaling,a_H,a_V : real);
 
 procedure gr3D_plot(x,y,z : real; colour : Byte);
 
@@ -26,92 +24,69 @@ procedure gr3D_line(x1,y1,z1,x2,y2,z2 : real);
 
 procedure gr3D_pointLine(point1,point2 : point3D);
 
-procedure gr3D_getViewersPosition(var viewersPosition : point3D);
-
 
 IMPLEMENTATION
 
-uses auxil;
+uses graph,auxil,math;
 
 
-const coordSystemInitialized    : boolean = false;
+const gr3D_initialized          : boolean = false;
 
 var   origo                     : pointType;
-      screenUnit                : real;
-      frontAngle                : real;
-      topAngle                  : real;
-      radius                    : real;
+      horizontalAngle           : real;
+      verticalAngle             : real;
+      xOffset                   : real;
+      yOffset                   : real;
+      xyUnit                    : real;
+      zUnit                     : real;
 
 
 function gr3D_x(x,y,z : real) : word;
 
 begin
-  gr3D_x:=origo.x+trunc(screenUnit*(y*cos(frontAngle)-x*sin(frontAngle)))
+  gr3D_x:=origo.x+trunc(xyUnit*((y-yOffset)*cos(horizontalAngle)+
+				(x-yOffset)*sin(horizontalAngle)))
 end;
 
 
 function gr3D_y(x,y,z : real) : word;
 
 begin
-  gr3D_y:=origo.y+trunc(screenUnit*((x*cos(frontAngle)+y*sin(frontAngle))*cos(topAngle)-z*sin(topAngle)))
+  gr3D_y:=origo.y+trunc(xyUnit*(((x-xOffset)*cos(horizontalAngle)-
+	  (y-yOffset)*sin(horizontalAngle))*sin(-verticalAngle))-
+	  (zUnit*z*cos(verticalAngle)))
 end;
 
 
-procedure gr3D_drawCoordSystem(theRadius,theFrontAngle,theTopAngle : real);
-
-var   xStartX                   : word;
-      xStartY                   : word;
-      xEndX                     : word;
-      xEndY                     : word;
-      yStartX                   : word;
-      yStartY                   : word;
-      yEndX                     : word;
-      yEndY                     : word;
-      zStartX                   : word;
-      zStartY                   : word;
-      zEndX                     : word;
-      zEndY                     : word;
+procedure gr3D_initCoordSystem(xMin,xMax,yMin,yMax,zScaling,a_H,a_V : real);
 
 begin
-  gr3D_initCoordSystem(theRadius,theFrontAngle,theTopAngle);
-  with origo do
-    begin
-      xStartX:=x-trunc(radius*screenUnit*sin(frontAngle));
-      xStartY:=y+trunc(radius*screenUnit*cos(frontAngle)*cos(topAngle));
-      xEndX:=x+trunc(radius*screenUnit*sin(frontAngle));
-      xEndY:=y-trunc(radius*screenUnit*cos(frontAngle)*cos(topAngle));
-      yStartX:=x-trunc(radius*screenUnit*cos(frontAngle));
-      yStartY:=y-trunc(radius*screenUnit*sin(frontAngle)*cos(topAngle));
-      yEndX:=x+trunc(radius*screenUnit*cos(frontAngle));
-      yEndY:=y+trunc(radius*screenUnit*sin(frontAngle)*cos(topAngle));
-      zStartX:=x;
-      zStartY:=y+trunc(radius*screenUnit*sin(topAngle));
-      zEndX:=x;
-      zEndY:=y-trunc(radius*screenUnit*sin(topAngle))
-    end;
-  line(yStartX,yStartY,yEndX,yEndY);
-  line(zStartX,zStartY,zEndX,zEndY);
-  line(xStartX,xStartY,xEndX,xEndY)
-end;
-
-
-procedure gr3D_initCoordSystem(theRadius,theFrontAngle,theTopAngle : real);
-
-begin
-  coordSystemInitialized:=true;
-  radius:=theRadius;
-  screenUnit:=((getMaxY div 2)-10)/radius;
+  gr3D_initialized:=true;
   origo.x:=getMaxX div 2;
-  origo.y:=getMaxY div 2;
-  frontAngle:=rad(theFrontAngle);
-  topAngle:=rad(theTopAngle)
+  origo.y:=2*(getMaxY div 3);
+  xOffset:=xMin+(xMax-xMin)/2;
+  yOffset:=yMin+(yMax-yMin)/2;
+  xyUnit:=(0.8*getMaxY)/realMax(xMax-xMin,yMax-yMin);
+  zUnit:=zScaling*xyUnit;
+  horizontalAngle:=rad(a_H);
+  verticalAngle:=rad(a_V)
+end;
+
+
+procedure gr3D_drawCoordSystem(xMin,xMax,yMin,yMax,zMin,zMax,zScaling,a_H,a_V : real);
+
+begin
+  gr3D_initCoordSystem(xMin,xMax,yMin,yMax,zScaling,a_H,a_V);
+  gr3D_line(xMin,0,0,xMax,0,0);
+  gr3D_line(0,yMin,0,0,yMax,0);
+  gr3D_line(0,0,zMin,0,0,zMax)
 end;
 
 
 procedure gr3D_plot(x,y,z : real; colour : Byte);
 
 begin
-  if coordSystemInitialized then
+  if gr3D_initialized then
     putPixel(gr3D_x(x,y,z),gr3D_y(x,y,z),colour)
   else
     fatalError('graph3D: Coordinate system not initialized!')
@@ -121,7 +96,7 @@ end;
 procedure gr3D_line(x1,y1,z1,x2,y2,z2 : real);
 
 begin
-  if coordSystemInitialized then
+  if gr3D_initialized then
     line(gr3D_x(x1,y1,z1),gr3D_y(x1,y1,z1),gr3D_x(x2,y2,z2),gr3D_y(x2,y2,z2))
   else
     fatalError('graph3D: Coordinate system not initialized!')
@@ -131,25 +106,13 @@ end;
 procedure gr3D_pointLine(point1,point2 : point3D);
 
 begin
-  if coordSystemInitialized then
+  if gr3D_initialized then
     line(gr3D_x(point1.x,point1.y,point1.z),
 	 gr3D_y(point1.x,point1.y,point1.z),
 	 gr3D_x(point2.x,point2.y,point2.z),
 	 gr3D_y(point2.x,point2.y,point2.z))
   else
     fatalError('graph3D: Coordinate system not initialized!')
-end;
-
-
-procedure gr3D_getViewersPosition(var viewersPosition : point3D);
-
-begin
-  with viewersPosition do
-    begin
-      x:=2*radius*sin(topAngle)*cos(frontAngle);
-      y:=2*radius*sin(topAngle)*sin(frontAngle);
-      z:=2*radius*cos(topAngle)
-    end
 end;
 
 
