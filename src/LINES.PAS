@@ -2,7 +2,7 @@ program lines;
 
 uses crt,graph,auxil,search,SVGA;
 
-const displayCenterPoint        : boolean = false;
+const displayCenterPoint        : boolean = false;  { -c option }
 
 var   pupilPoint                : pointType;
       pointToDisplay            : pointType;
@@ -22,9 +22,9 @@ var   fileName                  : string;
         thisParameter             : string;
 
 
-    function getParameterValue(parameterString : string) : byte;
+    function getParameterValue(parameterString : string) : real;
 
-    var   value                     : byte;
+    var   value                     : real;
           result                    : integer;
 
     begin
@@ -43,10 +43,12 @@ var   fileName                  : string;
         if (thisParameter[1]='-') then
           case thisParameter[2] of
             'c' : displayCenterPoint:=true;
-            'l' : lakeLevel:=getParameterValue(thisParameter);
-            'r' : filterRadiusFraction:=getParameterValue(thisParameter);
-            's' : sobelThreshold:=getParameterValue(thisParameter);
-            'q' : nonSearchRadius:=getParameterValue(thisParameter)
+            'l' : lakeLevel:=trunc(getParameterValue(thisParameter));
+            'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
+            's' : sobelThreshold:=trunc(getParameterValue(thisParameter));
+            'q' : nonSearchRadius:=trunc(getParameterValue(thisParameter));
+            'w' : wetFraction:=getParameterValue(thisParameter);
+            'a' : nAdjustments:=trunc(getParameterValue(thisParameter))
           else
             fatalError('Illegal option: -'+thisParameter[2])
           end
@@ -63,7 +65,7 @@ var   fileName                  : string;
     blockRead(inputFile,buffer,4);
     xSize:=(word(buffer[1]) shl 8)+buffer[2];
     ySize:=(word(buffer[3]) shl 8)+buffer[4];
-    initGlobals(xSize,ySize)
+    initGlobals
   end;
 
 
@@ -95,7 +97,7 @@ begin
         fatalError('Image file not found!')
     end
   else
-    fatalError('Usage: lines [-c][-r<radius>][-t<threshold>][-s<threshold>] file[.pic]')
+    fatalError('Usage: lines [-acloqsw] file[.pic]')
 end;
 
 
@@ -324,13 +326,13 @@ var   ascendingLine             : sobelLine;
                              threshold               : word);
 
       begin
-        line(start+round(unit1stAxis*(xPos-filterRadius)),yPos,
-             start+round(unit1stAxis*(xPos-filterRadius)),
+        line(start+round(unit1stAxis*(xPos-octopusRadius)),yPos,
+             start+round(unit1stAxis*(xPos-octopusRadius)),
              yPos-lengthOf2ndAxis);
         line(start+round(unit1stAxis*xPos),yPos,
              start+round(unit1stAxis*xPos),yPos-lengthOf2ndAxis);
-        line(start+round(unit1stAxis*(xPos+filterRadius)),yPos,
-             start+round(unit1stAxis*(xPos+filterRadius)),
+        line(start+round(unit1stAxis*(xPos+octopusRadius)),yPos,
+             start+round(unit1stAxis*(xPos+octopusRadius)),
              yPos-lengthOf2ndAxis);
         line(start,yPos-round(unit2ndAxis*threshold),
              start+lengthOf1stAxis,yPos-round(unit2ndAxis*threshold))
@@ -358,7 +360,7 @@ var   ascendingLine             : sobelLine;
         drawCharacteristics(x,y);
         markPositionInGraphs(x,y);
         setColor(63);
-        circle(x,y,filterRadius)
+        circle(x,y,octopusRadius)
       end
   end;
 
