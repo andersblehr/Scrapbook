@@ -16,8 +16,11 @@ var   xSize                     : word;
       endSeconds                : word;
       end100thSeconds           : word;
 
-      aPupilPoint               : pointPtr;
+      pupilPoint                : pointPtr;
       pupilPosition             : pointPtr;
+
+      pupilSearchTime           : real;
+      edgeSearchTime            : real;
 
 
 procedure init;
@@ -73,6 +76,8 @@ var   fileName                  : string;
   procedure initVariables;
 
   begin
+    new(pupilPoint);
+    new(pupilPosition);
     assign(inputFile,fileName);
     reset(inputFile,1);
     blockRead(inputFile,buffer,4);
@@ -90,7 +95,7 @@ begin
       getParameters(paramCount);
       if fileExists(fileName) then
 	begin
-	  initSVGAGraphics;
+	  SVGA_initGraphics(mode800x600);
 	  SVGA_setBlackAndWhitePalette;
 	  initVariables;
 	  getMem(image,4*ySize);
@@ -104,7 +109,10 @@ begin
 		  putPixel(startX+j-1,startY+i-1,buffer[j])
 		end
 	    end;
-	  close(inputFile)
+	  close(inputFile);
+	  rectangle(startX+searchAreaLeft,startY+searchAreaTop,
+		    startX+searchAreaLeft+xSizeSearchArea,
+		    startY+searchAreaTop+ySizeSearchArea)
 	end
       else
 	fatalError('Image file not found: '+picturePath(fileName))
@@ -116,32 +124,7 @@ end;
 
 procedure findPupilPosition;
 
-var   i,j                       : word;
-
-begin
-  getTime(startHours,startMinutes,startSeconds,start100thSeconds);
-  for i:=1 to numberOfIterations do
-    begin
-      aPupilPoint:=findPupilPoint;
-      if (aPupilPoint<>nil) then
-	begin
-	  pupilPosition:=findPosition(aPupilPoint);
-	  dispose(aPupilPoint)
-	end
-      else
-	begin
-	  closeGraph;
-	  fatalError('No pupil was found!')
-	end;
-      if (i<numberOfIterations) then
-	dispose(pupilPosition)
-    end;
-  getTime(endHours,endMinutes,endSeconds,end100thSeconds);
-  markPosition(pupilPosition^.x,pupilPosition^.y,asStar)
-end;
-
-
-procedure writeData;
+var   i                         : word;
 
 
   function sec100ths : real;
@@ -155,12 +138,39 @@ procedure writeData;
 
 
 begin
+  if findPupilPoint(pupilPoint) then
+    begin
+      getTime(startHours,startMinutes,startSeconds,start100thSeconds);
+      for i:=1 to numberOfIterations do
+	findPupilPoint(pupilPoint);
+      getTime(endHours,endMinutes,endSeconds,end100thSeconds);
+      pupilSearchTime:=sec100ths;
+      getTime(startHours,startMinutes,startSeconds,start100thSeconds);
+      for i:=1 to numberOfIterations do
+	findPosition(pupilPoint,pupilPosition);
+      getTime(endHours,endMinutes,endSeconds,end100thSeconds);
+      edgeSearchTime:=sec100ths
+    end
+  else
+    fatalError('No pupil was found!');
+  markPosition(pupilPosition^.x,pupilPosition^.y,asStar)
+end;
+
+
+procedure writeData;
+
+begin
   setTextStyle(defaultFont,horizDir,1);
   setTextJustify(leftText,centerText);
   setColor(60);
-  outTextXY(startX,startY+ySize+30,'Position  : ('+
+  outTextXY(startX,startY+ySize+30,'Position                 : ('+
 	    intString(pupilPosition^.x)+','+intString(pupilPosition^.y)+')');
-  outTextXY(startX,startY+ySize+40,'Time (ms) : '+realString(sec100ths))
+  outTextXY(startX,startY+ySize+40,'Search time (ms)         : '+
+	    realString(pupilSearchTime));
+  outTextXY(startX,startY+ySize+50,'Edge detection time (ms) : '+
+	    realString(edgeSearchTime));
+  outTextXY(startX,startY+ySize+60,'Total time (ms)          : '+
+	    realString(pupilSearchTime+edgeSearchTime))
 end;
 
 
@@ -171,6 +181,8 @@ var   i                         : word;
 begin
   readKey;
   closeGraph;
+  dispose(pupilPosition);
+  dispose(pupilPoint);
   for i:=1 to ySize do
     freeMem(image^[i],xSize);
   freeMem(image,4*ySize)
