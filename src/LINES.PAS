@@ -1,6 +1,6 @@
 program lines;
 
-uses crt,graph,paths,auxil,search,SVGA;
+uses crt,graph,auxil,search,SVGA;
 
 const displayCenterPoint        : boolean = false;
 
@@ -80,8 +80,8 @@ begin
       getParameters(paramCount);
       if fileExists(fileName) then
         begin
-          initSVGAGraphics(mode1024x768);
-          setBlackAndWhitePalette;
+          SVGA_initGraphics(mode1024x768);
+          SVGA_setBlackAndWhitePalette;
           initVariables;
           getMem(image,4*ySize);
           for i:=1 to ySize do
@@ -295,17 +295,17 @@ var   ascendingLine             : sobelLine;
       for i:=-(ascendingLineLeftSize-2) to ascendingLineRightSize do
         begin
           line(leftStart+round(ascendingUnit*(ascendingLineLeftSize+i-2)),
-               pixelLinesY-round(unitPixelAxis*image^[y+i-1]^[x+i-1]),
+               pixelLinesY-round(unitPixelAxis*map[image^[y+i-1]^[x+i-1]]),
                leftStart+round(ascendingUnit*(ascendingLineLeftSize+i-1)),
-               pixelLinesY-round(unitPixelAxis*image^[y+i]^[x+i]));
+               pixelLinesY-round(unitPixelAxis*map[image^[y+i]^[x+i]]));
           line(x+i-1,y+i-1,x+i,y+i)
         end;
       for i:=-(descendingLineLeftSize-2) to descendingLineRightSize do
         begin
           line(rightStart+round(descendingUnit*(descendingLineLeftSize+i-2)),
-               pixelLinesY-round(unitPixelAxis*image^[y-(i-1)]^[x+i-1]),
+               pixelLinesY-round(unitPixelAxis*map[image^[y-(i-1)]^[x+i-1]]),
                rightStart+round(descendingUnit*(descendingLineLeftSize+i-1)),
-               pixelLinesY-round(unitPixelAxis*image^[y-i]^[x+i]));
+               pixelLinesY-round(unitPixelAxis*map[image^[y-i]^[x+i]]));
           line(x+i-1,y-(i-1),x+i,y-i)
         end;
       for i:=2 to ascendingLineSize do
