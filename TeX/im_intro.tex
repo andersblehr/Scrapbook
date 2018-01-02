@@ -1,0 +1,113 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% im_intro.tex --- 
+%%% Author          : blehr
+%%% Created On      : Thu Mar 11 05:37:29 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr 11 12:42:53 1993
+%%% RCS revision    : $Revision: 1.14 $ $Locker:  $
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+\label{image:intro}
+
+\subsection{Intent}
+\label{image:intro:intent}
+
+The intent of this chapter is to give a relatively broad presentation
+of different techniques that may be applied to solve the problem
+defined by the algorithmic problem definition in
+Section~\ref{intro:problem}.  The presentation is intended to indicate
+some possible approaches and thus to form a theoretical foundation on
+which to base the development of a solution as complete and
+satisfactory as possible.
+
+Because of the requirement of speed, the techniques presented have
+been selected on the basis of being relatively cheap computationally.
+Most of them are also well-established, in that they are thoroughly
+described in the literature.  Many reliable, but, due to relatively
+complex mathematics, computational expensive methods, such as the
+Canny/Deriche approach to edge
+detection~(\cite{canny},~\cite{deriche}), are not discussed.
+
+In order to maintain an overall view, the presentation is kept on a
+relatively fundamental level.  Still, it has been aimed at making it
+thorough enough to suffice as a basis on which to draw a conclusion
+as to a suitable approach to the actual problem.
+
+\subsection{Categories in Image Processing}
+\label{image:intro:categories}
+
+The general field of automated image processing may be divided into
+four main categories.  These categories are~(\cite{digim}):
+
+\begin{description}
+\item[Image digitization:] In order to be in a form suitable for
+  processing in a computer, an image has to be discretized (digitized)
+  both spatially and in amplitude.  {\em Image digitization\/} is the
+  process of converting continuous (real) images into digitized form.
+\item[Image enhancement and restoration:] Often an image is unsuited
+  for machine and/or human perception, due to its being blurred,
+  noisy, or in some other way degraded.  The field of improving
+  degraded images for machine or human perception is generally
+  referred to as {\em image enhancement and restoration\/}.
+\item[Image encoding:] Techniques for representing an image or the
+  information contained in the image with fewer bits than required
+  for the ``raw'' digitized image are categorized as {\em image
+    encoding\/} techniques.
+\item[Image segmentation, representation, and description:] An image
+  is normally composed of contiguous regions, each region being
+  characterized by a set of properties that the pixels belonging to
+  the region share.  These regions correspond to the objects that make
+  up the image.  Often, one is interested in segmenting out one or
+  more of the objects that are present in an image.  This can be done
+  by applying techniques classified as {\em image segmentation\/}
+  techniques.  In addition, one may be interested in representing the
+  constituent parts of an image in forms suitable for further computer
+  processing, and to describe them in terms of parts and properties.
+  This is referred to as {\em image representation\/} and {\em
+    description\/}, respectively.
+\end{description}
+
+The field of {\em digital\/} image processing is concerned with the
+latter three of these categories, in that already digitized images are
+required as input to a computer.  In this chapter, the focus is on the
+fields of {\em noise reduction\/}, and {\em image segmentation\/}, as
+described in the next section.
+
+\subsection{Structure of the Chapter}
+\label{image:intro:structure}
+
+In this chapter, both spatial and frequency domain techniques are
+presented.  A theoretical introduction to the spatial domain and terms
+pertaining to it is given in Section~\ref{image:spatial}.  The
+theoretical foundations of frequency domain techniques, the Fourier
+transform and the convolution theorem, are given a relatively
+extensive presentation in Section~\ref{image:frequency}, along with a
+basic description of their use in image processing.
+
+A usual problem when processing digital images, is that they often
+have been subjected to some sort of noise.  In
+Section~\ref{image:noise}, some approaches to the problem of reducing
+the amount of noise present in a given image are presented.  
+
+Since the problem at hand is one of recognizing and locating a given
+object in an image (the pupil), the problem of decomposing an image
+into constituent regions representing different objects is elaborated
+upon in Section~\ref{image:segment}.  
+
+A branch of the field of image segmentation is the field that is
+concerned with locating discontinuities in an image, such as lines and
+edges.  Since an obvious approach to locating the pupil in an image is
+to try to locate the transition in brightness between the pupil and
+the iris, the field of edge detection is given separate treatment in
+Section~\ref{image:edge}.
+
+\subsubsection{References}
+
+Most of the material in this chapter is from~\cite{digim}.  Another
+main source is~\cite{digpic}.  The material in the section on template
+matching (Section~\ref{image:segment:template}) is mainly
+from~\cite{digpat} and~\cite{template}, the former having supplied
+additional material to other sections of the chapter as well.  A last
+source for additional material has been~\cite{digbild}.

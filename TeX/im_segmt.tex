@@ -1,0 +1,228 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% im_segmt.tex --- 
+%%% Author          : blehr
+%%% Created On      : Thu Mar 11 05:40:23 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr 11 13:23:51 1993
+%%% RCS revision    : $Revision: 1.10 $ $Locker:  $
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Image Segmentation}
+\label{image:segment}
+
+Image segmentation is the process of dividing an image into its
+constituent parts or objects.  One may be interested just in dividing
+the image into contiguous regions, without paying attention to what
+sort of objects the individual regions represent, or one may want to
+be able to identify and classify one or several parts of the image as
+belonging to specific classes of objects.  This section is only
+concerned with the problem of recognizing parts of images as belonging
+to continuous regions with certain characteristics.  A branch of image
+segmentation which is not touched upon here is {\em discontinuity
+  detection\/}, which aims at detecting points, lines and edges in an
+image.  However, in Section~\ref{image:edge}, the problem of {\em edge
+  detection\/} is given separate treatment.
+
+\subsection{Thresholding}
+\label{image:segment:threshold}
+
+The foundation of the segmentation technique known as {\em
+  thresholding\/} is the presumption that objects in an image can be 
+segmented out on the basis of their gray levels.  For example, if the 
+image consists of a bright object on a dark background, the foreground 
+object may be segmented out by classifying all pixels in the image 
+whose gray levels are above a certain {\em threshold value\/} $T$ as 
+belonging to it, and all other pixels (i.e., those whose gray levels 
+are below the threshold) as belonging to the background.  The 
+threshold is said to divide the gray scale into two {\em bands\/}.
+
+Generally, thresholding may be viewed as an image operation that
+involves tests against a {\em thresholding function\/} $T$ of the form
+\begin{equation}
+\label{eq:threshold:operator}
+  T=T[x,y,p(x,y),f(x,y)]\mbox{,}
+\end{equation}
+where $f(x,y)$ is the gray level at point $(x,y)$, and $p(x,y)$
+denotes some local property of this point.  A thresholded image
+$g(x,y)$ is then created by defining (compare
+Eq.~(\ref{eq:threshold:1}), p.~\pageref{eq:threshold:1})
+\begin{equation}
+\label{eq:threshold:2}
+  g(x,y)=\left\{
+    \begin{array}{ll}
+      1 & \mbox{if $f(x,y)>T$} \\
+      0 & \mbox{if $f(x,y)\leq T$.}
+    \end{array}\right.
+\end{equation}
+
+When $T$ depends only on $f(x,y)$, the threshold is called {\em
+  global\/}; if it depends on both $f(x,y)$ and $p(x,y)$, it is called
+{\em local\/}; and if it, in addition, depends on the spatial
+coordinates $x$ and $y$, it is called {\em dynamic\/}.  In this
+section, only global thresholding is considered.  That is,
+Eq.~(\ref{eq:threshold:operator}) is in the form
+\begin{equation}
+  T=T[f(x,y)]\mbox{.}
+\end{equation}
+
+If a given image $f$ consists of objects that are, say, darker than
+their background, global thresholding is a natural approach to
+extracting them.  In this case, the gray-level histogram of the image
+is similar to the one given in Fig.~\ref{fig:threshold:histogram}.  In
+the figure, the object and background pixels are grouped into two
+dominant modes, one at the dark end of the spectrum (the object) and
+one on the bright end of the spectrum (the background).
+in the figure, the object of interest is easily separated from its
+background.
+
+\insertpdfwidth{treshist}{\label{fig:threshold:histogram}Gray-level
+  histogram of an image containing a dark object on a bright
+  background.}{0.5} By choosing the threshold value $T$ as indicated
+
+By applying Eq.~(\ref{eq:threshold:2}) on the image, the resulting
+image will be a binary one, the object being black and its background
+white (assuming that 0 in the equation is chosen to correspond to
+black and 1 to correspond to white).
+
+The problem with thresholding is to choose a value for $T$ which
+separates the object of interest from other parts of the image well
+enough; only in ideal cases are the histogram characteristics of the
+image similar to those of Fig.~\ref{fig:threshold:histogram}.
+Normally, the gray levels of the image assemble in lumps whose dual
+characteristics are hardly discernible.  Consequently, care has to be
+taken when choosing the threshold level $T$.
+
+\subsection{Region Growing}
+\label{image:segment:region}
+
+{\em Region growing\/} is an algorithm which groups pixels or
+subregions into larger regions according to criteria of {\em
+  similarity\/} and {\em connectivity\/}.  The criterion of similarity
+says that only pixels or subregions having a specific set of
+properties can be added to the growing region, and the criterion of
+connectivity says that only pixels or subregions that constitute
+immediate neighbours of the growing region can be added to it.
+
+The simplest approach to region growing is called {\em pixel
+  aggregation\/}, where the starting point is a so-called {\em seed
+  point\/} from which a region is grown by appending to the seed point
+neighbouring pixels having similar properties to it.  It is of course
+also possible to apply more than one seed point, each at a different
+location in the image, thus having several regions grow
+simultaneously.  This is referred to as {\em multiple\/} region
+growing, as opposed to {\em single\/} region growing, applying only
+one seed point.  In the following, only single region growing is
+discussed.  The principles presented are, however, easily extendible
+to multiple region growing.
+
+Two immediate problems with region growing are the selection of a seed
+point which properly represents the region of interest and the
+selection of a suitable set of criteria for including new points
+during the growing process.
+
+If one has {\em a priori\/} knowledge of the properties of the region
+of interest, one approach in selecting the seed point is to apply a
+search strategy on the image, searching for the first pixel which
+satisfies these properties, and then using this pixel as seed point.
+With this approach there is of course the danger that the pixel found
+does not belong to the region of interest, since single pixels outside
+the region of interest may share properties with it.  Thus it is
+important to equip the search strategy with a very tight stop
+criterion in order to minimize the chance of erroneously choosing a
+non-region seed point (cf.\ Section~\ref{eval:eval:segment}).
+
+A usual similarity criterion for the inclusion of new points during
+the growing process is that the gray level of a pixel to be included
+not differ from that of the seed point by more than a specified
+amount.  The obvious stop criterion for the region growing procedure
+is to stop when no more pixels satisfy the criteria for inclusion.
+
+The advantage of region growing is its degree of automation.  It can
+be compared to filling an unevenly shaped pool with water: Once you
+start pouring water into it, you can be certain that the water will
+protrude into every far off corner of the pool, thus defining a
+continuous surface entirely covering the ``region of interest'', the
+floor of the pool.  The problem is that you have to know where to
+start pouring: The seed point.
+
+\subsection{Template Matching}
+\label{image:segment:template}
+
+So far, the focus has been on methods for segmenting out objects in an
+image based on a set of characteristics that differentiates the
+objects from their background.  These characteristics, however,
+include neither geometrical (e.g., shape) nor textural properties
+(e.g., dark and bright regions) of the objects to be segmented out.
+Thus, if one wants to be able to recognize an object in an image
+having an arbitrary pattern of gray levels, other techniques have to
+be found.
+
+{\em Template matching\/} is perhaps one of the most straightforward
+methods for locating the presence of an object in an image based on
+specific geometrical and textural properties.  The idea is that an
+object with given properties can be detected in an image by matching
+the image at different locations against a {\em template\/} having the
+sought properties, as illustrated in Fig.~\ref{fig:template}.  This
+must be done at every pixel location in the image, and, if the sought
+object is allowed to rotate, at every possible orientation.
+
+\insertpdf{template}{\label{fig:template}An image (a), and a template
+  designed to locate the bull's head (b).
+  (From~\protect\cite{template})}
+
+Matching of this kind would be a trivial task if an exact copy of the
+template could be expected to be present in the image.  A match would
+then be detected when each pixel in the template has the same gray
+level as the one it is matched against.  In practice, however, the
+image is normally noisy, and thus the sought object has to be found by
+maximizing some measure of the degree of match between the template
+and the image.  Some standard measures of the degree of match between
+an image $f(x,y)$ and a template $T$ whose gray level at $(x,y)$ is
+$t(x,y)$ are\footnote{For the sake of generality, integrals are used;
+  in the digital case these are replaced by summations.}:
+\begin{equation}
+\label{eq:max}
+  \max_{(x,y)\in T}|f(x,y)-t(x,y)|
+\end{equation}
+\begin{equation}
+\label{eq:savd}
+  {\int\int}_{T}|f(x,y)-t(x,y)|dxdy
+\end{equation}
+\begin{equation}
+\label{eq:correlation}
+  {\int\int}_{T}[f(x,y)-t(x,y)]^{2}dxdy\mbox{.}
+\end{equation}
+These measures are all zero for a perfect match and have high values
+for poor matches.  They differ, however, in the type of errors to
+which they are sensitive (to see how they differ, see~\cite{digpat}).
+
+A popular match measure which can be derived from
+Eq.~(\ref{eq:correlation}) is the {\em correlation coefficient\/}
+$\rho$, defined by
+\begin{equation}
+\label{eq:correlation:coefficient}
+  \rho(x,y)=\frac{{\int\int}_{T}f(x,y)t(x,y)dxdy}
+  {\sqrt{{\int\int}_{T}f^{2}(x,y)dxdy{\int\int}_{T}t^{2}(x,y)dxdy}}\mbox{.}
+\end{equation}
+It can be shown that $0\leq \rho(x,y)\leq 1$ for all $(x,y)$ in the
+image, with value $1$ being achieved if and only if $f(x,y)\equiv
+ct(x,y)$ for some positive constant $c$.  Also, $\rho$ is unaffected
+if the gray scale of $f$ is multiplied by a constant, unlike the
+measures in Eqs.~(\ref{eq:max}) through~(\ref{eq:correlation}).
+
+As is evident from the above, template matching is rather expensive
+computationally.  Correlation may be carried out more efficiently in
+the frequency domain, but only if the image and the template are of
+the same size, which is seldom the case.  The results obtained also
+vary depending on the similarity measure employed.
+In~\cite{template}, three measures of match are evaluated as to their
+performance in determining eye position.  The measures evaluated are
+the correlation coefficient (Eq.~(\ref{eq:correlation:coefficient})),
+the {\em sum of absolute valued differences\/} (SAVD,
+Eq.~(\ref{eq:savd})), and a relatively new technique called the {\em
+  stochastic sign change criterion\/} (SSC).  In this paper it is
+concluded that, due to ``gross misregistrations'', the correlation
+coefficient $\rho$ is ``inapplicable as a similarity measure''.  For
+the SAVD and SSC measures, the results as to their accuracy are
+satisfactory.

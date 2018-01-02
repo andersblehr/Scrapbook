@@ -1,0 +1,334 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% bk_track.tex --- 
+%%% Author          : blehr
+%%% Created On      : Wed Mar  3 01:08:28 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr 11 12:36:07 1993
+%%% RCS revision    : $Revision: 1.7 $ $Locker:  $
+%%% Status          : In writing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methods for Measuring Eye Movement}
+\label{back:track}
+
+Methods for measuring eye movements fall into four main
+categories~(\cite{monitor}): {\em Magnetic induction methods\/}, {\em
+  photoelectric methods\/}, {\em video techniques\/} and methods
+making use of the {\em optical properties\/} of the eye.
+
+In this section, these categories are described, along with four
+different systems, each falling into one of the categories.
+Section~\ref{back:track:coil} presents the {\em search coil\/} and
+{\em double magnetic induction\/} methods; in
+Section~\ref{back:track:oculometer}, a system making use of
+photoelectric principles is described;
+Section~\ref{back:track:monitor} introduces the video-based {\em eye
+  monitor\/}, and in Section~\ref{back:track:tv} an optical properties
+method employing an infrared TV-camera is described.
+
+All systems described require the head of the subject to be fixed.
+With monkeys, this is less of a problem, since the head can be fixed
+using a crown attached to the skull.  With human subjects, this
+requirement is harder to satisfy completely, but good results have
+been achieved using a bite board combined with a tightly fastened
+crown on the head.
+
+\subsection{Magnetic Induction Methods}
+\label{back:track:coil}
+
+The {\em search coil\/} technique was first proposed by D.\ A.\ 
+Robinson in~\cite{robinson}.  In Robinson's setup, the subject wears a
+short-circuited {\em induction coil\/} on a scleral contact lens, and
+is placed in two perpendicular, rapidly alternating magnetic fields,
+one horizontal and one vertical.  The voltage induced in the coil is
+related to the position of the eye relative to the horizontal and
+vertical fields, and can be measured using phase-sensitive detection
+methods.  To facilitate the registration of the induced voltage, the
+coil is equipped with a set of wires connected to the registering
+equipment, thus making it rather cumbersome for the subject to wear.
+
+A development of Robinson's method, the so-called {\em double magnetic
+  induction method\/}, first proposed by J.\ Allik {\em et al.\/}
+in~\cite{allik} and further developed by J.\ P.\ H.\ Reulen and L.\ 
+Bakker in~\cite{reulen}, requires no physical connection between the
+eye coil and the registering equipment.  The idea is to detect the eye
+position indirectly by determining the strength of the induced
+magnetic field of the coil through a {\em detection coil\/} placed in
+front of the eye.
+
+In~\cite{coil}, L.\ J.\ Bour {\em et al.\/} describe a further
+improvement of the double magnetic induction method.  In their setup,
+the amount of noise present is reduced through the use of a second
+external coil, the {\em compensation coil\/}.  This coil is placed in
+front of the second eye, and is used to cancel out remaining primary
+induction voltages, since it is the secondary, induced voltage that is
+of interest.  This is accomplished through differential amplification
+of the signals from the detection and compensation coils, thus
+sufficiently cancelling out the primary magnetic field.
+
+\subsection{Photoelectric Methods}
+\label{back:track:oculometer}
+
+Photoelectric eye position measuring methods take advantage of the
+fact that an image of the eye, when focused on a position sensitive
+photodiode, induces photocurrents in the diode, which through
+connectors at different points can be measured, and whose values
+depend on the image intensities at points surrounding the connectors
+(i.e., on the position of the pupil within the image).
+
+In~\cite{oculometer}, M.\ Bach {\em et al.\/} describe a system which
+measures gaze direction relative to head coordinates by analyzing the
+centre of gravity (COG) of the first Purkinje image as well as of the
+entire image of the eye viewed in infrared light.  In their setup, the
+eye is illuminated by a number of infrared LEDs.  The LEDs are
+arranged in an annulus around a lens which focuses the infrared image
+of the eye at a magnification of about two on a position sensitive
+photodiode.  The position is then measured via the COG of the image
+falling on the diode.  The diode has 5 connections: 2 at opposing
+edges ($x_{1},x_{2}$), 2 at the remaining edges ($y_{1},y_{2}$), and a
+central one at the backside ($s$).  The $x$- and $y$-coordinates of
+the COG are given by the partition of the photocurrents $I$ between
+the electrodes:
+\[x=\frac{I_{x_{1}}-I_{x_{2}}}{I_{s}}\] 
+\[y=\frac{I_{y_{1}}-I_{y_{2}}}{I_{s}}\mbox{.}\] Although the position
+of the COG depends in a complex way on gaze direction, it turns out
+that the resultant voltage output of the system is a linear function
+of gaze direction.
+
+\subsection{Video-Based Methods}
+\label{back:track:monitor}
+
+Video-based eye tracking systems analyze the video signals from a
+camera directly in order to determine the position of the pupil within
+the image represented by the signals.  Video-based systems are widely
+applicable and easy to use with untrained subjects.
+
+In~\cite{monitor}, G.\ A.\ Myers, K.\ R.\ Sherman and L.\ Stark
+present a system for real-time recording of eye movement, called the
+{\em eye monitor\/}.  This system takes advantage of the ability of
+video-based systems to measure the pupil (e.g., area, radius) as part
+of the basic measurement.
+
+The eye monitor is implemented almost entirely in hardware.  It
+employs an infrared video camera whose pixel clock directly drives a
+number of counters.  Each time the video signal is darker than an
+adjustable threshold value, one of these counters, C1, is incremented,
+and thus at the end of each video half frame, the contents of C1
+correspond to the pupil area in pixels.  This value is divided by two
+by shifting it one place to the right.  It is then loaded into another
+counter, C2, and during the subsequent half frame, C2 is decremented
+each time C1 is incremented, so that its contents equal zero when the
+current video line passes through the equator of the thresholded
+pupil.  The vertical centre of the pupil then corresponds to the
+number of horizontal lines processed.  The horizontal centre of the
+pupil as well as the horizontal and vertical centres of the first
+Purkinje image are found in conceptually similar manners.  The centre
+of the first Purkinje image is needed to make corrections for small
+head movements, as the difference between the pupil centre and that of
+the first Purkinje image is a first-order invariant with respect to
+translational head movements.
+
+Since the edges of the video field tend to be dark, they could be
+mistaken to be parts of the pupil.  To avoid this, a circular {\em
+  tracking window\/} centred on the current estimate of the pupil
+position disables the pupil-detection hardware outside the window.
+The position estimate is updated every half frame, and the area
+(radius) of the window is also updated to correspond to that of the
+pupil.
+
+All in all, the eye monitor can be said to employ an internal model of
+the eye, comprising most of what is known about what the eye looks
+like to a video camera.  The shape of the tracking window (circular)
+corresponds to the shape of the pupil, the location and size of the
+window is continuously updated to conform with the last known location
+and size of the pupil, and the pupil is detected using {\em area
+  detection\/}, emphasizing the low-frequency characteristics of the
+eye's video image, which are less sensitive to noise.
+
+\subsection{Optical Properties Methods}
+\label{back:track:tv}
+
+Although the aforementioned methods and systems all take advantage of
+the optical properties of the eye in determining the centre of the
+pupil, they have been associated with other categories of systems,
+corresponding to the manner in which these properties are detected.
+
+This last category really denotes a collection of techniques which all
+differ from the previous ones in that they perform the analysis in two
+completely separate steps, of which the first is common for all.  The
+first step consists of acquiring and possibly digitizing and storing
+({\em grabbing\/}) a complete image of the eye as it appears visually.
+During the next step, the acquired image is analyzed and the position
+of the pupil is determined using methods which differ from one system
+to another.  By far the most widely used method during the second step
+is {\em image processing\/}.  In Chapter~\ref{image}, some well-known
+image processing techniques are presented.  Here another approach is
+described, reported by S.\ Nagao in~\cite{tv}.
+
+Nagao describes a system for real-time eye-tracking making use of an
+infrared TV-camera.  The eye is illuminated by infrared LEDs, and the
+camera is used to deliver an image of the eye to a high resolution TV
+monitor.  Two narrow windows, one horizontal and one vertical, are set
+on the TV screen, covering the margins of the moving pupil
+(Fig.~\ref{fig:back:track:tv}).  Positions of the left-right and
+upper-lower margins of the pupil within the two windows are determined
+by the brightness contrast between the pupil and the iris by means of
+a slicer device.  Due to the camera delivering only half frames, the
+average left and right margins ($x_{1}$ and $x_{2}$, respectively) of
+the pupil within the horizontal window are measured twice as often as
+the upper and lower margins ($y_{1}$ and $y_{2}$, respectively) within
+the vertical window.  The centre position of the pupil within the TV
+screen is given by the relations
+\[x=\frac{1}{2}(x_{1}+x_{2})\] \[y=\frac{1}{2}(y_{1}+y_{2})\mbox{.}\]
+
+\insertpdfwidth{tv}{\label{fig:back:track:tv}The principle of the
+  infrared TV-camera method.  {\sf v\/} and {\sf h\/} designate the
+  vertical and horizontal windows, respectively, and $(x_{1},x_{2})$
+  and $(y_{1},y_{2})$ denote the detected margins of the pupil.}{0.45}
+
+\subsection{Summary}
+\label{back:track:summary}
+
+The systems discussed in this section each belong to one of the four
+categories of eye position measuring systems listed in the preamble.
+Their advantages and disadvantages correspond in large to those of the
+categories they represent.  In this section, an overview is given of
+the positive and negative aspects of the different approaches in terms
+of the requirements specified in Section~\ref{intro:motivation}, and a
+conclusion is drawn as to which category seems to suit the present
+needs at best.
+
+\subsubsection{Magnetic Induction Methods}
+
+The two magnetic induction methods described, the search coil
+method~(\cite{robinson}) and double magnetic
+induction~(\cite{allik},~\cite{reulen},~\cite{coil}), display
+approximately equal properties when it comes to accuracy and real-time
+abilities.  L.\ J.\ Bour {\em et al.\/} conclude in~\cite{coil} that
+the double induction method, as developed by them, is {\em ``useful
+  for the accurate measurement of eye movement in both man and
+  monkey''\/}.  The linear range of this system is $\pm 10^{\circ}$,
+and the total measuring range is $\pm 35^{\circ}$.  The calculated
+error of the system is $\pm 0.1^{\circ}$, and the eye position is
+measured with a rate of 500 samples/s, both of which satisfy the
+given requirements.
+
+Of the two systems, the latter, especially as developed by L.\ J.\ 
+Bour {\em et al.\/} in~\cite{coil}, is the least discomforting for the
+subject, in that there are no connecting wires between the search coil
+and the registering equipment.  Still, the subject is required to wear
+a metallic ring on the eye, causing discomfort and stress.  Another
+negative aspect, and the most important one in our case, is that the
+alternating magnetic fields would induce unwanted electric currents in
+the microelectrodes used to perform recordings from the visual cortex
+of the monkeys and in the EEG electrodes.  A last problem with these
+systems is their price, being in the order of DM 50,000, which by far
+exceeds the available means.
+
+\subsubsection{Photoelectric Methods}
+
+The resolution of the infrared oculometer of M.\ Bach {\em et
+  al.\/}~(\cite{oculometer}) is indicated to be $\pm 0.3^{\circ}$ in
+the worst case.  The highest measuring rate of the oculometer is not
+reported explicitly, but rates of 85 Hz are mentioned.  Both
+resolution and measuring rate satisfy the requirements.  The linear
+range of the system is reported to be greater than $\pm 20^{\circ}$,
+which is twice the range of the double magnetic induction method.
+
+An advantage of photoelectric methods as compared to magnetic
+induction methods is that they require no surgery, and thus do not
+interfere directly with the eye.  The main disadvantage of the method
+is that it has to be implemented in hardware, thus leaving little room
+for adaption to specific needs.  Another problem is that most
+photoelectric systems require time-consuming calibrating, which is
+not desirable in our case.
+
+As for the magnetic induction systems, the cost of the systems
+employing photoelectric techniques is prohibitive, being in the order
+of DM 40,000.
+
+\subsubsection{Video-Based Systems}
+
+The resolution of the eye monitor of G.\ A.\ Myers {\em et
+  al.\/}~(\cite{monitor}) is $\pm 0.2^{\circ}$ within a range of $\pm
+20^{\circ}$.  The measuring rate of the system, as of any video system,
+is bound to the video refresh rate of the camera.  Good cameras
+operate with refresh rates in the order of 50--60 half frames per
+second (thus reducing by a factor of 2 the vertical resolution of the
+system as compared to a system employing a camera delivering entire
+frames), the camera employed in~\cite{monitor} delivering
+approximately 60 half frames per second.  Thus both resolution and
+measuring rate satisfy the stated requirements.
+
+The main disadvantages with video-based systems are, as was the case
+for photoelectric methods, for one their price, and secondly that they
+are completely hardware dependent, thus preventing customization to
+specific needs.
+
+\subsubsection{Optical Properties Methods}
+
+The measuring rate of eye tracking systems belonging to this category
+is limited by (1) the refresh rate of the camera used, (2) the
+grabbing-time of an eventual frame grabber, and (3) the computing time
+of the position-analyzing algorithm.
+
+The system described by S.\ Nagao in~\cite{tv} employs a camera
+delivering one half frame every 33.3 ms, needs no frame grabbing, as
+the image is analyzed directly as it appears on the TV screen, and the
+computing time of the position-analyzing device is constant in time.
+The measuring rate of the system is thus limited to 30 Hz, as given by
+the refresh rate of the camera.  The spatial resolution of the system
+depends on the power of the TV-camera employed, and is reported to be
+$\pm 0.025^{\circ}$ in the given setup, which adheres to the specified
+requirements.  The measuring rate of the setup, on the other hand, is
+too slow for our purpose, but constitutes no real problem, in that it
+can be improved by choosing a camera with higher refresh rate.
+
+The primary advantage of this system is the superfluousness of time
+consuming frame grabbing, making the entire time interval between half
+frames available for the position analyzing device.  Thus its only
+time limiting aspect is the refresh rate of the camera, which can be
+chosen more or less freely.  The need to perform the position-analysis
+directly on the TV screen, on the other hand, does not give an
+impression of elegance, and the rigidness of the position-analyzing
+device constitutes another drawback of the system, making it
+unsuitable for our purpose.
+
+\subsubsection{Conclusion}
+
+As is evident from the above paragraphs, none of the presented systems
+fulfil all the stated requirements, their costs being the most
+prohibitive factor.  Magnetic induction methods are unsuited because
+the magnetic fields they employ induce unwanted currents in the
+experimental registering equipment.  Photoelectric methods as well as
+video-based methods were excluded from the set of possible candidates
+because of their strict hardware nature, violating the requirement of
+configurability.  The only category which has not been not completely
+excluded, although the one system belonging to it was, is the category
+of optical properties methods.
+
+The big advantage of image processing based optical properties systems
+as opposed to the approach used by Nagao in his system system is that
+they, being implemented mainly in software, offer easy customization
+and adaption to specific needs.  In fact, the more that is implemented
+in software, the easier the customization of the system.  One
+disadvantage of this kind of system, is that the video frames have to
+be grabbed before they can be analyzed, this constituting a
+competitive factor on valuable processor time.  Having two or more
+processors running in parallel (e.g., Transputers), one of which being
+responsible for grabbing the frames, would pretty much eliminate this
+problem.
+
+There already exists at least one commercially available and good eye
+tracking system based on a video camera delivering video frames to a
+computer performing the position-analysis~(\cite{antrag}).  Its price,
+though, is prohibitive ($\sim$DM 150,000), due to old and therefore
+expensive technology being employed.  The simplicity of this system,
+on the other hand, suggests that it ought to be possible to develop a
+similar system for only a fraction of the costs, employing new and
+cheaper technology.
+
+Based on this, it was decided that an entirely new image processing
+and software based eye tracking system should be developed, adhering
+as closely as possible to the requirements listed in
+Section~\ref{intro:motivation}. 

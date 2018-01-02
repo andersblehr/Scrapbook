@@ -1,0 +1,295 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% al_futur.tex --- 
+%%% Author          : blehr
+%%% Created On      : Sun Mar 28 02:32:42 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Mon Apr 12 13:10:33 1993
+%%% RCS revision    : $Revision: 1.6 $ $Locker:  $
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{{\octopus} and the Complete System}
+\label{algo:future}
+
+In this section the modifications and additions that have to be made
+to {\octopus} in order to have it work in cooperation with the
+complete eye-tracking system are discussed.  Problems pertaining to
+non-algorithmic parts of the system, such as the camera and
+illumination setups mentioned in Section~\ref{intro:problem}, are not
+discussed.
+
+\subsection{Major Line of Operation}
+\label{algo:future:line}
+
+The major line of operation for {\octopus} when integrated in the
+complete eye-tracking system will be as follows: 
+
+\begin{enumerate}
+\item {\octopus} declares itself ready to start processing a new
+  image by sending a ready-signal to the frame-grabber.
+\item It waits until the frame-grabber signals that a new image is
+  available for processing.  At the reception of this signal, the
+  present time is logged in order to be able to relate the returned
+  gaze direction with the registered brain activity.
+\item When a dedicated timer signals that the previous 20 ms period is
+  ended, processing of the new image starts and the timer is reset to
+  signal the end of the next 20 ms period.
+\item As soon as a final position estimate has been arrived at, the
+  position of the corresponding point of focus is sent to a given port
+  address of the host PC.  A signal is given that the position is
+  available at the port.  The relation between position estimate and
+  point of focus in given in Section~\ref{algo:future:output} below.
+\item {\octopus} returns to step 1 and the process is repeated.
+\end{enumerate}
+
+Evidently, the above procedure assumes that {\octopus} always will be
+able to arrive at a final position estimate in less than 20 ms.  With
+the time measures presented in Section~\ref{algo:eval:test}, this
+ought to be a valid assumption.  However, if measures are taken to
+correct for errors due to distortions of the pupil's appearance
+whenever the subject does not look straight into the camera (cf.\ 
+Section~\ref{algo:eval:improve}), the computational overhead
+introduced may invalidate this assumption.
+
+\subsection{Desired Output from {\octopus}}
+\label{algo:future:output}
+
+As is clear from the preceding sections, the value returned by the
+current formulation of {\octopus} is a coordinate pair corresponding
+to the estimated position of the pupil centre relative to the upper
+left corner of the image.  However, this is not the coordinate pair
+that is of primary interest from an experimental point of view.
+Moreover, the actual point of interest is the point on the inducing
+monitor (cf.\ Section~\ref{intro:motivation}) at which the subject
+focuses, hereafter referred to as the {\em point of focus\/}.
+Consequently, the position of the pupil in an image has to be mapped
+to the point on the inducing monitor corresponding to it.
+
+An admittedly memory consuming but time-efficient approach to
+implementing this mapping is to create for the $N\times N$ image a
+$N\times N$ array containing, for each possible (discrete) location of
+the pupil in the image, the corresponding point of focus on the
+inducing monitor.  Accordingly, when {\octopus} has arrived at a final
+position estimate for a given image, the $x$ and $y$ values of this
+estimate are used to index the array, and the coordinate pair thus
+obtained is made available to the outside world.
+
+An array of this type would, assuming an image resolution of
+$512\times 512$, require 1 MB of memory when each coordinate pair
+contained in it requires 32 byte.  This would, however, constitute no
+major problem, considering today's low cost and availability of RAM
+expanders.  The advantage of this approach is that, assuming an
+invariant experimental setup (cf.\ the next section), the values
+contained in it can be computed once and then stored in a file which
+is read anew each time {\octopus} is invoked.  Moreover, the inherit
+non-linearity between the pupil position in the image and the actual
+gaze angle can be compensated for without computational overhead by
+incorporating the needed correction in the values contained in the
+array.
+
+\subsection{Calibrating the Experimental Setup}
+\label{algo:future:calibrate}
+
+Evidently, {\octopus} will need some calibrating before being able to
+run satisfactorily within the framework of a complete eye-tracking
+system.  Here, two calibration issues are addressed; parameter values
+and initializing the mapping array described above.
+
+\subsubsection{Parameter Values}
+
+As is clear from the preceding chapters, the position estimates
+returned by {\octopus} depend heavily on the values assigned to the
+different parameters it employs.  These are:
+
+\begin{itemize}
+\item $T_{l}$: The threshold value for the lake-thresholding technique
+  described in Section~\ref{algo:seek:idea}.  Accordingly, also the
+  surface level of the lakes in an image are given by $T_{l}$.  For
+  the given test images it was found that $T_{l}=18$ ensures
+  ``optimal'' pupil lakes and sufficiently small non-pupil lakes.  For
+  a thorough discussion on the choice of a value for $T_{l}$, see
+  Section~\ref{algo:seek:idea}.
+\item $T_{s}$: The fraction of the total number of sensors possessed
+  by the octopus pixel filter that have to detect wetness for the
+  octopus to report that it is swimming.  With the given test images,
+  $T_{s}=0.8$ was found to be the best choice.  A discussion on how to
+  decide on a value for $T_{s}$ is found in
+  Section~\ref{algo:seek:octopus}.
+\item $T_{e}$: The threshold value used to determine whether or not
+  the responses returned by the Sobel operators in
+  Fig.~\ref{fig:masks} correspond to the pupil edge.  The choice made
+  for the given test images was $T_{e}=0.5$.  See
+  Section~\ref{algo:pos:operators} for a discussion of how to choose
+  an appropriate value for $T_{e}$, and in particular
+  p.~\pageref{pg:TEproblems} for a discussion of problems related to
+  this choice.
+\item $r_{p_{min}}$: The fraction of the image resolution $N$ to which
+  the minimum pupil radius corresponds.  With the given test images,
+  $r_{p_{min}}$ was estimated to be 10\% of the images' size in the
+  $x$ direction\footnote{\label{pg:notsquare}Recall that the given
+    test images are not square, i.e., they are of size $M\times N$,
+    $M\neq N$.}.
+\item $r_{o}$: The fraction of the image resolution $N$ to which the
+  radius of the octopus pixel filter corresponds.  In the current
+  implementation, this fraction was set to $0.8r_{p_{min}}$.  Two
+  general rules for choosing a value for $r_{o}$ are (1)
+  $r_{o}<r_{p_{min}}$ and (2) the better the image quality, the
+  smaller $r_{o}$ can be chosen without running the risk of
+  recognizing a non-pupil point as pupil point.  Evidently, the number
+  of operations for {\octopus} decreases with lower values for $r_{o}$
+  (cf.\ Section~\ref{algo:seek:O}).
+\item $r_{d}$: The radius of the ``dead'' region about the origin of
+  operation inside which the probability of locating the pupil edge is
+  zero.  In the algorithm formulation, it is automatically set to
+  $r_{o}/\sqrt{2}$ along the horizontal and vertical detection lines
+  and to $r_{o}/2$ along the diagonal detection lines, whereas in the
+  current implementation it is set to 0 along all detection lines.
+  See Section~\ref{algo:pos:operation}, p.~\pageref{pg:dead}, for a
+  discussion of problems related to defining a ``dead'' region about
+  the origin of operation.
+\end{itemize}
+
+Clearly, the appropriateness of a given set of values for these
+parameters depends on the image quality and on the illumination
+conditions under which the images are made.  Assuming that these are
+the same from one experiment to another, the same set of values can be
+used each time.  Otherwise, a somewhat cumbersome process of
+determining an apparently optimal set of values has to be carried out.
+How cumbersome this process would be depends on its
+implementation\footnote{In the current implementation, the parameters
+  are assigned values through typed constants which may be overridden
+  by values defined in the initialization file {\tt \_search.rc\/}, 
+  which in turn may be overridden by command line parameters (cf.\ 
+  Section~\ref{implem:details:param}).}.
+
+\subsubsection{Initializing the Mapping Array}
+
+When employing the above array to map the location of the pupil in an
+image to the corresponding point of focus on the inducing monitor, it
+is of vital importance that the coordinate pairs contained in the
+array actually represent the correct points of focus in the given
+setup.  If this is not the case, the estimates supplied by {\octopus}
+are of no value whatsoever.  Accordingly, either care has to be taken
+when calibrating the experimental setup or the values contained in
+the array have to be computed anew for each experiment.
+
+An approach to initially compute the values to be contained in the
+array is to make five illuminated points appear on the inducing
+monitor, and as the subject focuses on each of the points, register
+the position estimates returned by {\octopus}.  Since the coordinates
+on the inducing monitor of the five points are known, the relations
+thus obtained can be used to compute the entire set of values for the
+array.
+
+If it can be made certain that the position of the camera relative to
+the eye of the subject is exactly the same from one experiment to
+another, and that this also applies to the infrared mirror between the
+eye and the camera, the array thus obtained can be stored in a file.
+Next time an experiment is to be made, this file is read and the array
+initialized with the values contained in it.  However, if this
+requirement cannot be satisfied, which is most probable to be the
+case, the values contained in the array have to be computed each time
+an experiment is made, and the above procedure will constitute a part
+of the calibration process of the experimental setup.
+
+\subsection{Cooperation and Correlation}
+\label{algo:future:cooperate}
+
+Evidently, the proper functioning of {\octopus} in a complete
+eye-tracking system depends on its ability to work in cooperation and
+correlation with other integral parts of the system.  In addition, as
+pointed out in the overall problem definition in
+Section~\ref{intro:problem}, an interface between the eye-tracking
+system and the registering equipment of the setup has to be designed,
+in order to enable the simultaneous and correlated registration of
+brain activity and gaze direction.
+
+\subsubsection{Cooperating with the Frame-Grabber}
+
+From the above, it is evident that some sort of communication between
+{\octopus} and the employed frame-grabber has to take place.  The line
+of operation depicted indicates that this has to be a two-way
+communication, having {\octopus} tell the frame-grabber that it is
+ready to start processing a new image as well as having the
+frame-grabber tell {\octopus} that a new image is available for
+processing.  In a strict sense, only the latter of these two is
+necessary, since the former can be implemented by having {\octopus}
+ignore all signals that a new image is available until it is ready to
+start processing.  Still, it is important that the frame-grabber
+signal that a new image is available, since otherwise {\octopus} might
+start reading pixel values from memory locations still being written.
+Also, this signal is used to log the time when the gaze direction was
+recorded, and is thus of vital importance for the ability to relate it
+to the registered brain activity.
+
+Another important issue is the location of the memory to which the
+digitized image is written.  If {\octopus} is to run in the CPU of the
+host PC, it would be preferable to have this be the RAM of the host
+PC.  However, since most commercially available frame-grabbers have
+their own storage devices, this will hardly be possible.  Moreover, it
+would require transferring the entire digitized image to the main
+memory of the host PC during the digitization process.  If this
+transfer were to be carried out over the PC bus, its comparably low
+transfer rate would make little---if any---time available for
+processing the image.  An alternative solution would be to use a
+dedicated parallel bus for this purpose, using DMA to access the main
+memory.  
+
+The easiest and most cost-efficient solution, though, would be the
+straightforward approach; to let the frame-grabber write the digitized
+images to its own storage device(s).  This, however, imposes another
+problem on the setup.  If the digitized image is to be stored on the
+frame-grabber board and the processing is to take place in the CPU of
+the host PC, the pixel values of the image have to be accessed over
+the PC bus.  Since {\octopus} operates by accessing individual pixels
+of the image, this would imply initiating and closing a dedicated
+transfer session for each pixel value needed, thus imposing an
+unproportionally high transfer overhead in addition to the question
+of the transfer rate of the PC bus at all being able to sustain this
+communication.  Again, a possible solution would be to employ a
+dedicated bus for this purpose, but the transfer overhead involved
+suggests that another solution be sought.
+
+The apparently most promising approach to the above problem would be
+to purchase a frame-grabber also possessing an on-board processor
+capable of running an implementation of {\octopus} within the given
+time limits.  Ideally, one processor should be dedicated to digitizing
+frames received from the camera and another processor should perform
+the image analysis.  In addition, the purchased board should possess
+two memory banks to enable {\octopus} to access one image while the
+next is being digitized.  Accordingly, the digitized frames have to be
+written to the two banks in an interleaved manner.  
+
+Presently, a Transputer-based DSP board has kindly been placed at the
+group's disposal, possessing one T800 and one T200.  Attempts are
+being made at having the T200 grab the frames, which at a later stage
+would make it possible to have the T800 perform the image analysis.
+However, the board will remain at our disposal only for a limited time
+period, and its cost ($\sim$ DM 18,000) suggests that another board
+would have to be sought for the final implementation.  Still, the
+experiences obtained with it may prove valuable when a cheaper board
+has been chosen and is about to be programmed.
+
+\subsubsection{Correlation Issues}
+
+As pointed out in Section~\ref{intro:synch}, it is of vital importance
+for the proper functioning of the complete eye-tracking system within
+the framework of the Synchronization and Cognition-project that it be
+possible to relate registered brain activity to a specific gaze angle.
+In other words, {\octopus} has to work in correlation with the
+registering equipment of the experimental setup.  As indicated above,
+the interface between {\octopus} and the general setup will consist of
+a port address at which {\octopus} makes the returned estimate of the
+point of focus available.  Also, each time a new frame has been
+digitized by the frame-grabber, it gives a signal indicating this.
+Since the time the frame is made available can be approximated to
+equal the time when the visual snapshot of the subject represented by
+the frame was taken, this signals triggers the current time to be
+logged.  When {\octopus} signals that an estimate of the point of
+focus is available at the given port address, these two values---the
+time of the snapshot and the estimated point of focus resulting from
+the snapshot---are coupled to form a tuple.  This tuple can be made
+available to the program managing the output from the registering
+equipment, so that data concerning the registered brain activity at a
+given time can be compared to the estimated point of focus at that
+time.

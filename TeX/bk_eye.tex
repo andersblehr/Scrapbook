@@ -1,0 +1,128 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% bk_eye.tex --- 
+%%% Author          : blehr
+%%% Created On      : Tue Mar  9 03:58:22 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr 11 13:26:13 1993
+%%% RCS revision    : $Revision: 1.6 $ $Locker:  $
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The Eye}
+\label{back:eye}
+
+In this section, an introduction is given to some of the terms
+relating to the eye, as well as to its structure.  Although the
+subjects may be human as well as monkeys, only the human eye is
+described, given that the terms in general also apply to the monkey's
+eye.  Also, some, from an image processing point of view, useful
+visual properties of the eye are described.
+
+\subsection{Structure of the Human Eye}
+\label{back:eye:structure}
+
+In Fig.~\ref{fig:back:eye:human}, a horizontal cross section of the
+human eye is shown.  The shape of the eye is nearly spherical, and its
+average diameter is approximately 20 mm.  The eye ball ({\em optical
+  globe\/}) is made up of three enclosing membranes: the {\em
+  cornea\/} and {\em sclera\/}, which together form the outer cover of
+the eye, the middle {\em choroid\/}, and the inner {\em retina\/}.
+
+The cornea covers the {\em iris\/} and the {\em pupil\/}, and consists
+of a tough, transparent tissue, allowing light to pass through.  The
+rest of the eye is covered by the white sclera, which is continuous
+with the cornea.
+
+The choroid lies directly below the sclera.  This membrane contains a
+network of blood vessels that serves as a major source of nutrition to
+the eye.  Its coat is heavily pigmented to reduce the amount of
+extraneous light entering the eye.  The part of the choroid belonging
+to the foremost portion of the eye (its {\em anterior extreme\/}) is
+divided into the iris and the {\em ciliary body\/}.  The {\em ciliary
+  muscles\/} allow the iris to contract or expand to control the
+amount of light entering the eye through the pupil.  The pupil is
+variable in diameter from approximately 2 mm up to 8 mm, corresponding
+to an area range of 3--50 mm$^{2}$.  The front of the iris contains
+the visible pigment of the eye, whereas the back contains a black
+pigment.
+
+\insertpdfwidth{eye}{\label{fig:back:eye:human}A simplified diagram of
+  a cross section of the human eye.
+  (From~\protect\cite{digim})}{0.6}
+
+The {\em lens\/}, which lies behind the iris, is made up of concentric
+layers of fibrous cells and is suspended by {\em ciliary fibres\/},
+attaching it to the ciliary body.  It contains between 60 and 70 per
+cent water, about 6 per cent fat, and more protein than any other
+tissue in the eye.  The shape of the lens is controlled by the tension
+in the ciliary fibres.  To focus on distant objects, the controlling
+muscles cause the lens to be relatively flattened, whereas they cause
+the lens to thicken to focus on objects near the eye.  Both
+ultraviolet and infrared light are absorbed well by the lens and, in
+large amounts, may cause damage to the eye.
+
+The innermost membrane of the eye is the retina, which covers the
+inside of the backmost portion of the eye.  The surface of the retina
+is covered by light receptors on which an image of the outside world
+(an object, a scene, etc.) is focused by the lens.  There are two
+classes of light receptors: {\em cones\/} and {\em rods\/}.  The
+cones, which number between 6 and 7 million and are highly sensitive
+to colour, are primarily located in the central portion of the
+retina, the {\em fovea\/}.  The eye is rotated until the image of the
+object of interest falls on the fovea.  Each cone is connected to its
+own nerve end, allowing very fine visual resolution.  Cone vision is
+known as {\em photopic\/} or bright-light vision.
+
+The rods, which are distributed over the entire retinal surface,
+number between 75 and 150 million, and serve to give a general,
+overall picture of the field of view.  The larger area of distribution
+and the fact that several rods are connected to a single nerve end
+reduce the amount of detail discernible by them.  They are insensitive
+to colour, but much more sensitive to low levels of illumination than
+the cones.  Rod vision is known as {\em scotopic\/} or dim-light
+vision.
+
+\subsection{Optical Properties of the Eye}
+\label{back:eye:visual}
+
+In Fig.~\ref{fig:scaneye} is shown a relatively high-quality image of
+a monkey's eye.  From an eye-tracking point of view, the most
+interesting optical property noted is the relatively sharp transition
+in brightness between the dark pupil and the comparably bright iris.
+It is noted, however, that the iris of the monkey appears to be darker
+than that of man.  Note also that the pupil does not constitute the
+only dark region in the image.  In fact, in the given image there
+appears to be large regions outside the pupil with gray levels in the
+proximity of those of the pupil.  Evidently, an eye-tracking system
+has to take this into consideration in order to be able to
+differentiate between the pupil and other dark regions in an image.
+
+Another thing to be noted is that the pupil appears to approximate a
+circle relatively well.  However, although it is known to be circular
+physically, the appearance of the pupil is circular only when the
+subject looks straight into the camera.  If it looks to the side, the
+pupil appears as an ellipse whose major axis is vertical; if it looks
+up or down, the major axis of the pupil ellipse is horizontal; if it
+looks up or down as well as to the side, the major axis of the pupil
+ellipse has either a positive or negative angle with respect to the
+horizontal plane.  The deviation in the pupil's appearance from the
+circular shape depends on the gaze angle relative to the camera.  When
+the angle is relatively small, i.e., in the approximate range $\pm
+15^{\circ}$, the deviation is less than 4\%, but when the angle
+increases, the elliptic appearance becomes more dominant and is apt to
+cause errors in eye-tracking systems assuming that the pupil always
+constitutes a circle in an image.
+
+Note also the bright spot at the upper extremity of the pupil.  This
+is called to as the {\em first Purkinje image\/}, and constitutes the
+reflection of the illuminating source from the anterior surface of the
+cornea.  
+
+A last point of interest is that the iris appears brighter under
+infrared illumination than in visible light (\cite{template}), which
+is an additional incentive for choosing infrared illumination of the
+eye for the final eye-tracking system (cf.\ 
+Section~\ref{intro:problem}).
+
+\insertpdfwidth{scaneye}{\label{fig:scaneye}An image of a monkey's
+  eye.}{0.4}

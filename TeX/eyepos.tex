@@ -1,0 +1,235 @@
+\begin{verbatim}
+(***
+ ***  eyepos.pas, version 2.3
+ ***
+ ***  Example of how to employ search.pas, version 2.2 or later.
+ ***  The image is supplied as command line parameter, is displayed
+ ***  on the screen, and the pupil position found is marked with a
+ ***  small star in the image.
+ ***
+ ***  Usage:
+ ***
+ ***     eyepos [-d][-l<T_{l}>][-o<r_{o}>][-s<T_{e}>]
+ ***            [-w<T_{s}>][-n<nIterations>] file[.pic]
+ ***
+ ***  The -d option causes showSearch to be true and consequently each
+ ***  location in the image to which the Sobel operators are applied
+ ***  will be marked with a white point on the screen.
+ ***)
+
+program eyePos;
+
+(**
+ **  SVGA.pas contains routines for displaying high-resolution black &
+ **  white images on the screen.  Requires an ET4000 SVGA graphic card.
+ **)
+
+uses crt,dos,graph,auxil,search,SVGA;
+
+(**
+ **  Variables
+ **)
+
+var
+
+(*
+ *  Variables used to measure the time.
+ *)
+      startHours                : word;
+      startMinutes              : word;
+      startSeconds              : word;
+      start100thSeconds         : word;
+      endHours                  : word;
+      endMinutes                : word;
+      endSeconds                : word;
+      end100thSeconds           : word;
+
+(*
+ *  A pupil point, supplied by findPupilPoint.
+ *)
+      pupilPoint                : pointType;
+
+(*
+ *  The position of the pupil in the given image.
+ *)
+      pupilPosition             : pointType;
+
+(*
+ *  Estimate of the time needed to locate the pupil.  Accuracy
+ *  increases when nIterations increases.
+ *)
+      searchTime                : real;
+
+
+procedure init;
+
+var   fileName                  : string;
+      inputFile                 : file;
+      buffer                    : bufferType;
+      i,j                       : word;
+
+
+(*
+ *  getParameters
+ *
+ *  Reads and interprets the command line parameters.
+ *)
+
+  procedure getParameters(numberOfParameters : word);
+
+  var   i                         : byte;
+        thisParameter             : string;
+
+
+    function getParameterValue(parameterString : string) : real;
+
+    var   value                     : real;
+          result                    : integer;
+
+    begin
+      val(copy(parameterString,3,length(parameterString)-2),value,result);
+      if (result=0) then
+        getParameterValue:=value
+      else
+        fatalError('Illegal parameter value, must be a number!')
+    end;
+
+
+  begin
+    for i:=1 to numberOfParameters-1 do
+      begin
+        thisParameter:=paramStr(i);
+        if (thisParameter[1]='-') then
+          case thisParameter[2] of
+            'd' : showSearch:=true;
+            'l' : lakeLevel:=trunc(getParameterValue(thisParameter));
+            'o' : octopusRadiusFraction:=getParameterValue(thisParameter);
+            's' : sobelThreshold:=trunc(getParameterValue(thisParameter));
+            'w' : wetFraction:=getParameterValue(thisParameter);
+            'n' : nIterations:=trunc(getParameterValue(thisParameter))
+          else
+            fatalError('Illegal option: -'+thisParameter[2])
+          end
+        else
+          fatalError('Cannot specify more than one file: '+thisParameter)
+      end;
+    fileName:=picturePath(paramStr(numberOfParameters))
+  end;
+
+
+  procedure initVariables;
+
+  begin
+    blockRead(inputFile,buffer,4);
+    xSize:=(word(buffer[1]) shl 8)+buffer[2];
+    ySize:=(word(buffer[3]) shl 8)+buffer[4];
+    startX:=round(getMaxX/2-xSize/2);
+    startY:=round(getMaxY/2-ySize/2);
+    initGlobals
+  end;
+
+
+begin
+  if (paramCount<>0) then
+    begin
+      getParameters(paramCount);
+      if fileExists(fileName) then
+        begin
+          SVGA_initGraphics(mode800x600);
+          SVGA_setBlackAndWhitePalette;
+          assign(inputFile,fileName);
+          reset(inputFile,1);
+          initVariables;
+          getMem(image,4*ySize);
+          for i:=1 to ySize do
+            begin
+              blockRead(inputFile,buffer,xSize);
+              getMem(image^[i],xSize);
+(*
+ *  Initializes the in-memory image and displays it on the screen.
+ *)
+              for j:=1 to xSize do
+                begin
+                  image^[i]^[j]:=buffer[j];
+                  putPixel(startX+j-1,startY+i-1,buffer[j])
+                end
+            end;
+          close(inputFile);
+          rectangle(startX,startY,startX+xSize,startY+ySize)
+        end
+      else
+        fatalError('Image file not found: '+picturePath(fileName))
+    end
+  else
+    fatalError('Usage: eyepos [-dlonsw] file[.pic]')
+end;
+
+
+(*
+ *  findPupilPosition
+ *
+ *  Finds the pupil and computes the time needed.
+ *)
+
+procedure findPupilPosition;
+
+var   i                         : word;
+
+
+  function sec100ths : real;
+
+  begin
+    sec100ths:=(6000*(endMinutes     -startMinutes)+
+                 100*(endSeconds     -startSeconds)+
+                     (end100thSeconds-start100thSeconds))/
+               (nIterations/10)
+  end;
+
+
+begin
+  if findPupilPoint(pupilPoint) then
+    begin
+      getTime(startHours,startMinutes,startSeconds,start100thSeconds);
+      for i:=1 to nIterations do
+        begin
+          findPupilPoint(pupilPoint);
+          findPosition(pupilPoint,pupilPosition)
+        end;
+      getTime(endHours,endMinutes,endSeconds,end100thSeconds);
+      searchTime:=sec100ths
+    end
+  else
+    fatalError('No pupil was found!');
+  markPosition(pupilPosition.x,pupilPosition.y,asStar)
+end;
+
+
+procedure writeData;
+
+begin
+  setTextStyle(defaultFont,horizDir,1);
+  setTextJustify(leftText,centerText);
+  setColor(60);
+  outTextXY(startX,startY+ySize+30,'Position         : ('+
+            intString(pupilPosition.x)+','+intString(pupilPosition.y)+')');
+  outTextXY(startX,startY+ySize+40,'Search time (ms) : '+
+            realString(searchTime))
+end;
+
+
+procedure finishOff;
+
+begin
+  closeSearch;
+  readKey;
+  closeGraph
+end;
+
+
+begin
+  init;
+  findPupilPosition;
+  writeData;
+  finishOff
+end.
+\end{verbatim}

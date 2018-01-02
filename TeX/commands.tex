@@ -1,0 +1,93 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% commands.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Sat Apr 25 17:54:59 1992
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr  4 18:42:33 1993
+%%% RCS revision    : $Revision: 1.12 $ $Locker:  $
+%%% Status          : Subjected to continuous change....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% History 		
+%%% 20-Mar-1993		blehr	
+%%%    La til \inserttwoeps, som setter inn to EPS-filer ved siden av
+%%%    hverandre, kaller dem (a) hhv. (b), og gir dem en felles
+%%%    \caption.  Skiller ogsaa mellom mine og Anders' saker - Anders'
+%%%    er plassert nederst i filen.
+%%% 23-Feb-1993		blehr	
+%%%    Tok bort \hentps og \henpsbredde, siden dvips ikke forstaar
+%%%    psfig.  La til \inserteps og \insertepswidth istedet.  Begge
+%%%    disse krever Encapsulated PostScript (.eps).
+
+%%
+%%  Mine saker
+%%
+
+\renewcommand{\SS}{\bf S}
+\newcommand{\octopus}{OCTOPUS}
+\newcommand{\odd}{\mbox{\scriptsize odd}}
+\newcommand{\even}{\mbox{\scriptsize even}}
+\newcommand{\fft}{FFT}
+\newcommand{\nit}{NTH}
+
+%
+% Kommandoer for importering av EPS-filer (Encapsulated PostScript).
+%
+
+%
+% \insertpdf[2]
+%
+% Bruksmaate:
+%   \insertpdf{filnavn}{\label{fig:labref}figurtekst}
+%
+% X-utstrekningen til figuren settes til 0.7 ganger tekstbredden.
+%
+
+\newcommand{\insertpdf}[2]{\insertpdfwidth{#1}{#2}{0.7}}
+
+%
+% \insertpdfwidth[3]
+%
+% Bruksmaate:
+%   \insertpdfwidth{filnavn}{\label{fig:labref}figurtekst}{bredde}
+%
+% `bredde' er et tall mellom 0 og 1 som angir broekdel av
+% tekstbredden som figuren skal ha.
+%
+
+\newcommand{\insertpdfwidth}[3] {
+  \begin{figure}[tb]
+    \centering
+    \includegraphics[width=#3\textwidth]{figurer/#1.pdf}
+    \caption{#2}
+  \end{figure}
+}
+
+%%
+%%  Torp's saker
+%%
+
+% Et tastetrykk, eller en kombinasjon av to taster.
+\newcommand{\tast}[1]{\fbox{\rule{0mm}{1.5ex}{\tt #1}}}
+\newcommand{\totast}[2]{\tast{#1}-\tast{#2}}
+
+% Binder en taste-sekvens mot en kommando.
+\newcommand{\keybinding}[2]{#1 executes {\em #2}. See Section~\ref{#2-func}.}
+
+% Kommando som definerer ny funksjon.
+% Parameter 1 : Funksjonsnavn, Kommer til venstre under en strek.
+%           2 : Parametre. Kommer til h|yre for navnet i kursiv
+%           3 : Command|Function|Variable    Kommer til hoyre.
+%           4 : Forklaringen. Den quote's.
+
+% \newenvironment{params}{{\large Parameters:}\begin{description}}{\end{description}}
+
+\newcommand{\returns}[1]{
+        \begin{description}
+          \item [Returns : ]#1
+        \end{description}}
+
+% Dette er environmentet som brukes ved forklaring av funksjoner,
+% programmer eller variable.
+\newenvironment{func}[3]{\pagebreak[3] \label{#1-func} %
+  {\large\it  #1\hspace{1cm} #2 \hfill {\bf #3}}
+\begin{quote}}{\end{quote}}
