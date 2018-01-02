@@ -1,0 +1,157 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% in_probl.tex --- 
+%%% Author          : blehr
+%%% Created On      : Thu Mar 11 23:03:15 1993
+%%% Last Modified By: blehr
+%%% Last Modified On: Sun Apr 11 13:57:10 1993
+%%% RCS revision    : $Revision: 1.9 $ $Locker:  $
+%%% Status          : In writing....
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Problem Definition and Initial Work}
+\label{intro:problem}
+
+Originally, it was the intent that I should concern myself with the
+design of a complete eye-tracking system.  My task was defined by the
+following problem definition, hereafter referred to as the {\em
+  overall problem definition\/}:
+
+\paragraph{Overall problem definition:} 
+Design and test a complete system for measuring the eye movements of
+the subject during neurophysiological recordings from the visual
+cortex (monkey) or EEG recordings (man), satisfying the requirements
+listed in Section~\ref{intro:motivation}.  The different parts of the
+system to be designed are:
+\begin{itemize}
+\item An eye-tracking program satisfying
+  requirements~\ref{req:first}--\ref{req:last} of
+  Section~\ref{intro:motivation}.  The program shall run within the
+  framework of an IBM-compatible PC, either in the CPU of the PC
+  itself or on a special-purpose image processing board subjected to
+  it.
+\item An interface between the eye-tracking program and the
+  registering equipment of the setup, to enable the simultaneous and
+  correlated registration of brain activity and gaze direction.
+\item A setup to ensure optimal illumination of the subject's eye.  In
+  order to minimize the induced activity in the visual system of the
+  subject unrelated to the visual task, the illumination is to be in
+  the infrared area.
+\item A setup supplying the camera with an optimal image of the eye.
+  This is to be done with an infrared mirror placed in front of the
+  eye, reflecting an infrared image of it to the camera.  The camera
+  is to be placed in front of and above the eye, perpendicular to the
+  gaze direction.
+\end{itemize}
+In addition to the design, the following items have to be purchased:
+\begin{itemize}
+\item A highly IR sensitive camera.  The camera must conform to the
+  CCD video standard, and must be able to deliver at least 50,
+  preferably 100, half frames per second.
+\item All items required to build the illumination and camera setups
+  described above.
+\item A frame grabbing PC board.  The video input of the grabber has
+  to conform to the CCD video standard, and it must be able to receive
+  and digitize as many half frames per second as the camera delivers.
+  The digitized images are to have a resolution of $512\times 512$
+  pixels with 256 gray levels.  Alternatively,
+\item a special-purpose image processing board, in case of deciding on
+  letting the eye-tracking program run on such a board instead of in
+  the CPU of the host PC.  The board has to fulfil the requirements
+  listed above, and its processor(s) must be easily programmable.
+\end{itemize}
+The total cost of the above items may not exceed the amount given in
+requirement~\ref{req:last} in Section~\ref{intro:motivation}.
+\vspace*{0.1cm}
+
+\noindent As the resolution of the system to be designed depends on
+the resolution of the digitized images, it would have been desirable
+with an image resolution of at least $1024\times 1024\times 256$.
+However, the number of pixels in an image with this resolution is too
+high from a real-time image processing point of view to be
+sustainable.  Thus it was decided on a lower resolution of $512\times
+512\times 256$, as indicated above.
+
+\subsubsection{Working with the Initial Problem Definition}
+
+During the first months of my thesis work, I spent a lot of time
+trying to find reasonable approaches to problems pertaining to the
+non-algorithmic, fundamental aspects of this definition.  The most
+important of these can be summarized as
+\begin{itemize}
+\item Does the requirement of speed imply that the final system has to
+  employ a special-purpose image processing board?  In that case,
+  which requirements does the image processing board have to satisfy?
+  Which image processing boards are available, and what can they do?
+  Do they satisfy the technical and low-cost requirements?  From which
+  vendors are they available?  How long is the delivery time for the
+  different boards?  How easily programmable are they?
+\item In case an algorithm is found that is fast enough to allow the
+  program to run in CPU of the host PC, which requirements does the
+  frame grabbing board have to satisfy?  Which frame grabbing boards
+  are available, and what do they offer?  Do they satisfy the
+  technical and low-cost requirements?  From which vendors are they
+  available?  How long is the delivery time for the different boards?
+\item Which are the requirements that the camera has to satisfy, in
+  addition to the requirements of sensitivity, speed, and low cost?
+  Which highly infrared sensitive cameras complying to the requirement
+  of speed are available?  And from which vendors?  How do the video
+  signals from the different cameras conform with the CCD standard,
+  alternatively with the video input channels of the different frame
+  grabbing and image processing boards that are available?
+\item How shall the problem of eye illumination be approached?  Are
+  infrared light-emitting diodes sufficient?  Which is the best
+  positioning of the diodes relative to the eye to ensure optimal
+  illumination?  How many diodes are necessary to illuminate the eye
+  sufficiently?  Does the illumination constitute a danger to the eye?
+\end{itemize}
+
+Much time was spent in order to arrive at answers to some of these
+questions, partly on the telephone with different companies offering
+various cameras, frame grabbing and image processing boards, inquiring
+about how well the different cameras and boards would suit the given
+problem, ordering information material and inquiring about other
+vendors offering similar products; and partly browsing through a
+considerable amount of information material, trying to land at a
+conclusion as to which vendor offered the most cost-efficient
+solution.  Also, different approaches to the illumination problem were
+investigated, diodes were acquired and tested, and simple illumination
+setups were built.
+
+After some months of working with the overall problem definition, it
+became clear that the time available would not suffice to design a
+complete eye-tracking system, because neither a suitable image
+processing board complying to the low-cost requirement, nor a
+corresponding frame grabbing board or camera had been found.
+Particularly, as suitable image processing boards turned out to be far
+too costly, it was decided that an attempt should be made at
+developing an eye-tracking algorithm that was fast enough to run in
+the CPU of a host PC without assistance from an external processor.
+To supply the necessary test images, a small frame-grabber was
+purchased that received images from an ordinary video camera (cf.\ 
+Section~\ref{intro:env} below).  Thus a revised problem definition,
+hereafter referred to as the {\em algorithmic problem definition\/},
+or simply the {\em problem definition\/}, was found to be necessary:
+
+\paragraph{Algorithmic problem definition:} 
+Design, implement and, as extensively as possible, test an algorithm
+to, on the basis of a given image of the eye, determine the position
+of the (centre of the) pupil, relative to some given reference point.
+The algorithm must to be fast enough to run in the CPU of the
+computer, and has to satisfy the following requirements:
+\begin{itemize}
+\item The position of the pupil is to be determined with an accuracy
+  corresponding to 1 pixel in the digitized image.
+\item Whenever the pupil cannot be found (due to blinking,
+  disturbances, etc.), an error signal is to be given.
+\item The total running time of the algorithm may not exceed 20 ms in
+  the worst case.
+\end{itemize}
+Whether the accuracy requirement above complies with
+requirement~\ref{req:2} in Section~\ref{intro:motivation} depends on
+the resolution of the image and on the fraction of the image occupied
+by the pupil.  Preferably, the image should have a resolution of
+$512\times 512$ pixels with 256 gray levels, and the eye should fill
+the entire image.  Also, it has to be determined whether the final
+algorithm actually is to run in the CPU of the host PC, since data
+transfer rates may make it necessary to have it run in a processor
+near to the storage device to which the digitized images are written.
