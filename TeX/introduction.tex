@@ -1,0 +1,71 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% introduction.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Thu Apr 23 14:50:59 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 09:12:43 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : In progress
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\pagenumbering{arabic}
+\label{intro}
+
+\section{Motivation}
+\label{tucc}
+
+{\em The Understanding Computer\/} ({\tuc}) is a project initiated by
+Tore Amble at the Knowledge Systems Group of The Division of Computer
+Science \& Telematics (IDT) at The Norwegian Institute of Technology
+({\nit}), Trondheim, Norway.
+
+{\tuc} is a successor of the Nordic cooperation project {\hsql}, which
+was a prototype for answering queries to a relational database, given
+in any of the Scandinavian languages.
+
+The goal of the project is to investigate {\em ``how a naturally
+readable language can be a unifying framework for knowledge
+representation and natural language interfaces, {\em [that is,
+whether]} natural language is able to express knowledge in a way that,
+apart from its understandability, also is sufficient for an automated
+reasoning system to draw the right conclusions''} (\cite{solon}).
+
+In connection with {\tuc}, Tore Amble has developed a logical language
+{\solon} ({\em Second Order Logic for Natural Language\/}), which
+allows flexibility with respect to the number and types of arguments
+and which eliminates as many variables as possible from expressions.
+For a further description of {\tuc} and its foundations,
+see~\cite{solon}.
+
+Initially, it was the intention that I should work directly with
+{\tuc}, but given its complexity and the limited time I had available,
+it was decided that I should develop an independent system, and that
+Tore Amble, who has implemented the current version of {\tuc}, and who
+doubtlessly has the most in-depth knowledge of it, incorporate those
+parts of my work he sees fit into it.
+
+\section{Structure of the Paper}
+
+In Chapter~\ref{background}, an introduction to natural languages and
+natural language systems is given, as well as a description of rule
+based systems and brief introduction to predicate logic. In
+Chapter~\ref{nash}, my system, {\nash}, a natural language based
+expert system shell, is described. In Chapter~\ref{concl} the
+conclusions I have drawn while working with the project are presented.
+
+\section{The Project Environment}
+
+All computational work was done using the {\em SPARC\/} and {\em HP\/}
+workstations at IDT.
+
+{\nash} was implemented solely in {\SICStus}, a {\em WAM\/}-based
+implementation of Prolog made at The Swedish Institute of Computer
+Science, Kista, Sweden (see~\cite{sicstus}).
+
+This document was prepared with Leslie Lamport's {\LaTeX} document
+preparation system (see~\cite{lamport}) and Donald Knuth's {\TeX}
+typesetting system on which {\LaTeX} is based.
+
+Lastly, I would like to thank my supervisor Tore Amble for his
+enthusiasm and inspiring guidance.

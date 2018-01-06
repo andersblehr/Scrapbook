@@ -1,0 +1,146 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% back_rbs.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Sat Apr 25 20:00:15 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:01:54 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Rule Based Systems}
+\label{rbs}
+
+When we start out on the task of solving a particular problem, it is
+important that we know what the initial situation is (that is, the
+situation defining the problem), as well as what final situations
+constitute acceptable solutions to the problem. Along the way from the
+initial situation to an acceptable final situation, we pass through a
+set of intermediate steps, each leading from one situation to another.
+It is convenient that all of these intermediate situations, as well as
+the initial and final situation(s), be classified as {\em states\/},
+and that the process of moving from the initial to a final state be
+viewed as moving through a {\em state space\/}. Further, we need a set
+of {\em rules\/} describing the legal moves, given the current state.
+In any state, choosing one rule over another may bring us closer to or
+farther away from a solution, depending on the specific rule. In other
+words we need a control strategy to help us choose an appropriate
+rule. When no direct method for choosing a rule is known, as is
+usually the case, {\em search\/} has to be applied.  Search also
+provides a framework into which more direct methods for solving
+subparts of a problem can be embedded. Thus the process of finding a
+solution to a given problem can be classified as searching through a
+state space.
+
+\subsection{Production Systems}
+\label{prodsys}
+
+{\em Production systems\/} provide a means for describing and
+performing the search process described above. A production system
+consists of (from~\cite{rich}):
+
+\begin{itemize}
+  \item A set of rules, each consisting of a left side (a pattern)
+    that determines the applicability of the rule and a right side
+    that describes the operation to be performed if the rule is
+    applied.
+  \item One or more knowledge/databases that contain whatever
+    information is appropriate for the particular task.
+  \item A control strategy that specifies the order in which the
+    rules will be compared to the database and a way of resolving the
+    conflicts that arise when several rules match at once.
+  \item A rule applier.
+\end{itemize}
+
+This definition is very general, and it encompasses a great number of
+systems, including a family of complex, often hybrid, systems known as
+{\em expert systems\/} (see Section~\ref{expert}).
+
+\subsubsection{Control Strategies}
+
+As mentioned above, we need a control strategy to help us decide which
+rule to apply, given the current state of a search for a solution of a
+problem. How these decisions are made has a great impact on how
+quickly, if at all, a solution is reached. Two requirements the
+control strategy has to fulfill, are that it cause {\em motion\/} and
+that it be {\em systematic\/}. The first requirement ensures that a
+solution sooner or later will be arrived at, given that it exists, and
+the second requirement ensures that a certain path in the search space
+not be explored more than once.
+
+Several search strategies have been suggested, the most well-known
+being
+
+\begin{description}
+  \item[Depth-first search] Construct a tree with the initial
+    state as its root. Generate a child by applying one of the
+    applicable rules to the initial state. Pursue a single branch of
+    the tree by repeating this process at the lastly generated leaf
+    node until a goal is produced or it is decided to terminate the
+    branch. If the branch is terminated, backtrack to the first
+    predecessor which has not had all of its offspring examined and
+    continue the search from there.
+  \item[Breadth-first search] Generate all the offspring of the
+    root by applying each of the applicable rules to the initial
+    state.  Repeat this process for all the leaf nodes until some rule
+    produces a goal.
+  \item[Heuristic search techniques] Sometimes it is required that
+    one compromise the requirements of mobility and systematicity in
+    order to efficiently arrive at a solution which no longer is
+    guaranteed to be the best one, but which almost always is a very
+    good one. A {\em heuristic\/} is a search technique which
+    accomplishes this, employing what is called a {\em heuristic
+    function\/} to decide which rule to choose. The value returned by
+    the heuristic function is a measure of the desirability of
+    exploring the given path. ``{\em The purpose of a heuristic
+    function is to guide the search process in the most profitable
+    direction by suggesting which path to follow first when more than
+    one are available}'' (from~\cite{rich}).
+\end{description}
+
+Most complex problems, and that means most problems of practical
+interest, need to employ heuristic search techniques in order to be
+solved efficiently, and the process of problem solving can thus more
+accurately be described as a heuristic search process rather than
+merely a search process.
+
+\subsection{Expert Systems}
+\label{expert}
+
+As mentioned in Section~\ref{prodsys}, expert systems constitute a
+subset of the family of production systems.  An {\em expert system\/}
+can be labeled as a system which guides the user in solving problems
+which normally requires the intervention of a human expert in the
+field.
+
+To solve an expert-level problem, an expert system needs to employ a
+powerful reasoning system ({\em inference engine;\/}~\cite{amble}) as
+well as to have access to a substantial domain-specific {\em knowledge
+base\/}. To be convincing as to its conclusions, it is also important
+that the user of the expert system be able to interact with it easily,
+and that he, when it has arrived at a conclusion, can be given an
+explanation of how the conclusion was arrived at, that is, that the
+system be able to explain its reasoning.  Moreover, the system has to
+be able to acquire new knowledge as well as modifications of old
+knowledge.
+
+\subsubsection{Expert System Shells}
+
+Expert systems are employed in a wide variety of domains, including
+medical diagnosis, legislation and decision making, just to mention
+some. But even though the domains of different expert systems have
+little or nothing in common, they are generally based on the same
+principles. Thus it is common to separate the domain specific parts
+(typically the knowledge base) of an expert system from the non-domain
+specific ``core'', which usually is implemented separately as a
+general purpose expert system {\em shell\/}. The tasks performed by
+the expert system shell are typically (see~\cite{amble}) those of the
+inference engine, search processing and dialogue handling (user
+interface).
+
+From an {\nlp}-point of view, the ideal expert system shell would be
+one in which all interaction with the user as well as knowledge
+acquisition and explanation are done in natural language, and which
+still contains all the features of present day shells. Whether this is
+possible, is the question which the {\tuc}-project seeks to find some
+of the answers to.

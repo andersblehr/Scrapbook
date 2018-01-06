@@ -1,0 +1,92 @@
+\begin{thebibliography}{10}
+
+\bibitem{solon}
+Tore Amble.
+\newblock Understanding systems with second order logic.
+\newblock Technical report.
+
+\bibitem{amble}
+Tore Amble.
+\newblock {\em Logic Programming and Knowledge Engineering}.
+\newblock Addison-Wesley Publishing Company, 1987.
+
+\bibitem{foredrag}
+Tore Amble.
+\newblock Representasjon av regelverk i naturlig lesbar logikk - norsk lov om
+  statsborgerrett som ekspertsystem.
+\newblock Lecture notes, 1987.
+
+\bibitem{sicstus}
+Mats Carlsson.
+\newblock {\em SICStus Prolog User's Manual}.
+\newblock Swedish Institute of Computer Science, PO Box 1263, S-16428 KISTA,
+  Sweden.
+\newblock Draft version: 21 February 1992.
+
+\bibitem{eggen}
+Jorunn Eggen and B{\aa}rd Hugaas.
+\newblock Ekspertsystemskall i Prolog.
+\newblock Master's thesis, The Norwegian Institute of Technology (NTH), 1984.
+
+\bibitem{gal}
+Annie Gal, Guy Lapalme, Patrick Saint-Dizier and Harold Somers.
+\newblock {\em Prolog for Natural Language Processing}.
+\newblock John Wiley \& Sons, 1991.
+
+\bibitem{grice}
+H.~P. Grice.
+\newblock Logic and conversation.
+\newblock In P.~Cole and J.~L. Morgan, editors, {\em Syntax and Semantics},
+  volume~3 of {\em Speech Acts}, pages 41--58. Academic Press, New York, 1975.
+
+\bibitem{logic}
+A.~G. Hamilton.
+\newblock {\em Logic for Mathematicians}.
+\newblock Cambridge University Press, 1988.
+
+\bibitem{lamport}
+Leslie Lamport.
+\newblock {\em A Document Preparation System - \LaTeX User's Guide \& Reference
+  Manual}.
+
+\bibitem{maehle}
+{\AA}smund M{\ae}hle.
+\newblock Ekspertsystem for loven om norsk statsborgerskap med
+  brukergrensesnitt i naturlig spr{\aa}k.
+\newblock Project Report, NTH, 1990.
+
+\bibitem{torulf}
+Torulf Mollestad.
+\newblock Natural language interface to databases: Cooperating with the casual
+  user.
+\newblock Master's thesis, The Norwegian Institute of Technology (NTH), 1989.
+
+\bibitem{nilsson}
+Ulf Nilsson and Jan Ma{\l}uszy\'{n}ski.
+\newblock {\em Logic, Programming and Prolog}.
+\newblock John Wiley \& Sons, 1990.
+
+\bibitem{pereira}
+Fernando C.~N. Pereira and Stuart~M. Shieber.
+\newblock {\em Prolog and Natural-Language Analysis}.
+\newblock Center for the Study of Language and Information, 1987.
+\newblock Lecture notes.
+
+\bibitem{dcg}
+Fernando C.~N. Pereira and David H.~D. Warren.
+\newblock Definite clause grammars for language analysis - a survey of the
+  formalism and a comparison with augmented transition networks.
+\newblock {\em Artificial Intelligence}, 13:231--278, 1980.
+
+\bibitem{rich}
+Elaine Rich and Kevin Knight.
+\newblock {\em Artificial Intelligence}.
+\newblock McGraw-Hill, Inc., 1991.
+
+\bibitem{british}
+M.~J. Sergot, F.~Sadri, R.~A. Kowalski, F.~Kriwaczek, P.~Hammond and H.~T.
+  Cory.
+\newblock The British nationality act as a logic program.
+\newblock {\em Communications of the ACM}, 29(5), May 1986.
+
+\end{thebibliography}

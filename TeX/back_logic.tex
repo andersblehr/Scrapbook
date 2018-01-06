@@ -1,0 +1,143 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% back_logic.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Tue Apr 28 23:01:04 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:03:37 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Logic Foundations}
+\label{logic}
+
+For a formal definition of the terms used in this section, see for
+instance~\cite{logic} or~\cite{nilsson}.
+
+\subsection{Predicate Logic}
+\label{predicate}
+
+{\em First order predicate logic\/}, or simply {\em predicate
+logic\/}, is a branch of the general science of logic, and offers a
+powerful way of deriving new knowledge from old by means of what is
+called {\em mathematical deduction\/}.
+
+The counterpart in predicate logic of sentences in natural language is
+{\em well-formed formulas\/}, or simply {\em formulas\/}. Well-formed
+formulas are built from {\em constants\/}, {\em variables\/}, {\em
+functors\/}, {\em predicate symbols\/} and recursively from other
+well-formed formulas.  Variables can be either {\em free\/} or {\em
+bound\/}. If they are bound, they are either {\em existentially\/} or
+{\em universally quantified\/}. The symbols denoting existential and
+universal quantification are $\exists$ and $\forall$, respectively.
+Other symbols used in predicate logic, are the logical {\em
+connectives\/}: {\em conjunction\/} ($\wedge$), {\em disjunction\/}
+($\vee$), {\em negation\/} ($\neg$) and {\em implication\/}
+($\rightarrow$).
+
+Given the above, the natural language sentence ``Socrates is a man''
+can be represented by the well-formed formula
+
+\begin{center}
+  {\em man\/}({\em socrates\/}).
+\end{center}
+
+\noindent Similarly, the following well-formed formulas represent,
+from top to bottom, the sentences ``all men are mortal'', ``some pigs
+have wings'', ``every man loves a woman'' and ``not all birds can
+fly'':
+
+\begin{center}
+  $(\forall x)(\mbox{\em man\/}(x)\rightarrow\mbox{\em
+  mortal\/}(x))$\\ $(\exists x)(\mbox{\em pig\/}(x)\wedge\mbox{\em
+  have\/}(x,\mbox{\em wings\/}))$\\ $(\forall x)(\mbox{\em
+  man\/}(x)\rightarrow(\exists y)(\mbox{\em woman\/}(y)\wedge\mbox{\em
+  love\/}(x,y)))$\\ $(\exists x)(\mbox{\em
+  bird\/}(x)\wedge\neg\mbox{\em fly\/}(x))\mbox{\ or\ }\neg(\forall
+  x)(\mbox{\em bird\/}(x)\rightarrow\mbox{\em fly\/}(x))$.
+\end{center}
+
+\noindent The two representations given for the last sentence are of
+course equivalent. A common, but not universal, pattern of predicate
+logic (\cite{logic}) is recognized here, that the universal quantifier
+very often is followed by an implication and that the existential
+quantifier very often is followed by a conjunction. This last property
+has been utilized in {\nash} (see Section~\ref{naldef}).
+
+\subsubsection{The Internal Knowledge Representation Scheme of {\nash}}
+
+The internal knowledge representation scheme of {\nash} ({\niks}) is
+based on a scheme presented in~\cite{dcg}. The syntax of {\niks} is
+very similar to that of predicate logic. In addition to the universal
+and existential quantifiers, the connectives conjunction, implication
+and are employed, with a, for obvious reasons, slightly different
+notation: {\tt forall(X)}, {\tt exists(X)}, {\tt \&}, {\tt =>} and
+{\tt not} for $(\forall x)$, $(\exists x)$, $\wedge$, $\rightarrow$
+and $\neg$, respectively. In addition, {\niks} defines a
+non-associative binary infix operator {\tt :} for associating
+quantifiers with the logical expressions they quantify. Thus the
+examples given in above will look as follows in {\niks}:
+
+\begin{center}
+  {\tt forall(X):(man(X)=>mortal(X))\\
+  exists(X):(pig(X)\&have(X,wings))\\
+  forall(X):(man(X)=>exists(Y):(woman(Y)\&love(X,Y)))\\
+  exists(X):(bird(X)\&not fly(X))} or {\tt not
+  forall(X):(bird(X)=>fly(X))}
+\end{center}
+
+All the connectives employed in {\niks} are defined as operators. In
+order of ascending precedence, they are defined as follows: {\tt =>}
+is non-associative binary infix, {\tt \&} is right-associative binary
+infix and {\tt not} is prefix. The operator of highest precedence is
+{\tt :}.
+
+\subsection{Resolution}
+\label{resolution}
+
+The variant of mathematical deduction commonly employed in connection
+with predicate logic is called {\em resolution\/}, and is based on an
+inference rule called the {\em resolution principle\/}. Resolution
+produces proofs by {\em refutation\/}, that is, to prove that a
+statement is valid an attempt is made to show that the negation of the
+statement produces a contradiction with the known statements. For a
+thorough description of how the resolution procedure works,
+see~\cite{nilsson} and~\cite{rich}. Here we just mention that it
+requires that all statements be in {\em clause form\/}, that is, they
+should contain no quantifiers and only one connective, the disjunction
+$\vee$. An algorithm for transforming statements into clause form is
+given in~\cite{rich}.
+
+To give an informal presentation of how resolution works, imagine that
+we want to prove that Socrates is mortal given that we know that he is
+a man and that all men are mortal. I.e., our knowledge base contains
+the two clauses (which are also given above, although not in clause
+form)
+
+\begin{center}
+  {\em man\/}({\em socrates\/})\\ $\neg\mbox{\em
+  man\/}(x)\vee\mbox{\em mortal\/}(x)$,
+\end{center}
+
+\noindent and we want to prove the clause
+
+\begin{center}
+  {\em mortal\/}({\em socrates\/}).
+\end{center}
+
+\noindent To accomplish this, we try to refute the clause (or rather,
+the {\em goal\/}) $\neg\mbox{\em mortal\/}(\mbox{\em socrates\/})$
+(i.e., prove that it causes a contradiction with what we already
+know). When comparing the goal with the knowledge base, we see that it
+can be resolved with the literal {\em mortal\/}({\em x\/}), unifying
+$x$ with {\em socrates\/} and leaving us with the contradiction
+
+\begin{center}
+  {\em man\/}({\em socrates\/})\\ $\neg${\em man\/}({\em
+  socrates\/}).
+\end{center}
+
+\noindent In the next iteration of the the resolution procedure, the
+empty clause ($\Box$) will be produced, which means that we have
+succeeded in refuting the goal and thus in proving that Socrates
+indeed {\em is\/} mortal.

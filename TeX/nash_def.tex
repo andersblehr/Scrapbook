@@ -1,0 +1,390 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nash_def.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Mon Apr 27 17:24:52 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:12:49 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The Language}
+\label{def}
+
+In this section the semi-natural language employed in {\nash}, {\nal},
+is described. As mentioned in the previous section, the aim with
+{\nal} has been that it be as close to standard English as possible,
+and that it be sufficiently formal. The emphasis has been on accepting
+legal constructs rather than rejecting illegal ones.
+
+\subsection{Linguistic Background}
+\label{ling}
+
+Most of the linguistic material in this section is gathered
+from~\cite{gal}. 
+
+The basic element of any (natural) language is the {\em word\/}, which
+may have associated with it different {\em inflections\/} (number,
+tense, degree, etc.), depending on its function in the language. A
+{\em sentence\/} in a language is a sequence of words, and the
+particular language defines, by means of abstract rule systems, which
+sequences constitute legal sentences.  Within each sentence, words
+make up syntactic {\em constituents\/}, which in turn can be part of
+more complex syntactic constituents. The constituents are determined
+by how strongly the individual words of the sentence are linked to
+each other (e.g., an adjective will have stronger links with the noun
+it qualifies than with a preposition). These links are made explicit
+by the internal structure of the sentence. Simple sentences can be
+combined or their internal structures can be rearranged in order to
+form more complex constructions. Basic constituents are built from
+(centered on) the basic syntactic {\em categories\/} (i.e., word
+classes: nouns, verbs, adjectives, adverbs, prepositions, pronouns,
+etc.), and are defined in terms of them. Thus we have {\em noun\/}
+phrases, {\em verb\/} phrases, {\em adjective\/} phrases, {\em
+adverbial\/} phrases, {\em prepositional\/} phrases, and so on (the
+abbreviations {\sl NP\/}, {\sl VP\/}, {\sl AdjP\/}, {\sl AdvP\/}, {\sl
+PP\/} and the like are commonly used). The structure of the
+constituents is described using {\em phrase-structure rules\/}.
+
+As an example, consider English, where a simple sentence can be built
+from a noun phrase and a verb phrase (using BNF-notation for the
+phrase-structure rules):
+\begin{tabbing}
+  xxx\= xxx\= \kill \>\>\begin{tabular}{lcl} {\sl S\/} &
+  $\rightarrow$ & {\sl NP\/}, {\sl VP\/}.
+\end{tabular}  
+\end{tabbing}
+Similarly, a noun phrase can be made up from a determiner, an adjective
+phrase and a noun, a verb phrase from a (transitive) verb and a noun
+phrase (representing the direct object), and an adjective phrase from
+either an adjective or the empty string (denoted $\epsilon$):
+\begin{tabbing}
+  xxx\= xxx\= \kill \>\>\begin{tabular}{lcl} {\sl NP\/} &
+  $\rightarrow$ & {\sl Det\/}, {\sl AdjP\/}, {\sl N\/} \\ {\sl VP\/} &
+  $\rightarrow$ & {\sl V\/}, {\sl NP\/} \\ {\sl AdjP\/} &
+  $\rightarrow$ & {\sl Adj\/} \\ & $|$ & $\epsilon$
+\end{tabular}
+\end{tabbing}
+Using these simple rules, we can construct sentences like ``The old man
+walked the dog'' and ``Every man loves a woman''.
+
+The incorporation of words is achieved by {\em lexical insertion
+rules\/}, e.g.,
+\begin{tabbing}
+  xxx\= xxx\= \kill \>\>\begin{tabular}{lcl} {\sl N\/} &
+  $\rightarrow$ & [{\sl Noun\/}],
+\end{tabular}  
+\end{tabbing}
+where {\sl Noun\/} is any word in the {\em dictionary\/} classified as a
+noun. The dictionary (or {\em lexicon\/}) contains all the words of the
+given language, along with categorical information and morphological
+characteristics.
+
+A sentence is said to be {\em well-formed\/} if there exists at least
+one set or sequence of rules which define a complete description of
+the sentence. If there exist more than one such set or sequence, the
+sentence is said to be {\em structural ambiguous\/} (this corresponds
+to the inherent ambiguity of any natural language, see for instance
+the examples in Section~\ref{nla}).
+
+\subsection{Definition}
+\label{naldef}
+
+For a BNF-description of {\nal}, see Appendix~\ref{app_def}.
+
+The largest unit of {\nal} is the {\em sentence\/}. There are two
+types of sentences: {\em statements\/}, representing facts (knowledge)
+and rules, and {\em queries\/}, representing questions, either to the
+system or to the user. The only form of punctuation marks allowed in
+{\nal}, are ``.'', used to end statements, and ``?'', used to end
+queries. For clarity, other punctuation marks may occur in the
+examples, which all constitute legal sentences in {\nal}, given that
+the words they contain are found in the dictionary.
+
+\subsubsection{Statements}
+
+The statements of {\nal} can be divided into two distinct categories,
+{\em declarative statements\/}, whereof the set of {\em implicit
+rules\/} constitute a subset, and {\em formal rules\/}.
+
+{\em Declarative statements\/} convey some sort of information about
+the world, and may be conjugated with other declarative statements
+when different aspects of information about a particular world object
+(or several world objects) need to be contained in one sentence. The
+following sentences constitute declarative statements:
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em John is an old man.\/}\\
+  \>\>{\em Peter lives with Mary in London.\/}\\
+  \>\>{\em The woman that Robert loves, loves Frank.\/}\\
+  \>\>{\em Maurice builds a large house on an open field outside
+  Marseilles\/.}\\
+  \>\>{\em John looks at Mary and Mary talks to Peter and Peter
+  admires Janice.\/}
+\end{tabbing}
+
+A subset of the set of declarative statements is the set of {\em
+implicit rules\/}, which can be used to convey knowledge about
+specific classes of world objects. An implicit rule is defined by the
+determiner ``every''. The justification for this supposition is found
+in predicate calculus (see Section~\ref{predicate} and~\cite{logic}),
+where it has been pointed out that it is a common, albeit not
+universal pattern of predicate logic that the universal quantifier be
+followed by an implication. Examples of implicit rules are:
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em Every man loves a woman.\/}\\
+  \>\>{\em Rosette likes every picture that is painted by
+  Cezanne.\/}
+\end{tabbing}
+
+{\em Formal rules\/} are constructs of the form {\em ``If $<${\sl
+premise\/}$>$ then $<${\sl conclusion\/}$>$''}, and are used for
+defining more complex relations between specific world objects, and
+particularly for defining general rules to be used for reasoning
+within a certain domain. Both the {\sl premise\/} and the {\sl
+conclusion\/} have to be declarative statements. The sets of implicit
+and formal rules are not disjunct, that is, it is often possible to
+express knowledge about a specific relation either as an implicit or
+formal rule. It is recommended, though, for the sake of determinism
+(complex implicit rules may be transformed into logical expressions
+containing more than one implication, which in {\nash} represent an
+unhandled case), that complex relations be expressed by means of
+formal rules. The following constitute examples of formal rules:
+\label{specrules}
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em If John is married to Mary, then Mary is married to
+  John.\/}\\
+  \>\>{\em If Maurice loves Michelle and Michelle is married to Paul,
+  then Maurice is unhappy.\/}
+\end{tabbing}
+
+\subsubsection{Queries}
+
+{\em Queries\/} are used for asking questions to be answered either by
+the system or the user. What makes queries different from other
+sentences, (statements, that is), is that they have a different
+syntactic structure, and that they demand some sort of action to be
+taken. Queries may belong to one of the following categories:
+
+\begin{description}
+  \item[Aux-prefixed] The first word of the query is either ``{\em
+    is\/}'' or ``{\em does\/}'' (plurals are not handled, see
+    Section~\ref{limnal}). Queries belonging to this category may be 
+    classified as {\em confirmative\/}, in that the answers they
+    demand be either negative (``{\em no\/}''-answers) or affirmative
+    (``{\em yes\/}''-answers).
+  \item[Wh-prefixed] The first word of the query is a so-called
+    {\em wh-pronoun\/} (``{\em what\/}'', ``{\em who\/}'', ``{\em
+    where\/}'', ``{\em when\/}'', etc.). Queries belonging to this
+    category correspond to the user (or the system) during the
+    reasoning process having come across an unbound variable which
+    is required to be bound in order that a solution be found. The
+    response given is required to cause a binding of this variable,
+    usually to a term supplied as part of the response.
+\end{description}
+In addition, aux-prefixed queries (to the system) may be prefixed with
+the keyword ``{\em how\/}'' in order that a proof be supplied (see
+Section~\ref{proof}).  Examples of queries are (the corresponding
+declarative statements are given above):
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em Is John an old man?\/}\\
+  \>\>{\em Does Peter live with Mary in London?\/}\\
+  \>\>{\em Who does the woman that Robert loves, love?\/}\\
+  \>\>{\em What does Maurice build on an open field outside
+  Marseilles?\/}
+\end{tabbing}
+
+\subsubsection{Using Variables}
+
+To attribute knowledge to a specific class of world objects as a whole
+(e.g., persons, birds, houses, etc.), it would be rather cumbersome
+explicitly to attribute this knowledge to every known individual
+belonging to the class. Rather, it would be desirable that it be
+possible to refer to the class as a whole. Specifically, we need to be
+able to assert {\em general rules\/}, applying to entire classes of
+world objects, not only to specific individuals of the class. To
+achieve this, specific syntactic constructs (defined by Tore Amble,
+and also employed in {\tuc}) have been introduced to represent
+uninstantiated individuals of a class. 
+
+Look at the two formal rules listed in the example on
+page~\pageref{specrules}. They apply only to John and Mary, and
+Maurice, Michelle and Paul, respectively, even though they define
+universal relations, namely that marriage is a commutative relation,
+and that a man who loves a married woman (who is not his wife) is
+unhappy (whether this last relation is always true in the {\em real\/}
+world is not of concern here). If we restate these rules as
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em If any man is married to any woman then this woman is
+  married to this man.\/}
+\end{tabbing}
+and
+\begin{tabbing}
+  xxx\= xxx\= xxx\= \kill
+  \>\>{\em If any man loves any woman and this woman is married to any
+  other man,\/}\\
+  \>\>\>{\em then this man is unhappy.\/},
+\end{tabbing}
+they, if they are universally quantified, still apply to John and Mary
+and the rest, given that it is known that John is married to Mary, and
+that Maurice loves Michelle who is married to Paul. In addition, they
+apply to every other set of individuals fulfilling the same premises.
+This can be formalized as follows:
+
+The {\em key structures\/} ``{\em any\/}'', ``{\em any other\/}'' and
+``{\em any third\/}'' define the immediately following noun to
+quantify a variable. Thus a specific noun may quantify up to three
+different variables (by defining more key structures, it would be
+possible that it quantify accordingly many more variables). If a set
+of variables has been defined by these constructs, they may be
+referenced at a later time (within the same rule) by applying the key
+structures ``{\em this\/}'', ``{\em this other\/}'' and ``{\em this
+third\/}'', together with the quantifying noun. Thus the variables
+defined by the constructs ``{\em any man\/}'', ``{\em any other
+piece\/}'' and ``{\em any third river\/}'' may be referenced using the
+constructs ``{\em this man\/}'', ``{\em this other piece\/}'' and
+``{\em this third river\/}''.
+
+It is evident that restricting the words ``{\em any\/}'' and ``{\em
+this\/}'' to this use only, imposes restrictions on the language we
+are defining. On the other hand, the advantages of employing a
+mechanism like this one by far exceed the disadvantages.
+
+\subsection{Analysis and Generation}
+\label{anagen}
+
+{\nal} is treated at a purely syntactic level. That is, the semantic
+analysis step described in Section~\ref{nlpr} is not employed; words
+are treated as pure lexical units, that is, they have no {\em
+meaning\/} associated with them, and sentences are treated as pure
+syntactic constructs. The semantic representations that are generated
+represent only the syntactic categories of the basic constituents.
+
+\subsubsection{Definite Clause Grammars}
+
+{\em Definite clause grammars\/}, or DCG's, were developed by Fernando
+C.\ N.\ Pereira and David H.\ D.\ Warren and presented in~\cite{dcg}.
+DCG's constitute a subset of the set of so-called {\em logic
+grammars\/}, which are directly inspired by the formalisms and
+techniques of predicate logic: the grammar rules of a DCG have the
+form of predicates which allow arguments, and thus context dependent
+information, to be passed between them.
+
+\subsubsection{Analysis}
+
+The analyzer of {\nash} is based on a definite clause grammar for
+language analysis presented by Pereira and Warren in~\cite{dcg}.
+
+The basic idea behind the approach taken, is the application of the
+principle of {\em compositionality\/}, that is, the semantic
+representation of any constituent is composed from the semantic
+representation of its component parts. The computation of the semantic
+representation of a sentence therefore relies on
+
+\begin{itemize}
+  \item The representation of individual words, given in the
+    dictionary. At this level, variables are introduced as well.
+  \item The rules describing how the semantic representation of a
+    constituent is composed from the semantic representations of its
+    constituent parts.
+\end{itemize}
+For a detailed description of the mechanisms behind the analyzer, see
+for instance~\cite{gal},~\cite{pereira} or~\cite{dcg}. The logical
+representation scheme employed in {\nash}, {\niks}, is described in
+Section~\ref{predicate}.
+
+\subsubsection{Generation}
+
+As mentioned in Section~\ref{aims}, the main goal with {\nash} has
+been that its user interface should be exclusively based on {\nal}.
+That is, knowledge passing, both from the user to the system and from
+the system to the user, should be done in {\nal}. Since {\nash} uses
+{\niks}, not {\nal}, when it reasons, it is necessary that the
+knowledge be paraphrased from {\niks} into {\nal} before it is
+presented to the user. This task is of nature not trivial, and is
+known as {\em automatic text generation\/} (see~\cite{gal}).
+
+The approach taken in {\nash} is a rather na\"{\i}ve one, and his
+heavily dependent on the structure of {\niks}, but it works fairly
+well, and is easy to understand, and thus also to modify. The
+cornerstone of the approach is a DCG for paraphrasing basic
+{\niks}-structures into simple sentences. Deeply nested structures are
+treated recursively in a depth-first manner, and other complex
+structures are decomposed into their components, which are then
+treated separately. The simple sentences which result from this
+process may be conjugated and in other ways combined to form the final
+{\nal}-representation. Also, depending on whether the structure being
+paraphrased represents a statement or a query, different approaches
+are taken. The approach used in making a statement out of the
+resulting sentences is fairly straight-forward, based on conjugation
+and nesting, whereas the approach for making queries is more complex,
+as queries have an inherently different structure from statements.
+
+Some examples of {\niks}-structures and the {\nal}-representations
+resulting from the paraphrasing are shown below.
+
+\begin{center}
+\begin{tabular}{lcl}
+  {\tt man(john)} [query] & $\Rightarrow$ & {\em Is John a man?\/} \\
+  {\tt man(john)}         & $\Rightarrow$ & {\em John is a man.\/} \\
+  {\tt in(with(live(john),mary),london)} [query] & $\Rightarrow$ &
+  {\em Does John live with Mary in London?\/} \\
+  {\tt in(with(live(john),mary),london)} & $\Rightarrow$ &
+  {\em John lives with Mary in London.\/} \\
+  {\tt which(X):(place(X)\&in(live(john),X))} & $\Rightarrow$ &
+  {\em Where does John live?\/} \\
+  {\tt which(X):(person(X)\&of(mother(X),mary))} & $\Rightarrow$ &
+  {\em Who is a mother of Mary?\/} \\
+  {\tt exists(X):((ship(X)\&old(A))\&see(john,A))} & $\Rightarrow$ &
+  {\em John sees an old ship.\/}
+\end{tabular}
+\end{center}
+
+\subsection{Limitations}
+\label{limnal}
+
+When considering {\nal}, it is important to keep in mind, that it is
+no more than a prototype, and can thus be expected neither to be sound
+nor complete. Some of the most evident limitations of {\nal} are the
+following:
+
+\begin{itemize}
+\item No semantic analysis is done. This means that for instance the
+  sentences ``{\em Peter is a student in 1992\/}'' and ``{\em Gerard
+  is the mayor of Auvers\/}'' are identical as far as their semantical
+  representations are concerned, in that the semantical representation
+  of a sentence is determined exclusively by the basic constituents of
+  which it is composed. As a consequence, no temporal information can
+  be represented (as is evident from the example), thus seriously
+  reducing the practical usefulness of the system.
+\item Of the language, only the present tense is handled. This only
+  confirms what was stated above, that no temporal information can be
+  represented.
+\item Only the third person singular is handled. This means that it is
+  impossible to refer to groups of individuals other than by referring
+  directly to the class to which they belong, which is hardly useful
+  in general applications.
+\item In English, compound nouns are not formed by concatenating
+  basic words; rather, they are represented as sequences of separate
+  words. In {\nal}, a noun has to be a single word, thus imposing
+  serious restrictions on the set of legal nouns.
+\item Possessives are not handled, neither through possessive pronouns
+  nor possessive suffixes. This imposes further restrictions on the
+  usefulness of the system.
+\item Queries containing dangling prepositions, like in ``{\em Who
+  does Sarah play with?\/}'', are not handled at present. This is not
+  a major problem, though, in that it can be incorporated rather
+  easily.
+\item As stated in Section~\ref{naldef}, complex implicit rules may
+  result in an unhandled case, that is, a logical representation
+  containing more than one implication. This imposes a factor of
+  indeterminism on the system, which ought not to be there.
+\end{itemize}

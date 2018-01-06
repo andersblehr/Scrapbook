@@ -1,0 +1,268 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nash_shell.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Mon Apr 27 17:29:40 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:18:02 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The Expert System Shell}
+\label{shell}
+
+As mentioned in Section~\ref{aims}, the aim of {\nash} has been to
+make a working prototype of a system containing the basic features of
+an expert system shell, and of which the dialogue is entirely based on
+{\nal}. {\nal}, both the language and the analyzer, have been
+thoroughly treated in Section~\ref{def}. In this section, the
+reasoning system employed in {\nash} is described.
+
+\subsection{Asserting Facts and Rules}
+\label{assert}
+
+The internal database of {\nash} contains two categories of knowledge:
+{\em facts\/}, that is, declarative statements about the world, and
+{\em rules\/}.
+
+After a sentence supplied by the user has been transformed into the
+corresponding {\niks}-representation by the analyzer, this
+representation is passed on to the {\em evaluator\/}, which, depending
+on the category the sentence belongs to (statement, rule or query)
+decides what to do next. In this section we look at how statements and
+rules are treated by the evaluator, whereas the treatment of queries
+is described separately in Section~\ref{answer}.
+
+\subsubsection{Asserting Rules}
+
+Asserting rules is straight-forward in {\nash}: they are explicitly
+stored in the knowledge base in their given form without any further
+treatment.
+
+\subsubsection{Asserting Facts}
+
+Asserting facts could have been treated similarly to the assertion of
+rules, that is, to be stored explicitly without further delay. But,
+since facts as supplied by the analyzer may contain large amounts of
+implicit knowledge which may be cumbersome to extract later as part of
+the reasoning process, I found it convenient to try to extract as much
+of this knowledge as possible at an as early stage as possible, and to
+store each piece of knowledge thus extracted separately.
+
+To illustrate the approach, consider the sentence
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em John lives in a beautiful house in France\/}
+\end{tabbing}
+As is evident, this sentence indeed conveys that John lives in a
+beautiful house in France, but it also conveys a lot more. For
+instance that John lives in France, or that there is at least one
+beautiful house in France. To extract this knowledge, we can use the
+fact that it is contained in {\em nested prepositional phrases\/} to
+recursively go through the semantic structure representing the
+sentence, collecting noun phrases (like, in this case, John and the
+beautiful house) and combining them with the prepositional phrases
+from whose scope they are visible. Thus it is extracted that John
+lives in France, but not that France is in a beautiful house. To
+complete the example, these are the pieces of knowledge extracted from
+the given sentence by {\nash}, presented in paraphrased form:
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em John lives in a beautiful house in France.\/}\\
+  \>\>{\em John lives in a beautiful house.\/}\\
+  \>\>{\em A beautiful house is in France.\/}\\
+  \>\>{\em John lives in France.\/}\\
+  \>\>{\em John lives.\/}
+\end{tabbing}
+From a mere syntactic point of view, as that of {\nash}, this is about
+all that is possible to deduce about John and his beautiful house in
+France. Knowledge made up from nouns and their qualifiers is not
+extracted. This is because the combinations of nouns and qualifiers
+are considered to be separate entities, not variants of the same
+entity.  Thus, in the above example, it is not deduced that ``{\em A
+house is beautiful\/}''.
+
+It has to be pointed out, though, that the algorithm
+is not robust, in that it misses pieces of knowledge contained in
+certain complex nested constructs. 
+
+\subsection{Answering to Queries}
+\label{answer}
+
+In the following discussion, the term {\em literal\/} means a
+constituent part of a conjugation, and the verb to {\em solve\/} is
+used to denote the process of proving a given literal.
+
+The reasoning mechanism of {\nash} works analogously to the resolution
+principle described in Section~\ref{resolution}. Whereas resolution
+requires that the clause to be solved be a disjunction of literals,
+the mechanism employed in {\nash} requires that the clause be a
+conjunction of literals. Moreover, implications (rules, that is) need
+not be converted to the analogue of clause form.
+
+To supply an answer to a query, it is decomposed into a set of
+literals, where each literal has to be solved separately.  Whenever
+one of the literals in the set has been solved, it is removed from the
+set, and thus the entire query being solved corresponds to each of its
+constituent literals being solved (this is analogous to a conjunction
+being true only if all of its constituents are true).
+
+Simple literals may be solved in a number of ways:
+
+\begin{itemize}
+\item If the literal contains no variables and is contained in the
+  knowledge base, or a literal is contained in the knowledge base
+  which can be unified with the given literal, this literal has been
+  solved.
+\item If a rule is found whose right side can be unified with the
+  given literal, the rule is fired, which means that the left side of
+  the rule is substituted for the literal, and thus has to be solved
+  in order for the literal to be solved.
+\item If a rule is found whose right side constitutes is a
+  conjugation of literals, one of which can be unified with the given
+  literal, the rule is fired, and the process continues as
+  above\footnote{This is logically justified as follows. The given
+  rule is expressed as \(P\rightarrow Q_1\wedge Q_2\wedge\cdots\wedge
+  Q_{i}\wedge\cdots\wedge Q_{n}\mbox{,}\) which is equivalent to
+  \((\neg P\vee Q_1)\wedge(\neg P\vee Q_2)\wedge\cdots\wedge(\neg
+  P\vee Q_{i})\wedge\cdots\wedge(\neg P\vee Q_{n})\). In other words,
+  \(\neg P\vee Q_{i}\), which is equivalent to \(P\rightarrow Q_{i}\),
+  logically follows from the initial rule.}.
+\item If the leftmost argument of a prepositional literal which
+  cannot be solved as it is, is constituted by a non-atomic literal,
+  an attempt is made at solving this non-atomic literal. If the
+  attempt succeeds, the literal is recombined with the enclosing
+  expression, and a new attempt is made at solving it. 
+\item If neither of the above stages have caused the literal to be
+  solved, the user is prompted for the information needed for a
+  solution to be arrived at. If the information thus acquired is
+  insufficient, failure is reported and the search process terminates.
+\end{itemize}
+If the query has been solved, the answer it supplies depends on the
+nature of the query. That is, a confirmative query (see
+Section~\ref{naldef}) supplies a ``{\em yes\/}'' or ``{\em no\/}''
+answer, whereas all other queries (excluding ``{\em how\/}''-queries)
+corresponds to the user wanting to know the {\em name\/} of a certain
+individual (instance) of a class of world objects, and thus this name
+constitutes the answer given.
+
+\subsection{Collecting Proofs}
+\label{proof}
+
+Proofs are collected during the reasoning process. Each time a literal
+has been solved, or a rule has been fired, it (the solved literal or
+the rule) is added to a list which is passed along through each step
+of the reasoning process. When the initial query has been solved, this
+list constitutes a proof as to how the conclusion was arrived at, and
+will be presented to the user on request (that is, if the query was
+prefixed with the keyword ``{\em how\/}'', see Section~\ref{naldef}).
+
+\subsection{Cooperativity Issues (Not Implemented)}
+\label{notcoop}
+
+As mentioned in Section~\ref{coop}, Grice' Cooperation Principle has
+become widely accepted as a model on which to base intelligent
+(cooperative) interfaces to {\nlp}-systems. Several approaches have
+been proposed on how to implement cooperative interfaces. In this
+section, two of these approaches, {\em integrity constraints\/} and
+{\em scripts analysis\/}, are briefly touched upon. In {\nash}, no
+measures have been taken in order to make its interface cooperative.
+
+\subsubsection{Integrity Constraints}
+
+In~\cite{gal}, an approach is presented which is based on detecting
+disparities between the knowledge base (or database) and the
+assumptions the user makes about it. 
+
+Different users of the database may have different perceptions (or
+{\em viewpoints\/}) of it, which can be described by a set of {\em
+intensional\/} laws (that is, laws used to derive new facts from what
+is explicitly stored in the database, such as ``{\em 1848 is before
+1989\/}''. These laws can also be used to express semantic
+restrictions, or {\em integrity constraints\/} associated with the
+database. An example of an integrity constraint would be that one
+person cannot at the same time both be a mother and a father.
+
+The {\em presupposition\/} of a query can be loosely defined as all
+the more general statements resulting from the query. For example, the
+query ``{\em How many people took the train to Haugesund in 1991?\/}''
+presupposes that there exists a railway connection to Haugesund. When
+a very general presupposition is false, all the presuppositions less
+general than it are false also.
+
+A {\em misconception\/} occurs between a user and a database when no
+answer to the user's query exists because either a presupposition of
+the query is found to be false, or one ore more integrity constraints
+are violated. Several misconception may occur in connection with the
+same query. In~\cite{gal}, several rules are listed to guide the
+system in the selection of which information to present to the user as
+a response to a query containing one or more misconceptions.
+
+For a thorough description of the approach, as well as a Prolog
+implementation of parts of it, see~\cite{gal}.
+
+\subsubsection{Scripts Analysis}
+
+A {\em script\/} may be defined as a stereotyped description of a
+situation which may occur within a certain domain, say, the act of
+going to a restaurant, where each entity is assigned a particular
+r\^{o}le, the waiters serving food, the guests entering, ordering,
+eating, paying and leaving. A script consists of a set of {\em
+slots\/}, which represent people and objects that are involved in the
+events described in the script. A script has associated with it a {\em
+header\/}, which describes the prerequisites for its being activated,
+as well as its preferred locations, r\^{o}les and events. One of the
+most important features of scripts, is their ability to predict events
+which have not been explicitly observed.
+
+The main use of scripts has been in the field of {\em plan
+recognition\/}, but they have inherent features, such as their ability
+to detect the most likely course of events, which make them well
+suited as a basis for cooperative interfaces. For a more thorough
+treatment of scripts, see for instance~\cite{torulf} and~\cite{rich}.
+
+\subsection{Limitations}
+\label{limsys}
+
+When evaluating {\nash}, it is important to keep in mind that it, like
+{\nal}, is no more than a prototype, and should thus be expected
+neither to be complete nor sound. Many of its main limitations are of
+an implementational nature, in that the system as of yet is not fully
+implemented. Neither has it undergone thorough and error-seeking
+testing. Rather, its test set has been a limited set of rules and
+declarative statements, and errors have been corrected which were
+discovered using this set. Some of its limitations can be summarized
+as follows (see also Section~\ref{limnal}):
+
+\begin{itemize}
+\item Each time the system is started, its knowledge base is empty.
+  This means that the user has to, by hand, supply it with the
+  necessary rules and facts. This is not satisfactory under any
+  circumstances, and particularly not when the set of rules and facts
+  constituting the given domain becomes large.
+\item The user may not ask {\em why\/} he is asked a question. It is
+  desirable that he be able to do so, as a means to establish his
+  confidence in the system.
+\item When the system has arrived at an answer to a query, it is
+  presented as a single-word response, not as a complete sentence.
+  This is not a major issue, though, but it would be desirable from
+  the user's point of view that full-sentence responses be given.
+\item The set of separate pieces of knowledge derived from a
+  declarative statement is not complete (see Section~\ref{assert}).
+\item When trying to prove a query on the basis of a set of rules,
+  the system fires a rule and then loops forever if it is not able to
+  prove the query given that particular rule. This is caused by the
+  reasoning mechanism not being equipped with a counter ensuring that
+  failure eventually is reported if the set of unsolved literals does
+  not become empty (see Section~\ref{answer}). A minor bug to fix,
+  though.
+\item The system is not reliable, neither is its behaviour
+  predictable. Depending on the structure of the constructs
+  representing the query to be solved, the system may or may not
+  arrive at a solution. Most of the time it does, though (arrive at a
+  solution, that is).
+\end{itemize}
+There are other limitations as well, mostly due to implementational
+incompleteness, which are not elaborated upon here.

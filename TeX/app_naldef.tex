@@ -1,0 +1,98 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% app_naldef.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Thu Apr 30 11:11:55 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Fri May  1 00:32:11 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Definition of a Semi-Natural Language}
+\label{app_def}
+
+In what follows, a definition, represented in BNF, of the semi-natural
+language {\nal} is given. Since BNF is only able to represent
+context-free grammars, the context-dependent information contained in
+the DCG-implementation of the grammar has been lost. On the other
+hand, the BNF-representation is easier to read than the
+DCG-implementation, and is thus given here.
+
+The start symbol is {\sl sentence\/}, non-terminals are printed using
+a {\sl slanted\/} typestyle, and terminals are in {\bf bold}. The
+terminals have associated with them a set of lexical insertion rules
+(see Section~\ref{ling}), which is not shown here. Productions are
+presented in a depth-first manner. $\epsilon$ represents the empty
+string.
+
+\vspace*{0.7cm}
+
+\begin{tabular}{lcl}
+{\sl sentence\/}         & $\rightarrow$ & {\sl statement\/}       \\
+                         & $|$           & {\sl query\/}           \\
+{\sl statement\/}        & $\rightarrow$ & {\sl decl\_statement\/} \\
+                         & $|$           & {\sl formal\_rule\/}    \\
+{\sl decl\_statement\/}  & $\rightarrow$ & {\sl
+simple\_decl\_statement\/}, [{\sl and\/}], {\sl decl\_statement\/} \\
+                         & $|$ & {\sl simple\_decl\_statement\/}   \\
+{\sl simple\_decl\_statement\/} & $\rightarrow$ & {\sl noun\_phrase\/},
+{\sl verb\_phrase\/} \\
+{\sl noun\_phrase\/} & $\rightarrow$ & {\sl determiner\/}, {\sl
+adj\_phrase\/}, {\bf noun}, {\sl mod\_rel\/} \\
+                     & $|$ & {\sl atomic\_noun\_phrase\/} \\
+{\sl adj\_phrase\/} & $\rightarrow$ & {\bf adj}, {\sl adj\_phrase\/}\\
+& $|$ & {\bf adj} \\ & $|$ & $\epsilon$ \\
+{\sl mod\_rel\/} & $\rightarrow$ & {\sl modifier\/}\\
+& $|$ & {\sl relative\_clause\/} \\
+{\sl modifier\/} & $\rightarrow$ & {\bf modifier\_prep}, {\bf
+determiner}, {\sl adj\_phrase\/}, {\bf noun}, {\sl relative\_clause\/} \\
+& $|$ & {\bf modifier\_prep}, {\sl atomic\_noun\_phrase\/}\\
+{\sl relative\_clause\/} & $\rightarrow$ & {\bf rel\_pronoun}, {\sl
+verb\_phrase\/} \\
+& $|$ & $\epsilon$ \\
+{\sl atomic\_noun\_phrase\/} & $\rightarrow$ & {\bf name} \\
+& $|$ & {\bf abstract\_noun}\\ & $|$ & {\bf year} \\ & $|$ & {\bf
+var\_noun} \\
+{\sl verb\_phrase\/} & $\rightarrow$ & {\sl simple\_verb\_phrase\/},
+{\sl prep\_phrases\/} \\
+{\sl simple\_verb\_phrase\/} & $\rightarrow$ & {\bf intrans\_verb} \\
+& $|$ & {\bf trans\_verb}, {\sl noun\_phrase\/} \\ & $|$ & {\bf
+aux(be)}, {\sl aux\_tail\/} \\
+& $|$ & {\sl trace\_verb\_phrase\/}\\
+{\sl prep\_phrases\/} & $\rightarrow$ & {\sl prep\_phrase\/}, {\sl
+prep\_phrases\/} \\
+& $|$ & {\sl prep\_phrase\/} \\ & $|$ & $\epsilon$ \\
+{\sl prep\_phrase\/} & $\rightarrow$ & {\bf prep}, {\sl
+noun\_phrase\/}
+\end{tabular}
+
+\begin{tabular}{lcl}
+{\sl aux\_tail\/} & $\rightarrow$ & {\sl comp\/} \\
+& $|$ & {\sl prep\_phrase\/} \\
+{\sl comp\/} & $\rightarrow$ & {\bf adj} \\
+& $|$ & {\sl noun\_phrase\/} \\
+{\sl trace\_verb\_phrase\/} & $\rightarrow$ & {\sl noun\_phrase\/},
+{\bf trans\_verb} \\
+{\sl formal\_rule\/} & $\rightarrow$ & [{\sl if\/}], {\sl
+decl\_statement\/}, [{\sl then\/}], {\sl decl\_statement\/} \\
+{\sl query\/} & $\rightarrow$ & {\sl is\_does\_phrase\/} \\
+& $|$ & {\bf wh\_pronoun}, {\sl vp\_aux\/} \\
+{\sl is\_does\_phrase\/} & $\rightarrow$ & {\sl is\_phrase\/} \\
+& $|$ & {\sl does\_phrase\/} \\
+{\sl is\_phrase\/} & $\rightarrow$ & {\bf aux(be)}, {\sl
+noun\_phrase\/}, {\sl comp\_prep\_phrase\/}, {\sl prep\_phrases\/} \\
+{\sl does\_phrase\/} & $\rightarrow$ & {\bf aux(do)}, {\sl
+simple\_decl\_statement\/} \\
+{\sl comp\_prep\_phrase\/} & $\rightarrow$ & {\sl comp\/} \\ 
+& $|$ & {\sl prep\_phrase\/} \\
+{\sl vp\_aux\/} & $\rightarrow$ & {\sl verb\_phrase\/} \\
+& $|$ & {\sl aux\_phrase\/} \\
+{\sl aux\_phrase\/} & $\rightarrow$ & {\bf aux(do)}, {\sl
+trace\_simple\/} \\
+& $|$ & {\bf aux(be)}, {\sl noun\_phrase\/}, {\sl aux\_tail\/}, {\sl
+prep\_phrases\/} \\
+{\sl trace\_simple\/} & $\rightarrow$ & {\sl trace\_verb\_phrase\/} \\
+& $|$ & {\sl simple\_decl\_statement\/}
+\end{tabular}
+
+

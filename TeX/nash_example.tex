@@ -1,0 +1,281 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nash_example.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Mon Apr 27 17:27:20 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:22:36 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{An Example Domain - The Norwegian Nationality Act}
+\label{example}
+
+As an example domain for {\nash}, I have chosen the Norwegian
+Nationality Act. This is due to the fact that legislation, being
+basically definitional in nature, is particularly suited for
+formalization. This example is presented as though {\nash} is working
+completely in accordance with its specification. For the most part
+this is true, at least for the given domain, but no guarantee is given
+that the system will behave well in all circumstances (see
+Section~\ref{limsys}).
+
+\subsection{User Commands}
+
+In order for the user to be able to ask the system to perform specific
+tasks not directly connected to the reasoning process, {\nash} is
+equipped with a (small) set of user commands. These are
+
+\begin{itemize}
+\item {\em summary\/}: This command causes the system to print the
+  contents of the knowledge base, paraphrased into {\nal}. Facts are
+  preceded with the keyword ``{\sl known:\/}'', and rules with the
+  keyword ``{\sl rule:\/}''.
+\item {\em resk\/}: Retract all facts from the knowledge base.
+\item {\em resr\/}: Retract all rules from the knowledge base.
+\item {\em reset\/}: Retract everything from the knowledge base, both
+  facts and rules.
+\end{itemize}
+In addition the two built-in predicates {\em debug\/} and {\em
+nodebug\/} may be invoked from {\nash}.
+
+\subsection{Judicial Expert Systems}
+
+In judicial expert systems, the legislation is the primary source of
+the knowledge base. In addition, it may be influenced by other
+legislative factors, such as {\em case law\/} (law established by
+judicial decision in cases) and judicial literature. An expert system
+with the Norwegian Nationality Act as its domain will be able to
+answer questions like ``{\em Can Eigil Skallagrimsson become a
+Norwegian citizen?\/}''.
+
+It is important to have in mind that judicial expert systems never can
+replace a judicial system. Legislation often contains {\em vague\/}
+statements, such as ``{\em being of good character\/}'' and ``{\em
+having sufficient knowledge of Norwegian\/}'', as well as other
+ambiguities, and sometimes even contradictions. This demands careful
+consideration in each case to which the particular piece of
+legislation is applied, consideration which an automated reasoning
+system such as an expert system will not be able to support, at least
+not in the foreseeable future. The main task of judicial expert
+systems is thus a supervisory one; they may act as a guide in finding
+one's way through intricate law texts, and may point to areas
+demanding extra consideration.
+
+The pioneer project in the field of legislative expert systems was a
+system based on the British Nationality Act, done at the Imperial
+College, U.\ K., and presented in~\cite{british}. The Norwegian
+Nationality Act has been used previously as domain for judicial
+expert systems in connection with the {\hsql}-project at {\nit};
+see for instance~\cite{foredrag} and~\cite{maehle}.
+
+\subsection{Creating the Knowledge Base}
+
+In Appendix~\ref{app_lov}, the extract from the Norwegian Nationality
+Act on which the knowledge base of the example is based, is given.
+
+In order for the system to be able to understand the text, it has to
+be translated into {\nal}, in the form of formal rules. That is, the
+paragraphs have to be transformed into {\em if-then\/}-constructs,
+where the premises are conjugations of simple declarative statements,
+and the conclusions are single declarative statements. The given
+paragraphs have already been logically formalized in~\cite{eggen}, and
+are thus easily translated into {\nal}. In this example we will
+concentrate on \S 1, which gets the following representation:
+
+\begin{tabbing}
+  xxx\= xxx\= If \= \kill
+  \>\>{\em If any woman is a citizen in any year and\/}\\
+  \>\>\>{\em this woman is the mother of any person and\/}\\
+  \>\>\>{\em this person is born in this year\/}\\
+  \>\>{\em then\/}\\
+  \>\>\>{\em this person is a citizen by birth.\/}
+\end{tabbing}
+
+\begin{tabbing}
+  xxx\= xxx\= If \= \kill
+  \>\>{\em If any man is a citizen in any year and\/}\\
+  \>\>\>{\em this man is the father of any person and\/}\\
+  \>\>\>{\em any woman is the mother of this person and\/}\\
+  \>\>\>{\em this man marries this woman in any other year and\/}\\
+  \>\>\>{\em this other year is before this year and\/}\\
+  \>\>\>{\em this person is born in this year\/}\\
+  \>\>{\em then\/}\\
+  \>\>\>{\em this person is a citizen by birth.\/}
+\end{tabbing}
+
+\begin{tabbing}
+  xxx\= xxx\= If \= \kill
+  \>\>{\em If any man is the father of any person and\/}\\
+  \>\>\>{\em any woman is the mother of this person and\/}\\
+  \>\>\>{\em this man dies in any year and\/}\\
+  \>\>\>{\em this man is a citizen in this year and\/}\\
+  \>\>\>{\em this man is married to this woman in this year\/}\\
+  \>\>{\em then\/}\\
+  \>\>\>{\em this person is a citizen by birth.\/}
+\end{tabbing}
+
+\begin{tabbing}
+  xxx\= xxx\= If \= \kill
+  \>\>{\em If any person is an abandoned orphan\/}\\
+  \>\>{\em then\/}\\
+  \>\>\>{\em this person is a citizen.\/}
+\end{tabbing}
+``{\em Citizen\/}'' in this context is to be interpreted as ``{\em
+Norwegian citizen\/}''. These formalized rules can be fed directly to
+{\nash}, which stores them as formal rules in the knowledge base.
+
+\subsection{A Sample Dialogue}
+
+If we want to find out whether a certain person, e.g., Kristin, is a
+Norwegian citizen, we ask the question ``{\em Is Kristin a
+citizen?\/}'' to the system. In order for the system to know that any
+citizen by birth also is a citizen, we have to supply it with the
+additional rule (here given as an implicit rule):
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em Every citizen by birth is a citizen.\/}
+\end{tabbing}
+
+The system will now try to prove that Kristin indeed {\em is\/} a
+citizen, first by investigating whether this is an already known fact
+(which we assume it is not in our case), then by applying the above
+rules one by one until either a proof has been found or failure is
+reported. When applying a certain rule, the system may have to query
+the user for information in order to arrive at a proof.
+
+\subsubsection{Interacting with the User}
+
+The first assertion that the system has to prove (the initial
+question, that is), is whether Kristin is a citizen. There exist two
+rules in the knowledge base describing how she can be classified as a
+citizen. One says that she is a citizen if she is an abandoned orphan,
+the other that she is a citizen if she is a citizen by birth. The
+rules are applied in order of appearance in the knowledge base, and
+thus the first question asked to the user is
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em Is Kristin an abandoned orphan?\/}
+\end{tabbing}
+If the answer given is ``{\em yes\/}'', the assertion has been proved,
+and the search process terminates. If the answer is ``{\em no\/}'',
+the system tries to prove that Kristin is a citizen by birth, to which
+it can apply either of the three first rules above. The questions
+asked in connection with each rule, as well as answers causing a
+solution for the particular rule, are:
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em When is Kristin born?\/}\ \ {\sl Kristin is born in 1966.}\\
+  \>\>{\em Who is a mother of Kristin?\/}\ \ {\sl Sigrid.}\\
+  \>\>{\em Is Mary a citizen in 1966?\/}\ \ {\sl Yes.}
+\end{tabbing}
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em When is Kristin born?\/}\ \ {\sl 1966.}\\
+  \>\>{\em Who is a mother of Kristin?\/}\ \ {\sl Sigrid is the mother
+  of Kristin.}\\
+  \>\>{\em Who is a father of Kristin?\/}\ \ {\sl Jamm\ae lt.}\\
+  \>\>{\em Is Jamm\ae lt a citizen in 1966?\/}\ \ {\sl Yes.}\\
+  \>\>{\em When does Jamm\ae lt marry Sigrid?\/}\ \ {\sl Jamm\ae lt
+  marries Sigrid in 1964.}
+\end{tabbing}
+
+\begin{tabbing}
+  xxx\= xxx\= \kill
+  \>\>{\em Who is a mother of Kristin?\/}\ \ {\sl Sigrid.}\\
+  \>\>{\em Who is a father of Kristin?\/}\ \ {\sl Jamm\ae lt.}\\
+  \>\>{\em When does Jamm\ae lt die?\/}\ \ {\sl 1964.}\\
+  \>\>{\em Is Jamm\ae lt a citizen in 1964?\/}\ \ {\sl Yes.}\\
+  \>\>{\em Is Jamm\ae lt married to Sigrid in 1964?\/}\ \ {\sl Yes.}
+\end{tabbing}
+If the information supplied by the user does not suffice in proving
+that Kristin is a citizen by any rule in the knowledge base, the user
+is notified that failure has occurred.
+
+Note that it is possible to give full-sentence answers as well as one
+word answers. In fact, it is possible to supply answers which may have
+no relevance whatsoever with the question. The information contained
+in these answers is added to the knowledge base and may be used to
+answer later questions, which thus do not have to be presented to the
+user.  For instance, if given the question ``{\em Who is a mother of
+Kristin?\/}'', the answer may well be ``{\em Jamm\ae lt dies in
+1964\/}''. The system still does not know who Kristin's mother is, and
+will have to ask the question again, but it {\em does\/} know that
+Jamm\ae lt dies in 1964.  In other words, all questions given in
+connection with a specific rule have to be answered in order to arrive
+at a conclusion, but the order in which the answers are given does not
+have to correspond with the order of the questions.
+
+\subsubsection{Supplying Proofs}
+
+If the user wants a proof as to why Kristin is a citizen, he asks the
+question ``{\em How is Kristin a citizen?\/}'' to the system. For
+instance, if the system is able to prove that Kristin is a citizen by
+the second rule above, the proof supplied to the user may be (how
+proofs are collected is described in section~\ref{proof}):
+
+\begin{tabbing}
+  xxx\= xxx\= xxx\= xxx\= xxx\= xxx\= xxx\= \kill
+  \>\>{\em Kristin is a citizen if Kristin is a citizen by birth.}\\
+  \>\>{\em Kristin is a citizen by birth if}\\
+  \>\>\>{\em A is a man and B is a year and A is a citizen in B and}\\
+  \>\>\>{\em A is a father of Kristin and}\\
+  \>\>\>{\em C is a woman and C is a mother of Kristin and}\\
+  \>\>\>{\em D is a year and A marries C in D and D is before B}\\
+  \>\>\>{\em and Kristin is born in B.}\\
+  \\
+  \>\>{\em 1964 is before 1966.\/}\\
+  \>\>{\em Jamm\ae lt is a citizen in 1966.\/}\\
+  \>\>{\em Jamm\ae lt is a father of Kristin.\/}\\
+  \>\>{\em Sigrid is a mother of Kristin.\/}\\
+  \>\>{\em Jamm\ae lt marries Sigrid in 1964.\/}\\
+  \>\>{\em Kristin is born in 1966.\/}
+\end{tabbing}
+
+\subsubsection{Summaries}
+
+In addition to query the system and ask for proofs, the user may ask
+to be given a summary of the contents of the knowledge base. The
+command {\em summary\/} is used for this purpose. For instance, if the
+knowledge base has the same contents as that of the previous example,
+the summary given will look like:
+
+\begin{tabbing}
+  xxx\= xxx\= {\sl Rule: } \= {\em C} \= xxx\= xxx\= xxx\= \kill
+  \>\>{\sl Known: }{\em Kristin is born in 1966.\/}\\
+  \>\>{\sl Known: }{\em Kristin is born.\/}\\
+  \>\>{\sl Known: }{\em Sigrid is a mother of Kristin.\/}\\
+  \>\>{\sl Known: }{\em Sigrid is a mother.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt is a father of Kristin.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt is a father.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt is a citizen in 1966.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt is a citizen.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt marries Sigrid in 1964.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt marries Sigrid.\/}\\
+  \>\>{\sl Known: }{\em Sigrid is in 1964.\/}\\
+  \>\>{\sl Known: }{\em Jamm\ae lt is in 1964.\/}\\
+  \\
+  \>\>{\sl Rule: }{\em C is a citizen by birth if}\\
+  \>\>\>\>{\em A is a man and B is a year and A is a citizen in B and}\\
+  \>\>\>\>{\em C is a person and A is a father of C and}\\
+  \>\>\>\>{\em D is a woman and D is a mother of C and}\\
+  \>\>\>\>{\em E is a year and A marries D in E and E is before B and}\\
+  \>\>\>\>{\em C is born in B.}\\
+  \>\>{\sl Rule: }{\em A is a citizen if}\\
+  \>\>\>\>{\em A is a person and A is a citizen by birth }
+\end{tabbing}
+
+Note that some of the information contained in the knowledge base is
+inconsistent with common sense knowledge about the world. For
+instance, it is not sound to deduce from the fact that Jamm\ae lt is
+(or rather, {\em was\/}) a citizen in 1966 that he still is a citizen,
+which is how the average user would interpret the sentence ``{\em
+Jamm\ae lt is a citizen\/}''. This kind of inconsistence is a
+consequence of {\nash}' lack of semantic analysis (see
+Sections~\ref{anagen} and~\ref{limnal}), and may cause the knowledge
+base to contain some rather awkward pieces of knowledge.
+

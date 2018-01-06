@@ -1,0 +1,276 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% back_nls.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Sat Apr 25 19:58:14 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:32:44 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : In progress
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Natural Language Systems}
+\label{nls}
+
+\subsection{What Constitutes a Natural Language?}
+\label{nla}
+
+Natural languages, as opposed to artificial languages (e.g.\
+programming languages), are the languages human beings use in their
+daily life to communicate all sorts of information about the world.
+Thus Livian, Sorb, Basque, Norwegian, English and all other known
+languages (as well as those not yet discovered) constitute natural
+languages.
+
+What characterizes natural languages is that they are never stable.
+They are the result of a continued evolution, adapting to the ever
+changing set of demands characterized by the cultural as well as
+social setting in which each language is used, adopting words and
+constructs from other languages, but also evolving in what may seem to
+be a completely random manner.  This evolution has by no means come to
+an end. On the contrary, the large amount of information available in
+today's society combined with the extreme ease of communication has
+caused an acceleration of this process that is unparalleled in
+history. As a result of this evolution, natural languages have come to
+be extremely powerful, both with respect to expressivity and
+flexibility. On the other hand, the nondeterminism and inherent
+ambiguity of natural languages, although being useful to humans in
+their daily use of the language, cause serious problems for automated
+natural language systems.
+
+\subsubsection{Nondeterminism and Ambiguity}
+
+An inherent feature of natural languages is that it is not possible
+{\em a priori\/} to determine the set of well-formed sentences of
+which a language consists. This can be summarized as follows
+(from~\cite{gal}):
+
+\begin{itemize}
+  \item The vocabulary of a natural language is not completely known,
+    in particular because of the existence of specialized vocabularies:
+    technical, medical, local, etc.
+  \item The set of constructions is itself not completely
+    predetermined.
+  \item The set of senses attributed to each word is also not
+    completely predetermined, especially because a word often does not
+    really have a precise sense outside a particular context.
+\end{itemize}
+
+In addition, identical sentences can contain different meanings
+depending on the context in which they occur. Take for instance the
+sentence
+
+\begin{center}
+  {\em He saw her shaking hands}.
+\end{center}
+
+Whether he (whoever {\em he\/} may be; this is an example of what is
+called {\em anaphoric references\/}, i.e., the meaning of a sentence
+depends on knowledge gained from previous sentences) saw her shaking
+hands with someone, or saw that her hands were shaking, is not evident
+from the sentence. (In speech this ambiguity is usually avoided due to
+the fact that human beings use stress and intonation as a means of
+conveying the intended meaning to the receiver(s) of their utterances.
+This is an aspect of the act of communicating which is completely lost
+in written language).
+
+Another phenomenon is that to extract the correct meaning from
+sentences, it is not always sufficient only to have knowledge about
+the meanings of each word. Consider the sentences
+
+\begin{itemize}
+  \item {\em John saw the boy in the park with a telescope.}
+  \item {\em John saw the boy in the park with a dog.}
+  \item {\em John saw the boy in the park with a statue.}
+\end{itemize}
+
+In these three sentences, only the last word of the last prepositional
+phrase differs, and from a merely syntactic viewpoint it is not
+possible to deduce whether in each case this prepositional phrase is
+to be attributed to John's seeing act, the boy or the park. In fact,
+in each case, all attributions can be made to make sense if one
+carefully defines the contexts in which they appear. On the other
+hand, it is not very probable that John used a dog to see the boy in
+the park, or that the boy was carrying a statue with him through the
+park. Still it is important, although one knows that it is most likely
+that John used a telescope to see the boy, not to exclude the
+possibility that he in fact {\em did\/} use the dog (i.e., he was
+blind and his guide dog was trained to give him a certain signal when
+it saw a boy in the park).
+
+In other words, to extract the intended meaning from a sentence, it is
+necessary for the receiver, in addition to having semantic knowledge
+about each word, also to have knowledge about the world in which the
+language is used, and to be able to (unconsciously) assign probability
+measures to each possible interpretation of the sentence in order to
+arrive at a decision as to which one is the right one.
+
+\subsection{Natural Language Processing}
+\label{nlpr}
+
+Natural Language Processing ({\nlp}) is the field of which the
+objective is to make systems that are able to understand and reason on
+the basis of natural languages. It is useful to divide the entire
+{\nlp} problem into two tasks, of which the first is a subset of the
+second (from~\cite{rich}):
+
+\begin{itemize}
+  \item Processing written text, using lexical, syntactic and semantic
+    knowledge of the language as well as the required real world
+    information. 
+  \item Processing spoken language, using all the information needed
+    above, plus additional knowledge about phonology as well as enough
+    added information to handle the further ambiguities that occur in
+    speech.
+\end{itemize}
+
+The field of speech recognition is mainly concerned with being able to
+deduce from audio signals the sequence of words which make up an
+utterance. Since this sequence is readily given in written text, it is
+only natural that by far the most research has been done in the field
+of processing written language, of which {\nlp} more or less has
+become a synonym.
+
+The principal areas of research in {\nlp} are (from~\cite{gal}):
+
+\begin{itemize}
+  \item Developing and modeling linguistic systems.
+  \item Conceiving and implementing models and systems of {\nlp}.
+  \item Evaluating such systems from the point of view of
+    human-machine interfaces.
+\end{itemize}
+
+The necessity of developing new linguistic systems is due to the fact
+that existing linguistic systems have usually been developed without
+the needs of {\nlp} in mind. That is, to be able to develop a working
+model of a linguistic system, it is necessary that the linguistic
+system be suited for modeling.
+
+\subsubsection{The Process of Understanding Natural Language}
+
+The term {\em understand\/} in this context is to be understood as the
+ability of an {\nlp}-system to respond to statements and queries given
+to it in natural language as if these responses were the result of a
+human-like reasoning process. The extent to which an {\nlp}-system
+succeeds in seeming to understand and act according to its input is
+closely connected with its ability to act in correspondence with the
+principles of {\em cooperativity\/}, described briefly in
+Section~\ref{coop}, and thoroughly treated in~\cite{torulf}.
+
+The process of understanding natural language (written text) can be
+divided into the following individual, and more or less independent,
+steps:
+
+\begin{description}
+\item[Morphological Analysis] \begin{sloppypar} Individual words are
+  decomposed into their components, inflected words into their stems,
+  and derived words are traced back to their sources. \end{sloppypar}
+  \item[Syntactic Analysis] The string of words is analyzed to see
+    whether they represent correct sentences in the given language. If
+    they do, they are transformed into structures showing how the
+    individual words of each sentence relate to each other.
+  \item[Semantic Analysis] The structures created during the
+    syntactic analysis are analyzed to extract from them the meaning
+    of the sentences. Two important issues must be addressed
+    (from~\cite{rich}):
+
+    \begin{itemize}
+      \item Map individual words into appropriate objects in the
+        knowledge base or database. If no such mapping is found, the
+        sentence may or may not be refused, depending on the aims of
+        the particular application.
+      \item Create the correct substructures to correspond to the way
+        the meanings of the individual words combine with each other.
+    \end{itemize}
+    
+  \item[Pragmatic Analysis] The structure representing what was
+    said is analyzed to determine which action the system should take.
+    I.e., a statement like {\em ``It is cold in here''\/} could be
+    interpreted as a simple declarative statement to the fact that it
+    indeed {\em is\/} cold, but it could also be (and should be,
+    according to the cooperativity principles) interpreted as a
+    request to shut the window, given that there is an open window in
+    the room where the statement is uttered.
+\end{description}
+
+The sequence in which these steps are performed is not necessarily the
+same from one system to another, nor are the boundaries between them.
+Also, if it is found that a given system would work according to its
+specification without going through all the steps when analyzing its
+input, it is no requirement that it do. Still, every full-fledged
+{\nlp}-system has to have its input thoroughly analyzed to be certain
+to behave correctly in all situations, and is thus subject to carrying
+its input through all the steps.
+
+\subsection{Cooperative Responses}
+\label{coop}
+
+In human to human conversation, a lot of knowledge is passed on
+without being explicitly stated. In spoken conversation, the amount of
+information conveyed by stress, intonation, facial expressions and
+body language in general often by far exceeds the amount contained in
+the few words actually spoken. Since we are only concerned here with
+written language, all this information is lost to us, but even what
+appears to be a short declarative statement in written language, can
+convey a large body of hidden and implicit information, information
+which has to be inferred in order for the system to be able to act
+cooperatively and to the user's satisfaction.  From~\cite{gal}:
+
+\begin{quote}
+  {\em {\em [Human conversational exchanges]} are characteristically
+  cooperative efforts and each participant recognizes in them a common
+  purpose or a set of purposes or, at least, a mutually accepted
+  direction. Unless exceptional circumstances prevail, each
+  participant in a conversation is responsible for detecting and
+  correcting misconceptions that might otherwise occur, and expects
+  the other participants to do the same.}
+\end{quote}
+
+These implicit behaviour rules have been formalized by Grice, who
+in~\cite{grice} suggests several maxims constituting what he calls the
+{\em Cooperation Principle\/}. The maxims of quality, quantity,
+relation and manner are the ones of concern here:
+
+\paragraph{The maxim of quality} 
+This maxim requires that one try to make a truthful contribution:
+
+\begin{itemize}
+  \item Do not say what you believe to be false.
+  \item Do not say that for which you lack adequate evidence.
+\end{itemize}
+
+\paragraph{The maxim of quantity} 
+This maxim relates to the amount of information contained in a
+contribution:
+
+\begin{itemize}
+  \item Make your contribution as informative as is required.
+  \item Do not make your contribution more informative than is
+    required.
+\end{itemize}
+
+\paragraph{The maxim of relation} 
+This maxim requires that a contribution be relevant to the
+conversation.
+
+\paragraph{The maxim of manner} 
+This maxim relates to questions of presentation:
+
+\begin{itemize}
+  \item Avoid obscurity of expression.
+  \item Avoid ambiguity.
+  \item Be brief.
+\end{itemize}
+
+The other maxims suggested by Grice address aesthetic, social and
+moral questions, but in general the four maxims above are sufficient
+to guide a meaningful discourse. The Cooperation Principle was
+intended merely as a description of how humans behave in a
+conversation, but it has come to be widely accepted also as a model on
+which to base intelligent interfaces to {\nlp}-systems.
+
+By {\em cooperative responses\/} we mean responses that correspond as
+closely as possible to those we would expect to get from a person
+trying to understand and reply to the queries of another person. In
+connection with {\nlp}-systems, the aim is, in other words, to make
+the system behave as much in accordance with the Cooperation Principle
+as possible.

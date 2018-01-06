@@ -1,0 +1,45 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;; -*- Mode: Fundamental -*- ;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; LABELS --- 
+;;; Author          : Anders Blehr
+;;; Created On      : Sat Apr 25 19:20:43 1992
+;;; Last Modified By: Anders Blehr
+;;; RCS revision    : $Revision: 1.1 $ $Locker:  $
+;;; Status          : None
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+intro			Introduction
+  tucc			Description of TUC as well as my motivation for not
+			working directly with TUC.
+
+background		Theoretical background (NL and expert systems)
+  nls			Natural language systems
+    nla			What constitutes a natural language?
+    nlpr		Natural language processing
+    coop		Cooperativity principles
+  rbs			Rule based systems
+    prodsys		Production systems
+    expert		Expert systems
+  logic			Logic foundations
+    predicate		Predicate logic
+    resolution		Resolution
+
+nash			NaSh
+  aims			Aims and goals
+  def			Definition of SNaL
+    ling		Linguistic background
+    naldef		Definition of SNaL
+    anadef		Analysis and generation
+    limnal		Limitations of SNaL
+  shell			The expert system shell
+    assert		Asserting facts and rules
+    answer		Answering to queries
+    proof		Collecting proofs
+    notcoop		Cooperativity issues (not implemented)
+    limsys		Limitations of NaSh
+  example		An example
+  future		Future extensions
+
+appendices
+  app_def		Definition of SNaL
+  app_lov		Extract from the Norwegian Nationality Act
+  app_source		Source files

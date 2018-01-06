@@ -1,0 +1,40 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nash_limit.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Mon Apr 27 17:28:24 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:23:58 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Future Extensions}
+\label{future}
+
+The limitations of {\nal} and {\nash} are elaborated upon in
+Sections~\ref{limnal} and~\ref{limsys}. Some possible future
+extensions for the system as a whole are the following:
+
+\begin{itemize}
+\item Increase the reasoning powers of the system, by including
+  semantic analysis. In addition, it would be desirable to equip it
+  with mechanisms supporting temporal reasoning, which is a major
+  requirement that has to be fulfilled if the aim of the system is
+  that it be of practical use.
+\item Extend the definition of {\nal} also to handle the past tense,
+  other inflections than the third person singular, compound nouns,
+  possessives and dangling prepositions.
+\item Provide the system with an automated input mechanism for
+  asserting rules and facts when it is initialized. For instance, the
+  system may be initialized with a file as input parameter, containing
+  the required rules and facts.
+\item The bug causing the system to loop forever when the chosen rule
+  does not apply, has to be fixed. How this can be done, is described
+  in Section~\ref{limsys}.
+\end{itemize}
+Generally, it would be desirable to improve both the definition of the
+language as well as the reasoning mechanisms involved, in order to
+make the system of practical as well as theoretical interest. An
+approach to improving the reasoning mechanism, would be to base it on
+Tore Amble's powerful logical representation scheme {\solon}, rather
+than {\niks}.

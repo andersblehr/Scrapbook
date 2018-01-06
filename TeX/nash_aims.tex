@@ -1,0 +1,73 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- Mode: Latex -*- %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nash_aims.tex --- 
+%%% Author          : Anders Blehr
+%%% Created On      : Mon Apr 27 17:23:57 1992
+%%% Last Modified By: Anders Blehr
+%%% Last Modified On: Mon May  4 06:06:03 1992
+%%% RCS revision    : $Revision: 1.1 $ $Locker:  $
+%%% Status          : Unknown, Use with caution!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Aims and Goals}
+\label{aims}
+
+As mentioned in Section~\ref{tucc}, and further elaborated upon
+in~\cite{solon}, {\tuc} aims at investigating 
+
+\begin{quote}
+  {\em how a naturally readable language can be a unifying framework
+  for knowledge representation and natural language interfaces, {\em
+  [that is, whether]} natural language is able to express knowledge in
+  a way that, apart from its understandability, also is sufficient for
+  an automated reasoning system to draw the right conclusions.}
+\end{quote}
+
+My task in this project has been to define a semi-natural language
+({\nal} - {\em Semi-Natural Language\/}) and on the basis of this
+develop and implement a prototype of a natural language based expert
+system shell ({\nash} - {\em Natural Language Shell\/}).
+
+It has been my intention neither to make {\nal} nor {\nash} out to be
+anything more than prototypes. Whether they contain features of
+interest to Tore Amble in his work with {\tuc} - as I hope and believe
+they do - remains to be seen.
+
+\subsection{{\nal} - The Language}
+
+The term {\nal} will be used throughout the rest of this paper to
+interchangeably refer to the {\em language\/} and to the {\em
+analyzer\/} which constructs semantic representations from sentences
+of the language. In working with {\nal}, I aimed at making it
+
+\begin{itemize}
+  \item appear, from the user's point of view, as close to standard
+    English as practically tractable. That is, it should never require
+    that the user employ constructs which are illegal in English.
+  \item sufficiently formal. That is, it should be able to
+    represent and convey knowledge and information in a manner which
+    is unambiguous and suited for treatment by an automated reasoning
+    system. In order to avoid the ambiguities of standard English, its
+    vocabulary and set of legal constructs should be finite and well
+    defined.
+\end{itemize}
+
+It is important to keep in mind that, no matter how ``natural'' {\nal}
+may seem at first sight, it still is a {\em formal\/} language. No
+effort has been put into making it more than a very restricted subset
+of English.
+
+\subsection{{\nash} - The Expert System Shell}
+
+The aim of {\nash} has been to make a working prototype of a system
+containing the basic features of an expert system shell, and of which
+the dialogue handler is entirely based on {\nal}. That is, all input
+to the system (defining rules, supplying knowledge, querying, etc.) as
+well as all output from the system (answers to queries, explanations,
+queries to the user, etc) should be represented in {\nal}.
+
+To support the reasoning process, an internal knowledge representation
+scheme had to be chosen. I had the option of using Tore Amble's
+{\solon} language, which indeed is a powerful tool, but considering
+that it (or rather its specification) is still under development and
+thus changing from day to day, I chose to use first order predicate
+calculus as a platform on which to build the scheme.
