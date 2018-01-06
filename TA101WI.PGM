@@ -1,0 +1,3056 @@
+/******************************************************************************
+*
+*    File Name         :  TA101WI.PGM
+*
+*    Generated         :  03/29/95 - 17:32:57
+*
+*    Description       :
+*
+*
+*    Revision History:
+*    Date      Revised By       Description
+*    --------  ---------------  -----------------------------------
+*    03/29/95  AB               Created.
+*
+******************************************************************************/
+#define CTA_DLL_NAME "TA101CL"
+
+/******************************************************************************
+*  Application global variables
+******************************************************************************/
+STATIC PTTA_CHAR    pszTestWindowName = NULL;
+STATIC HAB          hab;           /* Application anchor block */
+STATIC HWND         hMenuBar;      /* Handle of the menu bar */
+STATIC PTTA_WINLIST pstWindowList; /* Pointer to the window list */
+STATIC USHORT       usSecs = 0;    /* Seconds counter used by desktop clock */
+STATIC INT          iDate;         /* Holds current date (day only) */
+
+
+/******************************************************************************
+*  #define Constants
+******************************************************************************/
+#define MAIN_WINDOW_X_POS           6
+#define MAIN_WINDOW_Y_POS           3
+
+#define CTA_TID_TASCLOCK            0x0fff  /* Timer for TAS desktop clock */
+#define CTA_TASCLOCK_FREQ           1000    /* ms */
+
+#define CTA_COPY_MP1                (PTTA_VOID)3002
+#define CTA_COPY_MP2                (PTTA_VOID)3
+#define CTA_PASTE_MP1               (PTTA_VOID)3003
+#define CTA_PASTE_MP2               (PTTA_VOID)3
+#define CTA_PRINTSCREEN_MP1         (PTTA_VOID)0x5D011006
+#define CTA_PRINTSCREEN_MP2         (PTTA_VOID)0x00193700
+
+
+/******************************************************************************
+/*  Function Prototypes For Local Functions 
+******************************************************************************/
+static VOID vDisplayMessageOK ( PTTA_CHAR           pszMessage,
+                                PCALLBACKEVENTINFO  pEventInfo  );
+
+//static <type> TAENTRY <function name> ( <parameters> );
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbMessageNotification
+*
+*    Control/Event  :    WINDOW / MSG_NOTIFICATION
+*
+*    Description    :
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbMessageNotification)
+{
+    TaErrCbkStart ("Ta101cbMessageNotification");
+
+    TaMsgRoute();
+
+    if( ( TaErrMsgNum == ETA_OK ) &&
+        ( ((PTTA_ARCH_HDR_RECV)CBI_pMSGData)->szLBoxName[0] != 0 ))
+    
+        TaLstSetCursorPos( ((PTTA_ARCH_HDR_RECV)CBI_pMSGData)->szLBoxName,
+                           ((PTTA_ARCH_HDR_RECV)CBI_pMSGData)->WIN_hwnd,
+                           CBI_pMSGData );
+
+    TaErrCbkStop ("Ta101cbMessageNotification");
+    return (0);
+
+} /* end Ta101cbMessageNotification */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbInterwindowMessage
+*
+*    Control/Event  :    WINDOW / INTERWINDOW_MSG
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbInterwindowMessage)
+{
+    USHORT          usIndex;
+    TTA_WINHEADER   stHeaderKeep;
+    SHORT           i;
+
+    TaErrCbkStart ("Ta101cbInterwindowMessage");
+
+    switch (CBI_IWApplMsg)
+    {
+        case CTA_MSG_WIN_RECEIVE_FOCUS :
+
+            if (TaWimValidHandle(*((HWND *)CBI_IWApplParm), &usIndex))
+            {
+                if (*((HWND *)CBI_IWApplParm) != TaWimQueryActiveHWND())
+                {
+                    /* Keep the window header of the next active window */
+                    stHeaderKeep = *(pstWindowList->apstWindow[usIndex]);
+
+                    /* Move the next active window to the fron of the list */
+                    for (i = usIndex; i > 0; i--)
+                        *(pstWindowList->apstWindow[i]) =
+                                *(pstWindowList->apstWindow[i - 1]);
+
+                    *(pstWindowList->apstWindow[0]) = stHeaderKeep;
+                }
+
+                /* Activate the window's dynamic menu items */
+                _TaMenActivate(&(pstWindowList->apstWindow[0]->stMenuData));
+
+                /* Check the window's item in the Windows menu */
+                TaMenWindowItemCheck(
+                        pstWindowList->apstWindow[0]->hHWND,
+                        pstWindowList->apstWindow[1]
+                            ? pstWindowList->apstWindow[1]->hHWND
+                            : 0                                    );
+
+                /* Set the window's desktop title */
+                _TaDesSetTitle( TaWimQueryActiveHWND(),
+                                NULL,
+                                pABHI,
+                                __FILE__,
+                                __LINE__  );
+            }
+            else
+                /* Window list is empty */
+                _TaDesSetTitle( CBI_hwnd,
+                                NULL,
+                                pABHI,
+                                __FILE__,
+                                __LINE__  );
+
+            break;
+
+        case CTA_MSG_WIN_LOSE_FOCUS :
+
+            break;
+    }
+
+    TaErrCbkStop ("Ta101cbInterwindowMessage");
+    return (0);
+
+} /* end Ta101cbInterwindowMessage */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbPredisplay
+*
+*    Control/Event  :    WINDOW / PREDISPLAY
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbPredisplay)
+{
+    TTA_INT7_DATETIME   stDateTime;
+    _FND_PROG_ARGUMENTS *pProgArguments;
+    CHAR                szAMPM[3];
+
+    TaErrCbkStart ("Ta101cbPredisplay");
+
+    /* Move the desktop to its default position */
+    FndWindowMove( CBI_hwnd,
+                   MAIN_WINDOW_X_POS,
+                   MAIN_WINDOW_Y_POS,
+                   (PTTA_FND_ERROR_BLOCK)pABHI );
+
+    /* Get the current date and time */
+    TaOpsGetDateTime(&stDateTime);
+
+    /* Print the date on the desktop */
+    sprintf( TxGnericData, "%2.2u/%2.2u/%2.2u",
+             stDateTime.month,
+             stDateTime.day,
+             stDateTime.year % 100              );
+
+    /* Format and print the time on the desktop */
+    if (stDateTime.hour < 12)
+    {
+        if (stDateTime.hour == 0)
+            stDateTime.hour = 12;
+
+        strcpy(szAMPM, "AM");
+    }
+    else
+    {
+        if (stDateTime.hour > 12)
+            stDateTime.hour -= 12;
+
+        strcpy(szAMPM, "PM");
+    }
+
+    sprintf( TxGneric1Data, "%2.2u:%2.2u %s",
+             stDateTime.hour,
+             stDateTime.min,
+             szAMPM                           );
+
+    /* Store date and initialize seconds counter */
+    iDate = stDateTime.day;
+    usSecs = stDateTime.sec;
+
+    /* Get the handle of the menu bar */
+    hMenuBar = WinWindowFromID(CBI_hwnd, FID_MENU);
+
+    /* Get the application anchor block */
+    hab = WinQueryAnchorBlock(CBI_hwnd);
+
+    /* Start the desktop clock timer */
+    WinStartTimer(hab, CBI_hwnd, CTA_TID_TASCLOCK, CTA_TASCLOCK_FREQ);
+
+    /* Initialize the service table */
+    TaMsgInitSvcTbl();
+
+    /* Allocate, initialize and retrieve the window list */
+    pstWindowList = TaWimCreateWindowList();
+
+    /* Supply the TaMen class with the handle of the desktop */
+    _TaMenMainPredisplay( CBI_hwnd );
+
+    /* Inform the TaMen class that no windows are active */
+    _TaMenActivate(NULL);
+
+    /* Enable launching of testwindows facility: Get cmd line argument(s) */
+    pProgArguments = (_FND_PROG_ARGUMENTS *)CBI_pInitData;
+
+    /* If a test DLL has been passed, check that it's a valid DLL */
+    if (pProgArguments->FndNumArguments >= 1)
+        pszTestWindowName = strtok(pProgArguments->FndArgumentStr, "\t");
+    else
+        /* Hide the launch button if no test DLL was passed */
+        TaWidCmdHide("TA014PB_LAUNCH_TEST_WINDOW");
+
+    /* Hide Windows menu menu items (no windows are open yet) */
+    FndCommandHide(CBI_hwnd, "TA074MI_WIN_WINDOW_1", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA075MI_WIN_WINDOW_2", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA076MI_WIN_WINDOW_3", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA077MI_WIN_WINDOW_4", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA078MI_WIN_WINDOW_5", (PTTA_FND_ERROR_BLOCK)pABHI);
+
+    /* Hide taxpayer items on File menu */
+    FndCommandHide(CBI_hwnd, "TA003MI_FIL_TAXPAYER_1", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA004MI_FIL_TAXPAYER_2", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA005MI_FIL_TAXPAYER_3", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA006MI_FIL_TAXPAYER_4", (PTTA_FND_ERROR_BLOCK)pABHI);
+    FndCommandHide(CBI_hwnd, "TA007MI_FIL_TAXPAYER_5", (PTTA_FND_ERROR_BLOCK)pABHI);
+
+    /* Read .INI file */
+    TaDesReadIniFile();
+
+    TaErrCbkStop ("Ta101cbPredisplay");
+    return (0);
+
+} /* end Ta101cbPredisplay */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbPredestroy
+*
+*    Control/Event  :    WINDOW / PREDESTROY
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbPredestroy)
+{
+    TaErrCbkStart ("Ta101cbPredestroy");
+
+    /* Write .INI file */
+    TaDesWriteIniFile();
+
+    /* Stop the desktop clock timer */
+    WinStopTimer(hab, CBI_hwnd, CTA_TID_TASCLOCK);
+
+    TaErrCbkStop ("Ta101cbPredestroy");
+    return (0);
+
+} /* end Ta101cbPredestroy */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbLaunchTestWindow
+*
+*    Control/Event  :    TA014PB_LAUNCH_TEST_WINDOW_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbLaunchTestWindow)
+{
+    TaErrCbkStart ("Ta101cbLaunchTestWindow");
+
+    TaWimOpen( pszTestWindowName,
+               "",
+               NULL,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbLaunchTestWindow");
+    return (0);
+
+} /* end Ta101cbLaunchTestWindow */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilPrint
+*
+*    Control/Event  :    TA002MI_FIL_PRINT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilPrint)
+{
+    SWP     stWindowPos;
+
+    TaErrCbkStart ("Ta101cbFilPrint");
+
+    if (WinQueryWindowPos(TaWimQueryActiveHWND(), &stWindowPos)      &&
+        WinSetPointerPos(HWND_DESKTOP, stWindowPos.x, stWindowPos.y)    )
+        WinPostMsg( TaWimQueryActiveHWND(),
+                    WM_CHAR,
+                    CTA_PRINTSCREEN_MP1,
+                    CTA_PRINTSCREEN_MP2     );
+
+    TaErrCbkStop ("Ta101cbFilPrint");
+    return (0);
+
+} /* end Ta101cbFilPrint */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilTaxpayer1
+*
+*    Control/Event  :    TA003MI_FIL_TAXPAYER_1_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilTaxpayer1)
+{
+    CHAR         szInternalID[CTA_LEN_INTERNAL_ID + 1];
+    DOUBLE       dbInternalID;
+
+    TaErrCbkStart ("Ta101cbFilTaxpayer1");
+
+    TaMenTaxpayerItemSelect(CTA_MEN_TAXPAYER_1, szInternalID);
+
+    dbInternalID = atof(szInternalID);
+
+    TaWimOpen( "TA911WI",
+               szInternalID,
+               &dbInternalID,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbFilTaxpayer1");
+    return (0);
+
+} /* end Ta101cbFilTaxpayer1 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilTaxpayer2
+*
+*    Control/Event  :    TA004MI_FIL_TAXPAYER_2_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilTaxpayer2)
+{
+    CHAR         szInternalID[CTA_LEN_INTERNAL_ID + 1];
+    DOUBLE       dbInternalID;
+
+    TaErrCbkStart ("Ta101cbFilTaxpayer2");
+
+    TaMenTaxpayerItemSelect(CTA_MEN_TAXPAYER_2, szInternalID);
+
+    dbInternalID = atof(szInternalID);
+
+    TaWimOpen( "TA911WI",
+               szInternalID,
+               &dbInternalID,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbFilTaxpayer2");
+    return (0);
+
+} /* end Ta101cbFilTaxpayer2 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilTaxpayer3
+*
+*    Control/Event  :    TA005MI_FIL_TAXPAYER_3_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilTaxpayer3)
+{
+    CHAR         szInternalID[CTA_LEN_INTERNAL_ID + 1];
+    DOUBLE       dbInternalID;
+
+    TaErrCbkStart ("Ta101cbFilTaxpayer3");
+
+    TaMenTaxpayerItemSelect(CTA_MEN_TAXPAYER_3, szInternalID);
+
+    dbInternalID = atof(szInternalID);
+
+    TaWimOpen( "TA911WI",
+               szInternalID,
+               &dbInternalID,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbFilTaxpayer3");
+    return (0);
+
+} /* end Ta101cbFilTaxpayer3 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilTaxpayer4
+*
+*    Control/Event  :    TA006MI_FIL_TAXPAYER_4_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilTaxpayer4)
+{
+    CHAR         szInternalID[CTA_LEN_INTERNAL_ID + 1];
+    DOUBLE       dbInternalID;
+
+    TaErrCbkStart ("Ta101cbFilTaxpayer4");
+
+    TaMenTaxpayerItemSelect(CTA_MEN_TAXPAYER_4, szInternalID);
+
+    dbInternalID = atof(szInternalID);
+
+    TaWimOpen( "TA911WI",
+               szInternalID,
+               &dbInternalID,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbFilTaxpayer4");
+    return (0);
+
+} /* end Ta101cbFilTaxpayer4 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilTaxpayer5
+*
+*    Control/Event  :    TA007MI_FIL_TAXPAYER_5_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFilTaxpayer5)
+{
+    CHAR         szInternalID[CTA_LEN_INTERNAL_ID + 1];
+    DOUBLE       dbInternalID;
+
+    TaErrCbkStart ("Ta101cbFilTaxpayer5");
+
+    TaMenTaxpayerItemSelect(CTA_MEN_TAXPAYER_5, szInternalID);
+
+    dbInternalID = atof(szInternalID);
+
+    TaWimOpen( "TA911WI",
+               szInternalID,
+               &dbInternalID,
+               CTA_WIM_OPEN_MODELESS );
+
+    TaErrCbkStop ("Ta101cbFilTaxpayer5");
+    return (0);
+
+} /* end Ta101cbFilTaxpayer5 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoCasework
+*
+*    Control/Event  :    TA053MI_TDO_CASEWORK_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoCasework)
+{
+    TaErrCbkStart ("Ta101cbTdoCasework");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoCasework");
+    return (0);
+
+} /* end Ta101cbTdoCasework */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoReviewItems
+*
+*    Control/Event  :    TA056MI_TDO_REVIEW_ITEMS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoReviewItems)
+{
+    TaErrCbkStart ("Ta101cbTdoReviewItems");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoReviewItems");
+    return (0);
+
+} /* end Ta101cbTdoReviewItems */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoReviewPotAudits
+*
+*    Control/Event  :    TA057MI_TDO_REVIEW_POT_AUDITS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoReviewPotAudits)
+{
+    TaErrCbkStart ("Ta101cbTdoReviewPotAudits");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoReviewPotAudits");
+    return (0);
+
+} /* end Ta101cbTdoReviewPotAudits */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoCorrectSuspdItems
+*
+*    Control/Event  :    TA055MI_TDO_CORRECT_SUSPD_ITEMS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoCorrectSuspdItems)
+{
+    TaErrCbkStart ("Ta101cbTdoCorrectSuspdItems");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoCorrectSuspdItems");
+    return (0);
+
+} /* end Ta101cbTdoCorrectSuspdItems */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoTaxpayerContact
+*
+*    Control/Event  :    TA058MI_TDO_TAXPAYER_CONTACT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoTaxpayerContact)
+{
+    TaErrCbkStart ("Ta101cbTdoTaxpayerContact");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoTaxpayerContact");
+    return (0);
+
+} /* end Ta101cbTdoTaxpayerContact */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoApproveNotices
+*
+*    Control/Event  :    TA047MI_TDO_APPROVE_NOTICES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoApproveNotices)
+{
+    TaErrCbkStart ("Ta101cbTdoApproveNotices");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoApproveNotices");
+    return (0);
+
+} /* end Ta101cbTdoApproveNotices */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoApprovePaymtAgrmt
+*
+*    Control/Event  :    TA048MI_TDO_APPROVE_PAYMT_AGRMT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoApprovePaymtAgrmt)
+{
+    TaErrCbkStart ("Ta101cbTdoApprovePaymtAgrmt");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoApprovePaymtAgrmt");
+    return (0);
+
+} /* end Ta101cbTdoApprovePaymtAgrmt */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoAssignUnasgnCases
+*
+*    Control/Event  :    TA052MI_TDO_ASSIGN_UNASGN_CASES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoAssignUnasgnCases)
+{
+    TaErrCbkStart ("Ta101cbTdoAssignUnasgnCases");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoAssignUnasgnCases");
+    return (0);
+
+} /* end Ta101cbTdoAssignUnasgnCases */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoAssignPotAudits
+*
+*    Control/Event  :    TA049MI_TDO_ASSIGN_POT_AUDITS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoAssignPotAudits)
+{
+    TaErrCbkStart ("Ta101cbTdoAssignPotAudits");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoAssignPotAudits");
+    return (0);
+
+} /* end Ta101cbTdoAssignPotAudits */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoAssignSuspdItems
+*
+*    Control/Event  :    TA051MI_TDO_ASSIGN_SUSPD_ITEMS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoAssignSuspdItems)
+{
+    TaErrCbkStart ("Ta101cbTdoAssignSuspdItems");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoAssignSuspdItems");
+    return (0);
+
+} /* end Ta101cbTdoAssignSuspdItems */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoAssignReviewItems
+*
+*    Control/Event  :    TA050MI_TDO_ASSIGN_REVIEW_ITEMS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoAssignReviewItems)
+{
+    TaErrCbkStart ("Ta101cbTdoAssignReviewItems");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoAssignReviewItems");
+    return (0);
+
+} /* end Ta101cbTdoAssignReviewItems */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoCorrectNotices
+*
+*    Control/Event  :    TA054MI_TDO_CORRECT_NOTICES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoCorrectNotices)
+{
+    TaErrCbkStart ("Ta101cbTdoCorrectNotices");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoCorrectNotices");
+    return (0);
+
+} /* end Ta101cbTdoCorrectNotices */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTdoViewUnreadNotes
+*
+*    Control/Event  :    TA059MI_TDO_VIEW_UNREAD_NOTES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTdoViewUnreadNotes)
+{
+    TaErrCbkStart ("Ta101cbTdoViewUnreadNotes");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTdoViewUnreadNotes");
+    return (0);
+
+} /* end Ta101cbTdoViewUnreadNotes */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbLkpCase
+*
+*    Control/Event  :    TA038MI_LKP_CASE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbLkpCase)
+{
+    TaErrCbkStart ("Ta101cbLkpCase");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbLkpCase");
+    return (0);
+
+} /* end Ta101cbLkpCase */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbLkpTaxpayer
+*
+*    Control/Event  :    TA041MI_LKP_TAXPAYER_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbLkpTaxpayer)
+{
+    TaErrCbkStart ("Ta101cbLkpTaxpayer");
+
+    TaWimOpen( "TA910WI",
+               "",
+               NULL,
+               CTA_WIM_OPEN_MODELESS );
+ 
+    TaErrCbkStop ("Ta101cbLkpTaxpayer");
+    return (0);
+
+} /* end Ta101cbLkpTaxpayer */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbLkpFinancial
+*
+*    Control/Event  :    TA040MI_LKP_FINANCIAL_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbLkpFinancial)
+{
+    TaErrCbkStart ("Ta101cbLkpFinancial");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbLkpFinancial");
+    return (0);
+
+} /* end Ta101cbLkpFinancial */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbLkpCorrespondenc
+*
+*    Control/Event  :    TA039MI_LKP_CORRESPONDENCE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbLkpCorrespondenc)
+{
+    TaErrCbkStart ("Ta101cbLkpCorrespondenc");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbLkpCorrespondenc");
+    return (0);
+
+} /* end Ta101cbLkpCorrespondenc */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunAddTaxpyer
+*
+*    Control/Event  :    TA010MI_FUN_ADD_TAXPAYER_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunAddTaxpyer)
+{
+    TaErrCbkStart ("Ta101cbFunAddTaxpyer");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunAddTaxpyer");
+    return (0);
+
+} /* end Ta101cbFunAddTaxpyer */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunAddCase
+*
+*    Control/Event  :    TA008MI_FUN_ADD_CASE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunAddCase)
+{
+    TaErrCbkStart ("Ta101cbFunAddCase");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunAddCase");
+    return (0);
+
+} /* end Ta101cbFunAddCase */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunRequestNotice
+*
+*    Control/Event  :    TA025MI_FUN_REQUEST_NOTICE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunRequestNotice)
+{
+    TaErrCbkStart ("Ta101cbFunRequestNotice");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunRequestNotice");
+    return (0);
+
+} /* end Ta101cbFunRequestNotice */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunNotesView
+*
+*    Control/Event  :    TA028MI_FUN_NOTES_VIEW_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/19/95  DW           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunNotesView)
+{
+    TaErrCbkStart ("Ta101cbFunNotesView");
+
+    TaMenItemSelect(CTA_DYN_NOTES_VIEW);
+
+    TaErrCbkStop ("Ta101cbFunNotesView");
+    return (0);
+
+} /* end Ta101cbFunNotesView */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunNotesAdd
+*
+*    Control/Event  :    TA009MI_FUN_NOTES_ADD_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/19/95  DW           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunNotesAdd)
+{
+    TaErrCbkStart ("Ta101cbFunNotesAdd");
+
+    TaMenItemSelect(CTA_DYN_NOTES_ADD);
+
+    TaErrCbkStop ("Ta101cbFunNotesAdd");
+    return (0);
+
+} /* end Ta101cbFunNotesAdd */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunReassignCases
+*
+*    Control/Event  :    TA023MI_FUN_REASSIGN_CASES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunReassignCases)
+{
+    TaErrCbkStart ("Ta101cbFunReassignCases");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunReassignCases");
+    return (0);
+
+} /* end Ta101cbFunReassignCases */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunReviewSuspnseAcct
+*
+*    Control/Event  :    TA026MI_FUN_REVIEW_SUSPNSE_ACCT_CMD /  FND_HELP_REQUESTED
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunReviewSuspnseAcct)
+{
+    TaErrCbkStart ("Ta101cbFunReviewSuspnseAcct");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunReviewSuspnseAcct");
+    return (0);
+
+} /* end Ta101cbFunReviewSuspnseAcct */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunMergeTaxpayers
+*
+*    Control/Event  :    TA021MI_FUN_MERGE_TAXPAYER_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunMergeTaxpayers)
+{
+    TaErrCbkStart ("Ta101cbFunMergeTaxpayers");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunMergeTaxpayers");
+    return (0);
+
+} /* end Ta101cbFunMergeTaxpayers */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunRecrdQstnblFilers
+*
+*    Control/Event  :    TA024MI_FUN_RECRD_QSTNBL_FILERS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunRecrdQstnblFilers)
+{
+    TaErrCbkStart ("Ta101cbFunRecrdQstnblFilers");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunRecrdQstnblFilers");
+    return (0);
+
+} /* end Ta101cbFunRecrdQstnblFilers */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunRecrdReturnedMail
+*
+*    Control/Event  :    TA022MI_FUN_RECRD_RETURNED_MAIL_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunRecrdReturnedMail)
+{
+    TaErrCbkStart ("Ta101cbFunRecrdReturnedMail");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunRecrdReturnedMail");
+    return (0);
+
+} /* end Ta101cbFunRecrdReturnedMail */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunSuppressCorrespdnc
+*
+*    Control/Event  :    TA027MI_FUN_SUPPRESS_CORRESPDNC_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunSuppressCorrespdnc)
+{
+    TaErrCbkStart ("Ta101cbFunSuppressCorrespdnc");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunSuppressCorrespdnc");
+    return (0);
+
+} /* end Ta101cbFunSuppressCorrespdnc */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunEnterPaymtAndRet
+*
+*    Control/Event  :    TA012MI_FUN_ENTER_PAYMT_AND_RET_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunEnterPaymtAndRet)
+{
+    TaErrCbkStart ("Ta101cbFunEnterPaymtAndRet");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbFunEnterPaymtAndRet");
+    return (0);
+
+} /* end Ta101cbFunEnterPaymtAndRet */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic1
+*
+*    Control/Event  :    TA011PB_TAXPAYER_CMD /  BUTTON_CLICK
+*                        TA013MI_FUN_DYNAMIC_1_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic1)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic1");
+
+    TaMenItemSelect(CTA_DYN_FUNC_1);
+
+    TaErrCbkStop ("Ta101cbFunDynamic1");
+    return (0);
+
+} /* end Ta101cbFunDynamic1 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic2
+*
+*    Control/Event  :    TA014MI_FUN_DYNAMIC_2_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic2)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic2");
+
+    TaMenItemSelect(CTA_DYN_FUNC_2);
+
+    TaErrCbkStop ("Ta101cbFunDynamic2");
+    return (0);
+
+} /* end Ta101cbFunDynamic2 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic3
+*
+*    Control/Event  :    TA015MI_FUN_DYNAMIC_3_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic3)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic3");
+
+    TaMenItemSelect(CTA_DYN_FUNC_3);
+
+    TaErrCbkStop ("Ta101cbFunDynamic3");
+    return (0);
+
+} /* end Ta101cbFunDynamic3 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic4
+*
+*    Control/Event  :    TA016MI_FUN_DYNAMIC_4_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic4)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic4");
+
+    TaMenItemSelect(CTA_DYN_FUNC_4);
+
+    TaErrCbkStop ("Ta101cbFunDynamic4");
+    return (0);
+
+} /* end Ta101cbFunDynamic4 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic5
+*
+*    Control/Event  :    TA017MI_FUN_DYNAMIC_5_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic5)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic5");
+
+    TaMenItemSelect(CTA_DYN_FUNC_5);
+
+    TaErrCbkStop ("Ta101cbFunDynamic5");
+    return (0);
+
+} /* end Ta101cbFunDynamic5 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic6
+*
+*    Control/Event  :    TA018MI_FUN_DYNAMIC_6_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic6)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic6");
+
+    TaMenItemSelect(CTA_DYN_FUNC_6);
+
+    TaErrCbkStop ("Ta101cbFunDynamic6");
+    return (0);
+
+} /* end Ta101cbFunDynamic6 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic7
+*
+*    Control/Event  :    TA019MI_FUN_DYNAMIC_7_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic7)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic7");
+
+    TaMenItemSelect(CTA_DYN_FUNC_7);
+
+    TaErrCbkStop ("Ta101cbFunDynamic7");
+    return (0);
+
+} /* end Ta101cbFunDynamic7 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunDynamic8
+*
+*    Control/Event  :    TA020MI_FUN_DYNAMIC_8_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunDynamic8)
+{
+    TaErrCbkStart ("Ta101cbFunDynamic8");
+
+    TaMenItemSelect(CTA_DYN_FUNC_8);
+
+    TaErrCbkStop ("Ta101cbFunDynamic8");
+    return (0);
+
+} /* end Ta101cbFunDynamic8 */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFunAuditTrail
+*
+*    Control/Event  :    TA011MI_FUN_AUDIT_TRAIL_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/19/95  DW           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbFunAuditTrail)
+{
+    TaErrCbkStart ("Ta101cbFunAuditTrail");
+
+    TaMenItemSelect(CTA_DYN_AUDIT_TRAIL);
+
+    TaErrCbkStop ("Ta101cbFunAuditTrail");
+    return (0);
+
+} /* end Ta101cbFunAuditTrail */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbStpDefineCaseFlow
+*
+*    Control/Event  :    TA042MI_STP_DEFINE_CASE_FLOW_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbStpDefineCaseFlow)
+{
+    TaErrCbkStart ("Ta101cbStpDefineCaseFlow");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbStpDefineCaseFlow");
+    return (0);
+
+} /* end Ta101cbStpDefineCaseFlow */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbStpDefineDataMatch
+*
+*    Control/Event  :    TA043MI_STP_DEFINE_DATA_MATCH_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbStpDefineDataMatch)
+{
+    TaErrCbkStart ("Ta101cbStpDefineDataMatch");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbStpDefineDataMatch");
+    return (0);
+
+} /* end Ta101cbStpDefineDataMatch */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbStpDefineOrganization
+*
+*    Control/Event  :    TA045MI_STP_DEFINE_ORGANIZATION_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbStpDefineOrganization)
+{
+    TaErrCbkStart ("Ta101cbStpDefineOrganization");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbStpDefineOrganization");
+    return (0);
+
+} /* end Ta101cbStpDefineOrganization */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbStpDefineEmployee
+*
+*    Control/Event  :    TA044MI_STP_DEFINE_EMPLOYEE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbStpDefineEmployee)
+{
+    TaErrCbkStart ("Ta101cbStpDefineEmployee");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbStpDefineEmployee");
+    return (0);
+
+} /* end Ta101cbStpDefineEmployee */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbStpMaintainCdTables
+*
+*    Control/Event  :    TA046MI_STP_MAINTAIN_CDS_TABLES_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbStpMaintainCdTables)
+{
+    TaErrCbkStart ("Ta101cbStpMaintainCdTables");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbStpMaintainCdTables");
+    return (0);
+
+} /* end Ta101cbStpMaintainCdTables */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsRefTaxStatute
+*
+*    Control/Event  :    TA070MI_TLS_REF_TAX_STATUTE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsRefTaxStatute)
+{
+    TaErrCbkStart ("Ta101cbTlsRefTaxStatute");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsRefTaxStatute");
+    return (0);
+
+} /* end Ta101cbTlsRefTaxStatute */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsRefPolcyAndProcs
+*
+*    Control/Event  :    TA069MI_TLS_REF_POLCY_AND_PROCS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsRefPolcyAndProcs)
+{
+    TaErrCbkStart ("Ta101cbTlsRefPolcyAndProcs");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsRefPolcyAndProcs");
+    return (0);
+
+} /* end Ta101cbTlsRefPolcyAndProcs */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsRefLexis
+*
+*    Control/Event  :    TA068MI_TLS_REF_LEXIS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsRefLexis)
+{
+    TaErrCbkStart ("Ta101cbTlsRefLexis");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsRefLexis");
+    return (0);
+
+} /* end Ta101cbTlsRefLexis */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsRefCreditRefrnce
+*
+*    Control/Event  :    TA067MI_TLS_REF_CREDIT_REFRENCE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsRefCreditRefrnce)
+{
+    TaErrCbkStart ("Ta101cbTlsRefCreditRefrnce");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsRefCreditRefrnce");
+    return (0);
+
+} /* end Ta101cbTlsRefCreditRefrnce */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsScheduleMeetings
+*
+*    Control/Event  :    TA073MI_TLS_SCHEDULE_MEETINGS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsScheduleMeetings)
+{
+    TaErrCbkStart ("Ta101cbTlsScheduleMeetings");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsScheduleMeetings");
+    return (0);
+
+} /* end Ta101cbTlsScheduleMeetings */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsReportTime
+*
+*    Control/Event  :    TA071MI_TLS_REPORT_TIME_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsReportTime)
+{
+    TaErrCbkStart ("Ta101cbTlsReportTime");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsReportTime");
+    return (0);
+
+} /* end Ta101cbTlsReportTime */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsRequestReport
+*
+*    Control/Event  :    TA072MI_TLS_REQUEST_REPORT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsRequestReport)
+{
+    TaErrCbkStart ("Ta101cbTlsRequestReport");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsRequestReport");
+    return (0);
+
+} /* end Ta101cbTlsRequestReport */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsPhonebook
+*
+*    Control/Event  :    TA066MI_TLS_PHONEBOOK_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsPhonebook)
+{
+    TaErrCbkStart ("Ta101cbTlsPhonebook");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsPhonebook");
+    return (0);
+
+} /* end Ta101cbTlsPhonebook */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsMap
+*
+*    Control/Event  :    TA063MI_TLS_MAP_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsMap)
+{
+    TaErrCbkStart ("Ta101cbTlsMap");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsMap");
+    return (0);
+
+} /* end Ta101cbTlsMap */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsCalendar
+*
+*    Control/Event  :    TA061MI_TLS_CALENDAR_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsCalendar)
+{
+    TaErrCbkStart ("Ta101cbTlsCalendar");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsCalendar");
+    return (0);
+
+} /* end Ta101cbTlsCalendar */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsCalculator
+*
+*    Control/Event  :    TA060MI_TLS_CALCULATOR_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsCalculator)
+{
+    TaErrCbkStart ("Ta101cbTlsCalculator");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsCalculator");
+    return (0);
+
+} /* end Ta101cbTlsCalculator */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsOptions
+*
+*    Control/Event  :    TA064MI_TLS_OPTIONS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbTlsOptions)
+{
+    TaErrCbkStart ("Ta101cbTlsOptions");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsOptions");
+    return (0);
+
+} /* end Ta101cbTlsOptions */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpContents
+*
+*    Control/Event  :    TA030MI_HLP_CONTENTS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpContents)
+{
+    USHORT  usSelButton;
+
+    TaErrCbkStart ("Ta101cbHlpContents");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpContents");
+    return (0);
+
+} /* end Ta101cbHlpContents */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpSearch
+*
+*    Control/Event  :    TA032MI_HLP_SEARCH_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpSearch)
+{
+    USHORT  usSelButton;
+
+    TaErrCbkStart ("Ta101cbHlpSearch");
+
+    vDisplayMessageOK("Search not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpSearch");
+    return (0);
+
+} /* end Ta101cbHlpSearch */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpWindows
+*
+*    Control/Event  :    TA037MI_HLP_WINDOWS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpWindows)
+{
+    USHORT  usSelButton;
+
+    TaErrCbkStart ("Ta101cbHlpWindows");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpWindows");
+    return (0);
+
+} /* end Ta101cbHlpWindows */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpGlossary
+*
+*    Control/Event  :    TA031MI_HLP_GLOSSARY_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpGlossary)
+{
+    USHORT  usSelButton;
+
+    TaErrCbkStart ("Ta101cbHlpGlossary");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpGlossary");
+    return (0);
+
+} /* end Ta101cbHlpGlossary */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpTutBeginTutorial
+*
+*    Control/Event  :    TA033MI_HLP_TUT_BEGIN_TUTORIAL_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpTutBeginTutorial)
+{
+    TaErrCbkStart ("Ta101cbHlpTutBeginTutorial");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpTutBeginTutorial");
+    return (0);
+
+} /* end Ta101cbHlpTutBeginTutorial */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpTutMainMenu
+*
+*    Control/Event  :    TA035MI_HLP_TUT_MAIN_MENU_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpTutMainMenu)
+{
+    TaErrCbkStart ("Ta101cbHlpTutMainMenu");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpTutMainMenu");
+    return (0);
+
+} /* end Ta101cbHlpTutMainMenu */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpTutKeyConcepts
+*
+*    Control/Event  :    TA034MI_HLP_TUT_KEY_CONCEPTS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpTutKeyConcepts)
+{
+    TaErrCbkStart ("Ta101cbHlpTutKeyConcepts");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpTutKeyConcepts");
+    return (0);
+
+} /* end Ta101cbHlpTutKeyConcepts */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpTutMandatoryTasks
+*
+*    Control/Event  :    TA036MI_HLP_TUT_MANDATORY_TASKS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpTutMandatoryTasks)
+{
+    TaErrCbkStart ("Ta101cbHlpTutMandatoryTasks");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpTutMandatoryTasks");
+    return (0);
+
+} /* end Ta101cbHlpTutMandatoryTasks */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbHlpAbout
+*
+*    Control/Event  :    TA029MI_HLP_ABOUT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbHlpAbout)
+{
+    TaErrCbkStart ("Ta101cbHlpAbout");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbHlpAbout");
+    return (0);
+
+} /* end Ta101cbHlpAbout */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbOtherGUIEvent
+*
+*    Control/Event  :    WINDOW / OTHER_GUI_EVENT
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/30/95  AB           Created.
+*
+*******************************************************************************/
+static WCBPROC (Ta101cbOtherGUIEvent)
+{
+    PSWP                pSWP;
+    SHORT               i;
+    TTA_INT7_DATETIME   stDateTime;
+    CHAR                szAMPM[3];
+    STATIC BOOL         fMenuEnd = FALSE;
+
+    TaErrCbkStart ("Ta101cbOtherGUIEvent");
+
+    switch (CBI_IWApplMsg)
+    {
+        case WM_ACTIVATE :
+
+            if (((BOOL)CBI_GUImp1) && (!TaWimQueryActiveHWND()))
+                TaMsgInterWinPost( CBI_hwnd,
+                                   (PTTA_VOID)&CBI_hwnd,
+                                   CTA_MSG_WIN_RECEIVE_FOCUS );
+
+            break;
+
+        case WM_TIMER :
+
+            /* Check if timer is the desktop clock timer */
+            if ((USHORT)CBI_GUImp1 == CTA_TID_TASCLOCK)
+            {
+                /* Increase seconds counter */
+                usSecs++;
+
+                /* Update if 60 seconds since last update */
+                if (usSecs == 60)
+                {
+                    /* Get the current date and time */
+                    TaOpsGetDateTime(&stDateTime);
+
+                    /* Format and print the time on the desktop */
+                    if (stDateTime.hour < 12)
+                    {
+                        if (stDateTime.hour == 0)
+                            stDateTime.hour = 12;
+
+                        strcpy(szAMPM, "AM");
+                    }
+                    else
+                    {
+                        if (stDateTime.hour > 12)
+                            stDateTime.hour -= 12;
+
+                        strcpy(szAMPM, "PM");
+                    }
+
+                    sprintf( TxGneric1Data, "%2.2u:%2.2u %s",
+                             stDateTime.hour,
+                             stDateTime.min,
+                             szAMPM                           );
+
+                    /* Reset seconds counter */
+                    usSecs = 0;
+
+                    /* Print new date if we're past midnight */
+                    if (stDateTime.day != iDate)
+                    {
+                        sprintf( TxGnericData, "%2.2u/%2.2u/%2.2u",
+                                 stDateTime.month,
+                                 stDateTime.day,
+                                 stDateTime.year % 100              );
+
+                        iDate = stDateTime.day;
+                    }
+                }
+            }
+
+            break;
+
+        case WM_MENUEND :
+
+            /* Indicate that we're leaving a menu */
+            fMenuEnd = TRUE;
+
+            break;
+
+        case WM_MENUSELECT :
+
+            /* Set focus to active window if control returns to desktop */
+            if ((fMenuEnd                    ) &&
+                ((ULONG)CBI_GUImp1 == 0xffff ) &&
+                ((HWND)CBI_GUImp2 == hMenuBar)    )
+            {
+                /* Only set focus if a window is indeed active */
+                if (TaWimQueryActiveHWND())
+                    TaWimSetFocus(TaWimQueryActiveHWND());
+
+                /* We've left the menu */
+                fMenuEnd = FALSE;
+            }
+
+            break;
+
+        case WM_MINMAXFRAME :
+
+            /* Get the Set Window Position structure from MP1 */
+            pSWP = (PSWP)CBI_GUImp1;
+
+            if (pSWP->fl & SWP_MINIMIZE)
+            {
+                /* Hide all non-minimized child windows */
+                for (i = 0; i < pstWindowList->usNumWindows; i++)
+                    if (!pstWindowList->apstWindow[i]->fMinimized)
+                        FndWindowHide( pstWindowList->apstWindow[i]->hHWND,
+                                       (PTTA_FND_ERROR_BLOCK)pABHI          );
+            }
+            else if (pSWP->fl & SWP_RESTORE)
+            {
+                /* Show all non-minimized child windows */
+                for (i = 0; i < pstWindowList->usNumWindows; i++)
+                    if (!pstWindowList->apstWindow[i]->fMinimized)
+                        FndWindowShow( pstWindowList->apstWindow[i]->hHWND,
+                                       (PTTA_FND_ERROR_BLOCK)pABHI          );
+
+                /* Set focus to the active window */
+                TaWimSetFocus(TaWimQueryActiveHWND());
+            }
+
+            break;
+    }
+
+    TaErrCbkStop ("Ta101cbOtherGUIEvent");
+    return (0);
+
+} /* end Ta101cbOtherGUIEvent */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinWindow1
+*
+*    Control/Event  :    TA074MI_WIN_WINDOWS_1_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinWindow1)
+{
+    TaErrCbkStart ("Ta101cbWinWindow1");
+
+    TaMenWindowItemSelect(CTA_MEN_WINDOW_1);
+
+    TaErrCbkStop ("Ta101cbWinWindow1");
+    return (0);
+
+} /* end Ta101cbWinWindow1 */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinWindow2
+*
+*    Control/Event  :    TA075MI_WIN_WINDOWS_2_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinWindow2)
+{
+    TaErrCbkStart ("Ta101cbWinWindow2");
+
+    TaMenWindowItemSelect(CTA_MEN_WINDOW_2);
+
+    TaErrCbkStop ("Ta101cbWinWindow2");
+    return (0);
+
+} /* end Ta101cbWinWindow2 */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinWindow3
+*
+*    Control/Event  :    TA076MI_WIN_WINDOWS_3_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinWindow3)
+{
+    TaErrCbkStart ("Ta101cbWinWindow3");
+
+    TaMenWindowItemSelect(CTA_MEN_WINDOW_3);
+
+    TaErrCbkStop ("Ta101cbWinWindow3");
+    return (0);
+
+} /* end Ta101cbWinWindow3 */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinWindow4
+*
+*    Control/Event  :    TA077MI_WIN_WINDOWS_4_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinWindow4)
+{
+    TaErrCbkStart ("Ta101cbWinWindow4");
+
+    TaMenWindowItemSelect(CTA_MEN_WINDOW_4);
+
+    TaErrCbkStop ("Ta101cbWinWindow4");
+    return (0);
+
+} /* end Ta101cbWinWindow4 */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinWindow5
+*
+*    Control/Event  :    TA078MI_WIN_WINDOWS_5_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinWindow5)
+{
+    TaErrCbkStart ("Ta101cbWinWindow5");
+
+    TaMenWindowItemSelect(CTA_MEN_WINDOW_5);
+
+    TaErrCbkStop ("Ta101cbWinWindow5");
+    return (0);
+
+} /* end Ta101cbWinWindow5 */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsWordProcessor
+*
+*    Control/Event  :    TA079MI_TLS_WORD_PROCESSOR_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbTlsWordProcessor)
+{
+    TaErrCbkStart ("Ta101cbTlsWordProcessor");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsWordProcessor");
+    return (0);
+
+} /* end Ta101cbTlsWordProcessor */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsSpreadsheet
+*
+*    Control/Event  :    TA080MI_TLS_SPREADSHEET_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/06/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbTlsSpreadsheet)
+{
+    TaErrCbkStart ("Ta101cbTlsSpreadsheet");
+
+    vDisplayMessageOK("Not yet implemented...", pEventInfo);
+
+    TaErrCbkStop ("Ta101cbTlsSpreadsheet");
+    return (0);
+
+} /* end Ta101cbTlsSpreadsheet */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinCascadeWindows
+*
+*    Control/Event  :    TA081MI_WIN_CASCADE_WINDOWS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/07/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinCascadeWindows)
+{
+    TaErrCbkStart ("Ta101cbWinCascadeWindows");
+
+    TaWimCascadeWindows();
+
+    TaErrCbkStop ("Ta101cbWinCascadeWindows");
+    return (0);
+
+} /* end Ta101cbWinCascadeWindows */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWinDefaultPositions
+*
+*    Control/Event  :    TA082MI_WIN_DEFAULT_POSITIONS_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/07/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWinDefaultPositions)
+{
+    TaErrCbkStart ("Ta101cbWinDefaultPositions");
+
+    TaWimSetDefaultPositions();
+
+    TaErrCbkStop ("Ta101cbWinDefaultPositions");
+    return (0);
+
+} /* end Ta101cbWinDefaultPositions */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbWindowClose
+*
+*    Control/Event  :    WINDOW / WINDOW_CLOSE
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/10/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbWindowClose)
+{
+    TaErrCbkStart ("Ta101cbWindowClose");
+
+
+    TaErrCbkStop ("Ta101cbWindowClose");
+    return (0);
+
+} /* end Ta101cbWindowClose */
+/******************************************************************************
+*
+*    Callback       :    Ta101cbFilExit
+*
+*    Control/Event  :    TA001MI_FIL_EXIT_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/10/95  <Initials>   Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbFilExit)
+{
+    TaErrCbkStart ("Ta101cbFilExit");
+
+    FndWindowDestroy(CBI_hwnd, (PTTA_FND_ERROR_BLOCK)pABHI);
+
+    TaErrCbkStop ("Ta101cbFilExit");
+    return (0);
+
+} /* end Ta101cbFilExit */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsPaste
+*
+*    Control/Event  :    TA007PB_PASTE_CMD /  BUTTON_CLICK
+*                        TA065MI_TLS_PASTE_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/13/95  AB           Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbTlsPaste)
+{
+    TaErrCbkStart ("Ta101cbTlsPaste");
+
+    if (TaWimQueryActiveHWND())
+        WinPostMsg( TaWimQueryActiveHWND(),
+                    WM_COMMAND,
+                    CTA_PASTE_MP1,
+                    CTA_PASTE_MP2           );
+
+    TaErrCbkStop ("Ta101cbTlsPaste");
+    return (0);
+
+} /* end Ta101cbTlsPaste */
+
+
+/******************************************************************************
+*
+*    Callback       :    Ta101cbTlsCopy
+*
+*    Control/Event  :    TA003PB_COPY_CMD /  BUTTON_CLICK
+*                        TA062MI_TLS_COPY_CMD /  BUTTON_CLICK
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/13/95  AB           Created.
+*
+*******************************************************************************/
+STATIC WCBPROC (Ta101cbTlsCopy)
+{
+    TaErrCbkStart ("Ta101cbTlsCopy");
+
+    if (TaWimQueryActiveHWND())
+        WinPostMsg( TaWimQueryActiveHWND(),
+                    WM_COMMAND,
+                    CTA_COPY_MP1,
+                    CTA_COPY_MP2            );
+
+    TaErrCbkStop ("Ta101cbTlsCopy");
+    return (0);
+
+} /* end Ta101cbTlsCopy */
+
+
+/******************************************************************************
+*                          L O C A L  -  F U N C T I O N S
+*******************************************************************************/
+
+/******************************************************************************
+*
+*    Function       :    vDisplayMessageOK
+*
+*    Description    :    Displays the message in an information box with
+*                        an OK button.  Used to indicate what action will
+*                        be performed when a yet unimplemented event occurs.
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    04/21/95  AB           Created.
+*
+*******************************************************************************/
+static VOID vDisplayMessageOK ( PTTA_CHAR           pszMessage,
+                                PCALLBACKEVENTINFO  pEventInfo  )
+{
+    USHORT              usSelButton;
+    _FND_ERROR_BLOCK    stErrorBlock;
+
+    FndMsgBoxDisplayText( pszMessage,
+                          NULL,
+                          CBI_hwnd,
+                          FND_MSGBOX_OK,
+                          FND_MSGBOX_INFORMATION,
+                          FND_MSGBOX_IDOK,
+                          NULL,
+                          &usSelButton,
+                          &stErrorBlock           );
+
+} /* end vDisplayMessageOK */
+
+
+/******************************************************************************
+*
+*    Function       :    <function name>
+*
+*    Description    :
+*
+*
+*
+*
+*    Revision History:
+*    Date      Revised By   Description
+*    --------  -----------  -------------------------------------------------
+*    03/29/95  <Initials>   Created.
+*
+*******************************************************************************/
+//static <type> TAENTRY <function name> ( <parameters> )
+//{
+    /*  Function variables  */
+
+
+                 /*************************************/
+                 /*  REPLACE WITH FUNCTION VARIABLES  */
+                 /*************************************/
+
+
+
+//    TaErrCbkStart ("<function name>");
+
+    /*  Function code  */
+
+
+                 /********************************/
+                 /*  REPLACE WITH FUNCTION CODE  */
+                 /********************************/
+
+
+
+
+//    TaErrCbkStop ("<function name>");
+
+//} /* end <function name> */
+
+
+/******************************************************************************
+*  End of source file
+*******************************************************************************/

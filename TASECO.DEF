@@ -1,0 +1,22 @@
+;****************************************************************************
+;
+;  File Name        : TASECO.DEF
+;
+;  Description      : Definition file for the TaSec class.
+;
+;  Platform         : OS/2 - IBM C/Set++ 32-bit.
+;
+;
+;  Revision History :
+;  Date      Revised By   Description
+;  --------  -----------  ------------------------------------------------
+;  03/13/95  AB           Created.
+;
+;****************************************************************************
+LIBRARY        TASECO INITINSTANCE
+DESCRIPTION    'TaSec class, TAS C/S 1995'
+PROTMODE
+DATA           MULTIPLE NONSHARED
+HEAPSIZE       8192
+EXPORTS        _TaSecUserProfile
+               _TaSecWindowAccess

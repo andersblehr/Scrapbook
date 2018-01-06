@@ -1,0 +1,47 @@
+;****************************************************************************
+;  INSERT DISCLAIMER
+;****************************************************************************
+;
+;  File Name        : TAWIMO.DEF
+;
+;  Description      : Definition file for the TaWim class.
+;
+;  Platform         : OS/2 - IBM C/Set++ 32-bit.
+;
+;
+;  Revision History :
+;  Date      Revised By   Description
+;  --------  -----------  ------------------------------------------------
+;  03/09/95  AB           Created.
+;
+;****************************************************************************
+LIBRARY        TAWIMO INITINSTANCE
+DESCRIPTION    'TaWim class, TAS C/S 1995'
+PROTMODE
+DATA           MULTIPLE NONSHARED
+HEAPSIZE       8192
+EXPORTS        _TaWimAbortClose
+               _TaWimCascadeWindows
+               _TaWimClose
+               _TaWimCreateWindowList
+               _TaWimDestroy
+               _TaWimDisable
+               _TaWimEnable
+               _TaWimMinimize
+               _TaWimMove
+               _TaWimOpen
+               _TaWimQueryActiveHWND
+               _TaWimQueryChanged
+               _TaWimQueryDefaultPosition
+               _TaWimQueryHandle
+               _TaWimQueryState
+               _TaWimQueryWindowList
+               _TaWimRegisterHandle
+               _TaWimRegisterTaskList
+               _TaWimSetChanged
+               _TaWimSetDefaultPositions
+               _TaWimSetFocus
+               _TaWimSetPointerType
+               _TaWimSetUnchanged
+               _TaWimValidHandle
+               _TaWimQueryAuditTrail

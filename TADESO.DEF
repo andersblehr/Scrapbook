@@ -1,0 +1,23 @@
+;****************************************************************************
+;
+;  File Name        : TADESO.DEF
+;
+;  Description      : Definition file for the TaDes class.
+;
+;  Platform         : OS/2 - IBM C/Set++ 32-bit.
+;
+;
+;  Revision History :
+;  Date      Revised By   Description
+;  --------  -----------  ------------------------------------------------
+;  04/19/95  AB           Created.
+;
+;****************************************************************************
+LIBRARY        TADESO INITINSTANCE
+DESCRIPTION    'TaDes class, TAS C/S 1995'
+PROTMODE
+DATA           MULTIPLE NONSHARED
+HEAPSIZE       8192
+EXPORTS        _TaDesReadIniFile
+               _TaDesSetTitle
+               _TaDesWriteIniFile

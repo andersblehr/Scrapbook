@@ -1,0 +1,41 @@
+;****************************************************************************
+;
+;  File Name        : TAMENO.DEF
+;
+;  Description      : Definition file for the TaMen class.
+;
+;  Platform         : OS/2 - IBM C/Set++ 32-bit.
+;
+;
+;  Revision History :
+;  Date      Revised By   Description
+;  --------  -----------  ------------------------------------------------
+;  03/29/95  SR           Created.
+;  04/07/95  AB           Added TaMenWindowItemAdd, -Remove and -Select.
+;  04/19/95  AB           Added TaMenTaxpayerItemAdd and -Select.
+;  05/04/95  AB           Added TaMenWindowItemCheck
+;
+;****************************************************************************
+LIBRARY        TAMENO INITINSTANCE
+DESCRIPTION    'TaMen class, TAS C/S 1995'
+PROTMODE
+DATA           MULTIPLE NONSHARED
+HEAPSIZE       8192
+EXPORTS        _TaMenItemShow
+               _TaMenItemHide
+               _TaMenItemCheck
+               _TaMenItemUncheck
+               _TaMenItemEnable
+               _TaMenItemDisable
+               _TaMenPredisplay
+               _TaMenMainPredisplay
+               _TaMenActivate
+               _TaMenItemAdd
+               _TaMenItemSelect
+               _TaMenTaxpayerItemAdd
+               _TaMenTaxpayerItemSelect
+               _TaMenWindowItemAdd
+               _TaMenWindowItemCheck
+               _TaMenWindowItemRemove
+               _TaMenWindowItemSelect
+               _TaMenNaaAddFunc
