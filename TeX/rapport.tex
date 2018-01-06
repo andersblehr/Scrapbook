@@ -8,11 +8,19 @@
 %%% Status          : In progress
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentstyle[a4,ab10pt,logo,twoside]{report} % tgrind hoerer egentlig med
+\documentclass[a4,ab10pt,logo,twoside]{report}
+\usepackage{graphicx,latexsym}
 
+\addtolength{\oddsidemargin}{-.59in}
+\addtolength{\evensidemargin}{-.59in}
+\addtolength{\textwidth}{1.18in}
+
+\addtolength{\topmargin}{-.8in}
+\addtolength{\textheight}{1.65in}
+        
 \pagestyle{headings}
 \raggedbottom
-\input{kommando.tex}
+\input{kommandoer.tex}
 \pagenumbering{roman}
 \begin{document}
 
@@ -22,17 +30,17 @@
 \cleardoublepage
 \tableofcontents
 
-\include{introduc}
-\include{backgrou}
+\include{introduction}
+\include{background}
 \include{nash}
-\include{conclusi}
+\include{conclusions}
 
 \cleardoublepage
 \appendix
 
-\include{app_nald}
+\include{app_naldef}
 \include{app_lov}
-%\include{app_sour}
+\include{app_source}
 
 \cleardoublepage
 
