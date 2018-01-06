@@ -1,0 +1,1451 @@
+#53#5#1#1#255#255#0#54#0#113#1#186#1#226#5#131
+
+_                General Overview
+
+With this program, in the following referred to as
+@{FILTER}, the user is supplied with an on-line and
+real time presentation of the current configuration
+of the LFP- and MUA-filters used in connection with
+Reinhardt Eckhorn's matrix-programme at the
+@{Phillips-Universit„t Marburg}, Germany.
+
+_Communication
+
+\{Communication} with the filters is facilitated
+through the use of a @{SI-8255} based digital I/O
+card, which has to be built into the computer in
+order for the program to be of any use.
+
+_Modes of Operation and How to Run FILTER
+
+The program operates in two \{modes}, @{real time mode}
+and @{edit mode}, corresponding to taking, respectively
+treating (editing) @{snapshots} of the current configu-
+ration.  When run on an ordinary AT with 640K RAM,
+the program can handle up to several hundred such
+snapshots at the same time.
+
+For each mode there exists a set of actions that the
+user can perform.  These actions are initiated
+either by using the mode specific @{pop-up menu}, or by
+pressing the F-key corresponding to the wanted
+action, as given in the menu.
+
+For information on how to @{install} and \{run} the
+program, see the referred section.
+
+_Implementation
+
+The program was programmed by @{Anders Blehr} during
+the summer of 1992, using Turbo Pascal Version 6.0,
+object-oriented.  The \{implementation} makes use of
+application specific as well as pre-made, partly
+revised, general purpose libraries, which may be
+freely distributed and used, though not in any way
+copyrighted.
+
+_Improvements
+
+As of yet, the program works fairly well according
+to its current specification.  Still, as is the case
+with any program, it can be subjected to
+\{improvements}, and it is recommended that the reader
+read the paragraph on @{bugs} in the referred section.
+
+#58#0#5#1#0#0
+
+_         Communication and the I/O Card
+
+_Communication
+
+The LFP and MUA filters have been equipped with
+logic circuits enabling outside applications to
+query each filter for a status word containing
+information about its current configuration.  The
+application puts the adress of one of the filters on
+an 8-bit adress bus, and when one of the filters
+recognizes its adress, it responds by putting its
+status word on the 16-bit data bus.
+
+_The I/O Card
+
+The SI-8255 is a general purpose I/O chip that
+through 2 8-bit ports (A and B) and 2 4-bit ports
+(constituting port C) gives the computer access to
+24 lines of digital I/O signals.  Each port can be
+software programmed as either input or output.
+
+From three SI-8255 chips, hereafter referred to as
+@{Building Blocks 1-3} (BB1-3), a general purpose I/O
+card has been made.  Each of these building blocks
+may be programmed independently of the others, and
+the same card may thus be used for several
+applications.
+
+_FILTER and the I/O Card
+
+Per default, FILTER makes use of only BB1, and thus
+BB2 and BB3 may be used for any purpose the user
+sees fit.  In case BB1 already is in use, all the
+user has to do in order to transfer the operation to
+either BB2 or BB3, is to change the constants in the
+source code corresponding to the adress, data and
+control registers, as described in the section
+@{Implementation:General purpose:Types}.
+
+_FILTER's Way of Communicating with the Filters
+
+Of the ports constituting the Building Block used by
+FILTER (BB1 by default, but as mentioned, with a
+keystroke, both BB2 and BB3 may be used instead), A
+is connected with the adress bus, and is thus
+specified as output, whereas the ports B and C are
+connected with the data bus, and are thus specified
+as input.
+
+To get the current configuration of the filters,
+FILTER outputs to port A (adress bus) the adress of
+the first filter, LFP 1, delays a specified amount
+of time (at present 1 ms, may be modified), and then
+reads the status word from the data bus into ports B
+and C.  These ports are then read by the program,
+and the status word can be analysed.
+
+#16#2#5#2#0#0#0#130#0#228
+
+_                Modes of Operation
+
+FILTER operates in two @{modes}, \{real time mode} and
+\{edit mode}.  In real time mode, the current
+configuration is displayed on the screen in real
+time, and @{snapshots}, as described below, can be
+made.  In edit mode, the snapshots that have been
+made, can be worked upon in different ways, and
+previous snapshots can be loaded from file.
+
+In the following, the terms @{snapshot} and
+@{configuration} are used interchangeably.  See the
+section @{Real time mode} below for a definition of the
+term snapshot.
+
+#38#5#2#1#0#113#0#169#0#178#0#199#0#211#0#222
+
+_                  Real Time Mode
+
+In this mode, as described above, the current
+configuration of the LFP- and MUA-filters is
+presented on the screen in real time.  That is, when
+a knob on the front panel of one of the filters is
+turned, or a switch is being switched, the user
+immediately sees the changes he is making to the
+configuration on the screen.
+
+_Snapshots
+
+The real time mode is the main mode of operation, in
+that it is in this mode that the aforementioned
+@{snapshots} are made.  A snapshot is, as the name
+indicates, a picture of the configurations of the
+LFP- and MUA-filters at a given moment in time.  One
+snapshot is stored in memory as an array of words,
+one word corresponding to the status word of one
+filter.  In addition, for each snapshot, the time
+and date when the snapshot was made is stored, and
+the user also has the possibility to supply the
+snapshot with a remark of his own choice.  See the
+section @{Modes:Edit mode} for details.
+
+As mentioned, up to several hundred snapshots can be
+handled at the same time with an ordinary 640K RAM
+AT.  The snapshots are stored in a list, which can
+be worked upon in @{edit mode}.
+
+_The Menu
+
+The menu contains the actions that the user may
+perform when in real time mode.  These actions are,
+in the order they appear in the menu, \{get}, \{save} and
+\{print} configuration, \{toggle mode} and \{help}.
+
+#8#0#5#1#0#130
+
+_Get configuration (F2)
+
+Choosing this alternative in the menu corresponds to
+making a snapshot.  That is, a picture is taken of
+the current configuration and added to the afore-
+mentioned list of snapshots.
+
+#20#0#5#2#0#130
+
+_Save configuration (F3)
+
+Works analogously to @{get configuration}.  The
+difference is that the snapshot is stored in a file,
+and not in memory.  Snapshots stored in files can be
+loaded when in @{edit mode}, and may thus be worked
+upon in the same manner as snapshots read by @{get}
+@{configuration}.
+
+When this menu alternative is chosen, the user is
+prompted for the name of the file in which the
+snapshot is to be saved.  Thereafter the screen
+contains no information telling him that the
+configuration has been saved, as opposed to when in
+@{edit mode}.  It is thus recommended that the user,
+when he wants to save a snapshot in a file, first
+@{gets} the configuration, then switches to @{edit}
+@{mode} and saves the snapshot from there.
+
+#11#0#5#3#0#130
+
+_Print configuration (F4)
+
+This function merely sends a copy of the screen to
+the printer.  That is, a print of the current
+configuration is made.
+
+When the printer is not ready, or perhaps not even
+connected, the user gets a warning that it is not
+responding correctly.
+
+#10#0#5#4#0#130
+
+_Toggle mode (F10)
+
+When this menu alternative is chosen when in @{real}
+@{time mode}, the program switches to @{edit mode}.  If
+snapshots have been made, the last snapshot made is
+displayed on the @{edit mode} screen, otherwise the
+user gets a warning that no snapshots have been
+made.
+
+#5#0#5#5#0#130
+
+_Help (Ctrl-F1)
+
+For @{help on help}, press Ctrl-F1 yet another time.
+
+#69#7#2#2#0#113#1#42#1#80#1#102#1#123#1#139#1#163#1#177
+
+_                   Edit Mode
+
+In this mode, the basis of operation is a list of
+snapshots.  This list can contain up to several
+hundred snapshots, and can be constructed in two
+ways, as described below.
+
+_Get Configurations from Real Time Mode
+
+When in @{real time mode}, the user can choose to
+@{get} the current configuration (see the section
+@{Modes:Real time mode}).  If the snapshot list is
+empty when he does this, it is initiated with the
+gotten configuration as its only element, otherwise
+the gotten configuration is appended to the end of
+the list.
+
+_Get Configurations from File
+
+It is possible for the user to load a set of
+configurations from a file that has been made
+earlier. See the @{menu} section below for more
+details.
+
+_How to Navigate between the Configurations
+
+When the list of snapshots contains more than one
+element, the user has to be able to move from the
+one currently being displayed on the screen to
+another of his own choice.  This he does with the
+keys @{PgDn}, @{PgUp}, @{Home} and @{End}, which switch to the
+previous, next, first and last snapshot, respecti-
+vely.
+
+_The Fields on the Screen
+
+The main fields of the screen when in this mode are
+the same as those of @{real time mode}.  These are
+the fields that tell the configuration of each of
+the LFP- and MUA-filters, as well as the fields that
+tell the @{time} and @{date}.  As opposed to @{real time}
+@{mode}, where time and date are displayed in real
+time, the time and date fields in this mode display
+the time and date when the snapshot being displayed
+was made.  To the right of the time and date fields
+is a field which tells in which file the current
+snapshot is saved.  If this field is empty, it means
+either that the snapshot has not been saved, that it
+has been altered since last save (the remark, that
+is, since the remark is the only attribute of a
+snapshot that may be edited upon), or that the file
+in which the snapshot was saved has been rewritten.
+Below these fields, there is a field labeled @{remark}.
+If a remark has been entered, it is displayed in
+this field, otherwise the field is empty.
+
+_The Menu
+
+As for @{real time mode}, the menu contains commands
+corresponding to the actions the user can perform.
+These actions are, in the order they appear in the
+menu, \{save} and \{forget} configuration(s), \{read file},
+\{delete file}, change or view \{config file},
+\{edit remark}, and \{toggle mode}, as well as @{print}
+configuration and @{help}, which work analogously to
+the corresponding commands in @{real time mode} (see
+the section @{Modes:Real time mode} for details).
+
+#37#0#7#1#0#228
+
+_Save configuration(s) (F3)
+
+Works analogously to the @{save configuration} command
+in @{real time mode}, that is, one or several snapshots
+are saved in a file.  The snapshots to be saved can
+be chosen according to four @{save criteria}.
+
+@{This configuration}: Only the snapshot currently
+   presented on the screen is saved.  If it has
+   already been saved in a file, the user is
+   prompted to confirm that he really wants to save
+   it yet another time.
+
+@{Commented configurations}: Only snapshot with a
+   remark attached to them are saved, independently
+   of whether they already have been saved or not.
+   If there are no commented snapshots, the user
+   gets a warning telling him this.
+
+@{Unsaved configurations}: Only snapshots that as of
+   yet have not been saved, are saved.  If there are
+   no unsaved snapshots, the user gets a warning
+   telling him this.
+
+@{All configurations}: All snapshots in the list are
+   saved.  If some snapshots already have been
+   saved, the user is prompted to confirm that he
+   wants to go on.
+
+The file in which to save the configuration(s) has
+to be chosen from the files with the extension .CNF
+in the current default directory.  To investigate
+which directory this is, choose @{Change/view config}
+in the menu (see section @{Modes:Edit mode:Config file}
+for details about this function).
+
+#21#0#7#2#0#228
+
+_Forget configuration(s) (F5)
+
+This command removes one or more snapshots from the
+list of snapshots, according to three @{forget}
+@{criteria}.
+
+@{This configuration}: Only the snapshot currently
+   presented on the screen is to be removed.  If it
+   has not been saved in a file, the user is
+   prompted to confirm that he really wants to
+   throw away the snapshot.
+
+@{Saved configurations}: Only snapshots that have been
+   saved are removed from the list.
+
+@{All configurations}: All elements are removed from
+   the list of snapshot.  If not all snapshots have
+   been saved, the user is prompted to confirm that
+   he really wants to go on.
+
+#20#0#7#3#0#228
+
+_Read file (F6)
+
+This command reads a set of snapshots from a user
+specified file.  If the list of snapshots is not
+empty when the command is called, it will be emptied
+before the file is read, so that afterwards the list
+contains only the snapshots read from the file.  If
+the list has to be emtied, the user is warned of
+this and prompted to confirm that he really wants to
+go on.  If the file is empty (has zero size), the
+user is warned about this as well.
+
+The files that may be read with this command have to
+be chosen from the files with the extension .CNF in
+the current default directory.  To investigate which
+directory this is, choose @{Change/view config} in the
+menu (see section @{Modes:Edit mode:Config file} for
+details about this function).
+
+#15#0#7#4#0#228
+
+_Delete file (F7)
+
+This command rewrites a file specified by the user.
+The file is not removed from the directory, only, as
+said, rewritten, and will thus afterwards have the
+size zero.
+
+The files that may be thus rewritten have to be
+chosen from the files with the extension .CNF in the
+current default directory.  To investigate which
+directory this is, choose @{Change/view config} in the
+menu (see section @{Modes:Edit mode:Config file} for
+details about this function).
+
+#23#0#7#5#0#228
+
+_Change/view config file (F8)
+
+In connection with FILTER, there exists, or should
+exist, a @{config file}, containing information about
+the @{directory} in which to search for files, as well
+as the default name of the @{file} to read,
+alternatively write.
+
+When this command is invoked, an edit window
+appears, containing the current contents of the
+config file.  If the user wants to @{change} one of the
+values or both, he can do this by editing the values
+one by one, and using the @{Tab}-key to toggle between
+the fields.  If the user only wants to @{view} the
+values currently stored in the config file, he has
+to press @{Return} to exit.
+
+If, when FILTER is about to stop execution, these
+values have been altered since they initially were
+read from the config file, the user is asked if he
+wants to save the new values in the config file.
+
+#13#0#7#6#0#228
+
+_Edit remark (F9)
+
+This command allows the user to edit a remark to be
+attached to the current snapshot.  If a remark
+already exists, the user is warned of this and
+prompted to confirm that he wants to go on.  If he
+chooses to go on, the current remark is passed on as
+default.  Otherwise, that is if no remark already
+exists, and the snapshot preceding the current one
+in the list has a remark, this remark is passed on
+as default.  Otherwise no default is given.
+
+#8#0#7#7#0#228
+
+_Toggle Mode (F10)
+
+When this menu alternative is chosen when in @{edit}
+@{mode}, the mode switches to @{real time mode}, and the
+@{saved in} and @{remark} fields are removed.  The time
+and date fields start showing real time.
+
+#39#0#5#3#0#0
+
+_             How to Run the Program
+
+_Directories
+
+To run the program, the directory C:\\FILTER has to
+exist, because it is in this directory that the
+program looks for the @{config file}.  The FILTER.EXE
+and FILTER.HLP files have to be in the same
+directory, but this directory does not have to
+correspond to the C:\\FILTER directory.  All other
+files read and written by the program may be located
+anywhere.  It is nevertheless recommended that the
+files FILTER.EXE and FILTER.HLP be located in the
+directory C:\\FILTER, for consistency.
+
+The simplest way to ensure that the program operates
+properly, is to run the @{INSTALL} program from the
+floppy disk drive of the computer on which FILTER is
+to run.
+
+_Getting around
+
+For a detailed description of how the two modes of
+FILTER work and which options exist in each mode,
+see section @{Modes}.
+
+_Quit
+
+To stop execution of FILTER, simply press @{Esc} when
+in the main window.  If there at this moment exist
+snapshots in the list that have not been saved, the
+user is warned about this and prompted to confirm
+that he wants to go on.  If the specified default
+@{file name} and @{directory} no longer correspond to the
+ones saved in the config file, the user is asked
+whether he wants to save the new values in the
+config file.
+
+#37#5#5#4#0#0#2#8#2#69#2#97#2#111#3#174
+
+_                  Implementation
+
+_Reader's Advice
+
+The reading of this section, as well as the ones
+below it, requires that the reader have some
+understanding of the principles applying to object
+oriented programming, such as @{inheritance}, @{virtual}
+@{methods}, @{data} and @{method encapsulation},
+@{specification} vs. @{implementation}, as well as the
+term @{object} as opposed to an @{instance} of an object.
+
+_Implementation
+
+The implementation is based on a set of Turbo Pascal
+(version 5.5 or later) @{objects}, which implement
+and group together different aspects of the tasks
+needed by the program.  These \{objects} are all
+declared and implemented in 11 Turbo Pascal @{units},
+and instantiated in the \{main program}.
+
+The units used by FILTER can be divided into three
+categories: \{standard} units, and the more or less
+distinct categories of \{application specific} and
+\{general purpose} units.
+
+In itself, the source code itself is thoroughly
+commented, and names of variables, procedures and
+functions are made to be as self-explanatory as
+possible.
+
+When the program was installed using INSTALL, the
+source files (main program, all units, as well as a
+couple of auxiliary programs) are located in the
+directory @{C:\FILTER\SOURCE}.
+
+#60#0#5#1#1#226
+
+_The Main Objects used by FILTER
+
+That a type in the source code represents an @{object}
+is recognized in that its name ends with a capital
+@{O}.  Variables in the source code whose names end
+with @{OPtr} represent pointers to the corresponding
+objects.
+
+The most important objects contributing to the
+implementation of FILTER, are, in the order in which
+they are instantiated:
+
+@{helpManagerO}: This object reads and presents the
+   pages of the help system - of which this is one -
+   as well as allows the user to navigate between
+   the pages.  This very help screen is in its
+   entirety managed by @{helpManagerO}.  Its single
+   instantiation in FILTER is @{helpManager}.
+
+@{configManagerO}: This object reads the config file if
+   it exists, presents a warning to the user if not,
+   and updates the config variables if the user asks
+   it to (@{Change/view config file} in the @{edit mode}
+   menu), as well as updates the config file when
+   this is required.  If the directory C:\\FILTER
+   does not exist when FILTER is started, a critical
+   error is reported, and the program halts.  Its
+   single instantiation in FILTER is @{configManager}.
+
+@{chooseFileWindowO}: This object makes and manages the
+   window that appears when the user is prompted for
+   the name of a file, and returns the name of the
+   chosen file.  Its single instantiation in FILTER
+   is @{chooseFileWindow}.
+
+@{dataFileO}: This object handles every aspect having
+   to do with reading and writing snapshots from,
+   respectively to, files.  Its single instantiation
+   in FILTER is @{configurationFile}.
+
+@{verticalMenuO}: There are four menues present in
+   FILTER, of which each is an instantiation of this
+   object.  They are @{loopMenu}, corresponding to the
+   real time mode menu, @{doMenu}, corresponding to the
+   edit mode menu, and the two menues
+   @{saveConfigurationMenu} and
+   @{deleteConfigurationMenu}, which both are present
+   in edit mode, and correspond to choosing save and
+   delete criteria, respectively.
+
+@{configurationListO}: This object constitutes and
+   manages the list of snapshots.  It inherits from
+   the object @{doubleListO}, which implements a
+   doubly linked list.  Its single instantiation in
+   FILTER is @{configurationList}.
+
+In addition several other objects are used by these
+objects as well as by other objects.
+
+#27#0#5#2#1#226
+
+_The Main Program
+
+The main program is contained in the file @{FILTER.PAS}.
+Besides initializing and managing the different
+objects and drawing the screen, it also implements
+the following features:
+
+@{1.} Initializing the SI-8255 I/O card.
+@{2.} Reading the filter status words.
+@{3.} Analysing the filter status words and presenting
+   the analysed results to the user.
+@{4.} Real time and edit modes and the toggling between
+   them.
+@{5.} Reading the commands given by the user and
+   calling the corresponding routines.
+@{6.} Saving configuration(s) according to the
+   aforementioned save criteria.
+@{7.} Sending a copy of the configuration currently
+   being presented on the screen to the printer.
+@{8.} Removing configuration(s) from the configuration
+   list (implemented by @{configurationListO})
+   according to the aforementioned forget criteria.
+@{9.} Placing the configuration(s) read from a file in
+   the configuration list, after having emptied it.
+@{10.} ...and other things.
+
+#13#0#5#3#1#226
+
+_Standard Turbo Pascal Units
+
+FILTER makes use of three standard Turbo Pascal
+units:
+
+@{crt}: Contains input and output procedures as well
+   as procedures for writing to the screen.
+@{dos}: Contains procedures for communicating with
+   the operating system (DOS).
+@{printer}: Enables easy communication with the
+   printer.
+
+#24#5#5#4#1#226#2#136#2#177#2#190#2#223#2#238
+
+_Application Specific Units
+
+With @{application specific} units is to be understood
+units which did not exist before the implementation
+of FILTER begun, as opposed to those units I had
+with me when I came here, the @{general purpose} units,
+described in section @{Implementation:General purpose}.
+This distinction between application specific and
+general purpose units is somewhat floating, in that
+three of the five units labeled application
+specific, from a functional point of view have a
+very general purpose nature.
+
+The distinction is made because the units labeled
+application specific to a large extent are inter-
+twined with each other as well as with the general
+purpose units.  The general purpose units, on the
+other hand, are loosely intertwined with each other,
+but not at all with the application specific units.
+
+The five application specific units are \{types},
+\{auxil}, \{files}, \{config} and \{help}.
+
+#40#0#5#1#2#111
+
+_The Application Specific Unit TYPES
+
+The main purpose of this unit is to group together
+constant and type declarations which are needed not
+only by the main program, but also by one or more of
+the other application specific units.  In addition,
+some constants and types needed only by the main
+program are declared here, for the sake of
+consistency.  And finally, the @{configurationListO}
+object is implemented in this unit, along with the
+object @{configurationNodeO}, whose instances
+constitute the elements of the configuration list.
+@{configurationListO} inherits from @{doubleListO}, which
+is described in section @{Implementation:General}
+@{purpose:ADT}.
+
+See the source code for details.
+
+_Transfering Operation from BB1 to BB2 or BB3
+
+As mentioned above, FILTER uses BB1 of the SI-8255
+I/O card for communicating with the filters.  If the
+user wants to transfer operation from BB1 to either
+BB2 or BB3, all he has to do is to change the
+constants @{adressRegister}, @{dataRegister1},
+@{dataRegister2} and @{controlRegister}, which are
+declared in lines 48-51 in TYPES.PAS, to correspond
+to BB2 and BB3, respectively.  Only one character of
+the current values needs to be changed, namely the
+'1', which has to be changed to '2', respectively
+'3'.
+
+_Modifying the Read Time
+
+The amount of time that FILTER waits to allow a
+filter to put its status word on the data bus, is
+defined by the constant @{readTime} defined at line 53
+in TYPES.PAS.  Its value is currently set to 1 ms.
+
+#12#0#5#2#2#111
+
+_The Application Specific Unit AUXIL
+
+This unit contains auxiliary procedures and
+functions needed by different parts of the program,
+including procedures for writing and reading the
+registers, converting numbers to strings, checking
+whether a file or directory exists and communicating
+with the user.
+
+See the source code for details.
+
+#31#0#5#3#2#111
+
+_The Application Specific Unit FILES
+
+This unit contains the implementation of the two
+objects @{dataFileO} and @{chooseFileWindowO}, as well as
+the implementation of objects needed by these.  For
+details about these auxiliary objects, and for other
+details, see the source code.
+
+_The Object dataFileO
+
+@{dataFileO} contains procedures and functions which
+make it easier to handle data files.  These include
+procedures to decide on which file to work, as well
+as reading, writing, rewriting, opening and closing
+the chosen file.
+
+_The Object chooseFileWindowO
+
+This object contains one main function, @{chooseFile},
+which supplies the user with an easy to use tool for
+choosing a file with a given extension from a given
+directory.  The window is divided in two, the upper
+part constituting an edit window, where the user may
+write the name of the file in full, and the lower
+part constituting a list of all the files in the
+given directory having the given extension.  It is
+possible for the user to choose from this list
+instead of having to write the name in full.  To
+toggle between the two modes of choosing, the user
+simply presses the Tab key.
+
+#14#0#5#4#2#111
+
+_The Application Specific Unit CONFIG
+
+This unit contains the implementation of the object
+@{configManagerO}.  Its routines include procedures
+to read and save the config file and prompting the
+user to supply his preferences.  As of yet, it works
+only with FILTER, in that its only variables are
+@{path} and @{file name}.  It is in other words in
+nature application specific, not only in the name.
+With a few modifications, though, it can be made
+general purpose by supporting any set of config
+variables through inheritance.
+
+#82#1#5#5#2#111#3#65
+
+_The Application specific Unit HELP
+
+This unit is initialized with the name of the help
+file on which it is to run, and contains the
+implementation of the object @{helpManagerO}, as well
+as of the objects @{pageManagerO} and @{childNodeO}, which
+are used by helpManagerO.
+
+_The Structure of The Help File
+
+The @{help file} is divided into several @{pages}, which
+together make up a general @{tree structure}.  Each
+page may have one or more pages below it, its
+@{children}, and every page, except the @{root page}, has
+exactly one page above it, its @{parent}.  Pages that
+have the same parent, are said to be on the same
+@{level}.
+
+The help system implemented in HELP.PAS displays
+only one help page at the time.  From the current
+help page, the user can choose to go to its parent,
+its @{left} and @{right siblings}, if they exist, and if
+the page has any, to one of its children.  The
+\{help file format} is defined in the source code as
+well as in the referred section.
+
+_The Object helpManagerO
+
+An instantiation of @{helpManagerO} contains an
+instantiation of @{pageManagerO}, which takes care
+of navigating between the pages of the given help
+file.  @{helpManagerO} itself contains only two
+procedures, of which @{navigate} nearly does all that
+needs to be done.  The procedure @{helpOnHelp} gives
+the user on-line help on how to use the help system.
+
+When @{helpManagerO} has been initialized with a
+legal help file (having the correct format, that
+is), the invocation of @{navigate} causes the help
+screen to be drawn and the current help page as
+supplied by the page manager (implemented by
+@{pageManagerO}) to be displayed.  It also lets the
+user navigate within the current help page, as well
+as to choose which page to go to next, as described
+above.  Alternatively, he can choose to end the help
+session.
+
+_The Object pageManagerO
+
+An instantiation of @{pageManagerO}, as is present in
+any instantiation of @{helpManagerO}, contains the
+following pieces of information about the page
+currently being displayed: The number of lines the
+page contains, the number of children it has, its
+sibling number (e.g., sibling number 4, when its
+parent has 4 or more children), the number of
+siblings on its level, the file position of its
+parent, and the file positions of each of its
+children.
+
+The routines implemented by this object include
+methods to set the current page to be any of the
+current page's parent, left and right siblings and
+children.  The current page can be set without being
+displayed as well as being set and displayed at the
+same time.  Also included are methods to navigate
+within the current page.
+
+The invocation of any of its methods has to be put
+between the invocations of the methods @{initOperation}
+and @{closeOperation}.
+
+_The Object childNodeO
+
+The page manager maintains a list of the current
+page's children.  This list is an instance of the
+object @{doubleListO}, as described in section
+@{Implementation:General purpose:ADT}, and its elements
+are instances of @{childNodeO}, which inherits from
+@{doubleNodeO}, also implemented in ADT.
+
+#108#0#1#1#2#238
+
+_           The Format of the Help File
+
+The help file is of Turbo Pascal type @{file of}
+@{helpScreenString}, where @{helpScreenString} is defined
+as @{string[65]}.
+
+_To Edit the Help File
+
+To make a help file readable to @{helpManagerO}, the
+text of the file is edited upon as ordinary text.
+Make sure that no line is longer than 65 characters,
+and that the @{visible characters} of a line not exceed
+52.  @{Invisible characters} are characters that define
+the nature of the diferent parts of the text.  The
+text can be divided into four categories:
+
+@{Normal text}: Any piece of text that does not have a
+   special purpose or is not emphasized.  All text
+   that is not defined by invisible characters is
+   defined to be normal text.
+
+@{Headlines}: Headlines are characterized by the
+   first character of the line (at position 1) being
+   an underscore, '@{_}'.  When this is the case, the
+   entire line is written with the attribute
+   preassigned for headlines.
+
+@{Emphasized text}: Sometimes there is a need to
+   emphasize particular words or sentences.  The
+   text to be emphasized in this way is put between
+   curly paranthesis, { and }.  The left paranthesis
+   has to be preceded by an alpha curl, '@{@}'.  The
+   emphasized text is written with its preassigned
+   attribute.
+
+@{References to child pages}: A child of the current
+   page always has to be mentioned in the text of
+   the page in order to be included in the @{next}
+   @{level} menu in the upper left corner of the help
+   screen.  To be recognized as references to child
+   pages, the references have to, like emphasized
+   text, be put between curly paranthesis, { and },
+   of which the left paranthesis has to be preceded
+   by a backslash, '@{\}'.  The references thus defined
+   are displayed with their preassigned attribute.
+
+_The Info String
+
+The different pages are in the help file separated
+by an @{info string} containing the information
+necessary for the help manager to navigate between
+them.  Each character of this string represents a
+byte, and two characters together represent a word,
+the leftmost of the two characters containing the
+high byte and the rightmost the low byte.  The
+format of the info string is as follows:
+
+@{1. byte}  The number of lines contained in the page,
+   not including the info string itself.  A page may
+   in other words not contain more than 255 lines.
+@{2. byte}  The number of children that the page has.
+   A page may in other words not have more than 255
+   children
+@{3. byte}  The number of siblings on the same level as
+   this page.  That is, the number of children that
+   the parent of this page has.
+@{4. byte}  The sibling number of this page (e.g.,
+   child number 4 of 7 of the parent).
+@{5. and 6. bytes}  The number of the line in the help
+   file containing the info string of the parent of
+   the page (i.e., the file position of the parent's
+   info string; thus, the lines are numbered from 0,
+   and not from 1).  When the current page is the
+   root page, this line number is set to @{65535},
+   which represents @{NULL}.
+@{7. and 8. bytes}  If the page has any children, this
+   word contains the file position of the info string
+   of its first child.  If the page has more than
+   one child, the file positions of their info lines
+   are given analogously in the consequent words.
+
+When the info string is edited upon in an ordinary
+text editor like that of Turbo Pascal, it cannot
+immediately be made to comply with this format.
+Instead, the characters that it is to contain are
+written one after the other using Turbo Pascal
+notation.  E.g., when the page whose info string is
+being edited upon contains 56 lines of text and has
+three children, the first two characters of the info
+line are represented with the string '#56#3'.  The
+following bytes and words are represented
+analogously and appended to the string.
+
+_Converting the Text File to Help File
+
+When the editing of the text file representing the
+help file is finished - make sure that the strings
+representing the info strings are correct - it is
+converted into a help file with the program @{convert}.
+Each line of the text file is then converted into a
+string of type @{helpScreenString}, and the lines
+representing the info strings are converted into
+readable info strings, also of type
+@{helpScreenString}.
+
+For more details, see the source code.
+
+#23#5#5#5#1#226#3#198#3#222#3#238#4#97#5#24
+
+_General Purpose Units
+
+A couple of years ago, I spent some time imple-
+menting general purpose units, taking care of tasks
+extending from a very powerful menu based framework
+for program development and 3D graphical analysis to
+small, auxiliary procedures to switch the cursor on
+and off, allocating strings dynamically and making
+pop-up windows, just to mention a few.
+
+These units I took with me when I travelled here,
+and I have used some of them to implement FILTER.
+
+The ones I have used have partly been stripped for
+unused procedures and objects and have also been
+subject to more or less thorough revisions.  All
+variabel, procedure and function names have been
+translated from Norwegian into English.
+
+The units thus brought and modified are \{keys},
+\{strings}, \{screen}, \{oScreen} and \{ADT}.
+
+#23#0#5#1#3#174
+
+_The General Purpose Unit KEYS
+
+First and foremost, this units contains constant
+declarations that enables quick and easy access to
+the most usual key combinations that occur in
+connection with user interaction.  Every key has got
+its own name, so that instead of remembering that
+Ctrl-PgUp corresponds to #132 and Alt-F1 to #104,
+the user only uses the constants @{CtrlPgUp} and
+@{AltF1} of this unit.
+
+The procedures and functions implemented in KEYS.PAS
+are mostly various input routines, including a
+reimplementation of the @{crt} function @{readKey}.  For
+more details, see the source code.
+
+_The General Purpose Unit INTRUPT
+
+This unit has no direct use in FILTER, but is needed
+for the initialization part of @{keys}, and is thus
+supplied with the rest of the code.
+
+#15#0#5#2#3#174
+
+_The General Purpose Unit STRINGS
+
+The most powerful feature implemented in STRINGS.PAS
+is its @{dynamic strings}.  When the dynamic string,
+having the type @{stringPtr}, is used instead of the
+conventional type @{string}, and is initialized
+using the function @{strPtr} and removed using the
+procedure @{delStr}, a string variabel never uses
+more memory than what is strictly needed.
+
+In addition, some auxiliary string procedures and
+functions are included.  For more details, see the
+source code.
+
+#114#0#5#3#3#174
+
+_The General Purpose Unit SCREEN
+
+This unit supplies the user with a large library of
+screen management routines, of which not all are
+used by FILTER.  The most important characteristic
+of the unit is that its functionality is nearly
+completely independent of that of @{crt}, except for
+@{readKey}.  The library routines that write to the
+screen, write directly into video memory.
+
+_Video Memory
+
+The video memory can be viewed as an 80x25 (80x50)
+two-dimensional array (matrix), where each element
+contains a @{word} describing the appearance of the
+corresponding coordinate on the screen.  The high
+byte of this word contains the character that is
+displayed on the screen, the low byte contains a so-
+called @{attribute}, whose two least significant bytes
+contain the text colour and whose two most
+significant bytes contain the background colour of
+this character.
+
+By writing directly into video memory, the user is
+supplied with a powerful way of writing text in
+different colours to different positions of the
+screen.  In addition, when he wants to make a pop-up
+window, it is easy to read, and thus also to store,
+the piece of the screen which will be covered by the
+window.  Thus, when the window is removed, its
+background can be restored.  This technique also
+enables the user to write to partitions of the
+screen outside the current @{crt window}.
+
+_The SCREEN Library
+
+The unit supports the following functionalities:
+
+@{Managing attributes}: Depending on the nature of the
+   specific piece of text the user may want to write
+   to the screen, he can preset the attribute with
+   which the text is to be written.  In addition, he
+   can preset the {frame type} of pop-up windows as
+   well as whether they shall appear with shadow or
+   not.
+
+   The categories of attributes defined, are:
+
+   @{1.} Main Attribute: Normal text is written with
+      this attribute.
+   @{2.} Marked Attribute: Used for emphasized text.
+   @{3.} Frame Attribute: Used for frames of pop-up
+      windows.
+   @{4.} Text Attribute: Pop-up windows may be supplied
+      with a headline, which is written using this
+      attribute.
+   @{5.} Inverse Attribute: When the user is choosing
+      from a pop-up menu or otherwise, the field to
+      which the cursor currently points is written
+      using this attribute.
+   @{6.} Read Attribute: When one of the input
+      procedures is used to get an input string from
+      the user, he writes using this attribute.
+   @{7.} Frame Type: The making of pop-up windows may
+      take advantage of the predefined frame types
+      @{simpleFrame}, @{doubleFrame} and @{noFrame}.
+   @{8.} Shadow: In addition, whether the window shall
+      display a shadow or not, may be decided using
+      the constants @{shadow} and @{noShadow}.
+
+@{Writing to the screen}: To write to the screen, the
+   user always has to give the position on the
+   screen where the text is to be put.  Aside from
+   that, he can choose whether the text is to be
+   written with a certain, parametrized attribute,
+   or with the attribute(s) already present in the
+   partition of screen memory to which he is
+   writing.
+
+@{Setting number of lines on the screen}: The user can
+   choose whether the screen is contain 25 (default)
+   or 50 lines.
+
+@{Clearing the screen}: Either the entire screen or
+   only a part of it can be cleared with a certain
+   attribute.  It can also be cleared in a way that
+   preserves the written text, but sets the
+   attributes of the entire screen or parts of it.
+
+@{Windows}: The user can make two kinds of pop-up
+   windows on the screen: windows that save the part
+   of the screen they cover, so that if they are
+   removed, the old contents of the screen can be
+   restored, and windows that do not.  In addition,
+   the user can choose that the window be either a
+   physical (@{crt}) window, or just an appearance of
+   the screen.
+
+@{Menues}: The user can make a pop-up menu on the
+   screen and wait for a choice to be made from the
+   menu.  Menues of this kind do not constitute
+   objects, and therefore have to be made anew each
+   time they are needed.  See the section on the
+   general purpose unit @{oScreen} for an object-
+   oriented implementation of pop-up menues.
+
+@{Defining the cursor}: The user may want to change the
+   appearance of the cursor on the screen, as well
+   as hide it completely.  A procedure for doing
+   this is included in this unit.
+
+For more details, see the source code.
+
+#9#3#5#4#3#174#4#107#4#178#5#9
+
+_The General Purpose Unit OSCREEN
+
+This unit defines an @{object-oriented} extension of
+the screen handling general purpose unit @{screen}.
+It contains two categories of objects, \{menues} and
+\{virtual screens}.  In addition a screen storing
+object \{screenO} is defined.
+
+#70#0#3#1#4#97
+
+_OSCREEN: Menues
+
+Menues are implemented by two objects, @{menuO}, the
+root object, and @{verticalMenuO}, which inherits from
+@{menuO}.  Originally the unit contained yet two menu
+objects, @{horizontalMenuO}, which also inherited from
+@{menuO}, and @{rootMenuO}, which was a stand alone object
+which defined the root of the aforementioned menu
+based framework for program development.  Since
+these objects are not used by FILTER, they have been
+removed.  If there is interest, on the other hand, I
+would be glad to supply them.
+
+Originally, the four objects mentioned above, of
+which the two present in @{oScreen} are given a
+further description below, could be made up to
+define a hierarchy of menues, the root menu being an
+instance of @{rootMenuO}, and its submenues and their
+submenues being instances of either @{verticalMenuO} or
+@{horizontalMenuO}.  To each choice in a given menu
+could be attached either a submenu, when further
+choices had to be made to decide on which procedure
+to run, or, when no further choices were necessary,
+a procedure executing the action connected with the
+given choice.  This procedure was invoked
+automatically when the corresponding menu choice was
+made.
+
+The two menu objects still left in @{oScreen} display
+the following characteristics:
+
+@{menuO}: This object can not operate on its own, in
+   that it does not write anything to the screen. It
+   implements, on the other hand, the most important
+   internal functions, which were common for both
+   @{verticalMenuO} and @{horizontalMenuO}.
+
+   The methods of immediate interst are @{showMenu},
+   @{choose} and @{removeMenu}, whose functions ought to
+   be evident.  @{showMenu} and @{removeMenu} are virtual
+   methods which have to be reimplemented by heirs.
+   They cause no action.  The method @{addAlternatives}
+   lets the user add new alternatives (choices) to
+   the menu.  This is particularly useful when a
+   large menu is made, because the 255 characters of
+   the original @{alternative string} sent to the
+   constructor may not be sufficient to represent
+   all alternatives wanted.
+
+@{verticalMenuO}: This object implements an ordinary,
+   vertical pop-up menu, which is initialized once,
+   an subsequently may be used as often as wanted.
+
+   It is initialized with values defining its
+   attributes (see the section @{Implementation:}
+   @{General purpose:Screen} for a description of the
+   predefined categories of attributes) its location
+   on the screen, its title, and the alternatives
+   from which a choice has to be made.  In addition,
+   its constructor expects a parameter
+   @{addedCharacters} which is a remnant from its
+   old function in the menu hierarchi.  It should be
+   initialized with the value @{[]}.
+
+   The methods of immediate interest are @{showMenu}
+   and @{removeMenu}, which are virtual
+   reimplementations of the corresponding methods in
+   @{menuO}.
+
+#86#0#3#2#4#97
+
+_OSCREEN: Virtual Screens
+
+A @{virtual screen} is a user defined screen which can
+be operated upon as if it were the physical screen,
+but which not necessarily correspond to it.  It can
+be of random size (within certain limits), and may
+thus be larger than the physical screen.  Normally,
+that is when the virtual screen does not correspond
+to the physical, the user does not see anything
+happen on the screen when he writes to it.  To
+display the virtual screen on the physical, the user
+has to specify the part of the physical screen (that
+is, a window) where the virtual one is to be
+displayed, as well as which point of the virtual
+screen shall be displayed in the upper left corner
+of this window.  When the virtual screen has been
+displayed, the user can @{scroll} it in all four
+directions, within its predefined limits.
+
+Every virtual screen (the screen which contains this
+text is a virtual screen) is an instance of the
+object @{virtualScreenO}.  It's constructor takes only
+one parameter, namely the attribute with which text
+to the screen normally is to be written (the main
+attribute).  The methods of immediate interest are:
+
+@{makeScreen}: This method defines the virtual screen
+   to be of a certain size and allocates the memory
+   needed to store the screen.  In addition, the
+   screen is cleared with the attribute sent to the
+   constructor.
+
+@{clearScreen}: Clears the virtual screen with the
+   given attribute.
+
+@{vWriteXY}: Writes a string to the given position of
+   the virtual screen, using the attribute already
+   stored in the corresponding location.
+
+@{vWriteColourXY}: Like @{vWriteXY}, only that the
+   attribute with which the text is to be written is
+   specified as well.
+
+@{makeWindow}: Defines the part of the physical screen
+   in which the virtual screen is to be displayed.
+
+@{showScreen}: Displays the virtual screen with the
+   point corresponding to the given coordinates in
+   the upper left corner of the window defined with
+   @{makeWindow}.
+
+@{initScrolling}: Makes the initializations
+   necessary to enable scrolling of the current
+   virtual screen.
+
+@{scroll}: Scrolls the virtual screen in the given
+   direction.
+
+@{closeScrolling}: Disables scrolling.
+
+@{forgetWindow}: Disables the window defined by
+   @{makeWindow}.
+
+@{forgetScreen}: Disposes the entire virtual screen.
+   This has to be done in order to be able to define
+   a virtual screen of different size than the
+   current one.  When you now choose to go to
+   another page of the help system, this virtual
+   screen is disposed using this method, and a new
+   screen complying to the size of the page you have
+   chosen is defined, using @{makeScreen}.
+
+The order in which these methods are presented
+roughly corresponds to the order order in which the
+methods have to be invoked to achieve correct
+operation.  @{makeScreen} and @{makeWindow} must be
+invoked before @{showScreen} and @{initScrolling} must be
+invoked before @{scroll}.  It is possible to write to
+the virtual screen after the screen has been
+displayed using @{showScreen}.  @{makeWindow} does not
+define a pop-up window, so if the user wants the
+text of the screen to appear in such a window, he
+has to make it before the invocation of @{showScreen},
+using the routines of @{screen}.
+
+#14#0#3#3#4#97
+
+_The Object screenO
+
+The only function of this object is to store the
+entire screen so that it at a later stage can be
+restored.  The screen is stored when an instance of
+the object is made and restored when the same
+instance is disposed.  Typically, an instance of
+this object is made in the initialization part of a
+program (the screen is stored), and this instance is
+then disposed when the program terminates (the
+screen is restored).  Except for the constructor and
+the destructor, this object has no methods.
+
+#21#3#5#5#3#174#5#46#5#88#5#116
+
+_The General Purpose Unit ADT
+
+This unit contains objects implementing some general
+purpose @{abstract data types} (ADTs).  The ADTs thus
+implemented were originally @{singly linked lists},
+\{doubly linked lists} and \{binary trees} whose keys
+could be either of type @{string} or of type @{integer}.
+Since neither singly linked lists nor integer based
+binary trees are used by FILTER, these objects have
+been removed.
+
+A new object, implementing a \{general tree} (each node
+may have a random number of children), has been
+included.  This object is not used by FILTER, but is
+used by the program @{makeHelp}, with which I have not
+finished working.  This program was/is intended to
+automize the rather cumbersome process of sewing the
+pages of the help file together.  See the section
+@{Implementation:Application specific:Help}.
+
+#41#0#3#1#5#24
+
+_ADT: Doubly Linked Lists
+
+Doubly linked lists are implemented by the object
+@{doubleListO}, and the elements of the list are
+implemented by the object @{doubleNodeO}.  Three
+pointers keep track of the start and the end of the
+list, as well as the element currently being worked
+upon.  The methods can be summarized as follows:
+
+@{Access methods}: The elements that can be reached
+   through the use of access methods, are the first
+   and the last element element of the list, the
+   element currently being worked upon, labeled
+   @{position}, as well as the previous and next
+   elements, relative to position.
+
+   The methods to access the data stored in the
+   elements of the list have to be implemented in
+   objects inhereting from @{doubleNodeO}.
+
+@{Status methods}: Methods exist to tell whether one is
+   currently is at the start, respectively the end
+   of the list, whether the list is empty, whether a
+   certain element is a member in the list, and how
+   many elements the list contains.
+
+@{Operational methods}: To move around in the list,
+   methods exist to go to the start, respectively
+   the end of the list, to go one element forwards,
+   respectively backwards, to go to a specified
+   element, to empty the list, to append a new
+   element as well as put it at a specified position
+   in the list, to remove a specified element from
+   the list, and to remember the current position in
+   the list, so that it can be restored after a set
+   of operation have been carried through.
+
+A doubly linked list is empty when it is
+initialized.
+
+#27#0#3#2#5#24
+
+_ADT: Binary Trees with Strings
+
+A @{binary tree} is a data structure in which each
+node has at most two children.  Each node contains
+a @{key}, according to which a new node is to be
+inserted in the tree.  When the tree is traversed in
+@{infix} order, the keys of the nodes appear sorted.
+
+A binary tree with keys of type @{string} sorts the
+keys of its nodes alphabetically.  It is here
+implemented by the object @{stringTreeO}, and its
+nodes are implemented by the object @{stringNodeO}.
+
+The methods include routines to add a new node, to
+investigate whether a string is stored in the tree,
+to dispose the tree and to @{dump} the tree.  This last
+method, along with the method to add a new node,
+form the basis of the object.  @{dump} is a virtual
+method that simply writes all the elements of the
+tree to the screen in alphabetical order.  To treat
+the elements otherwise, this method has to be
+reimplemented in an object inhereting from
+@{stringTreeO}.  To make a tree whose nodes contain
+more than a single string, an object has to be made
+that inherits from @{stringNodeO}.
+
+#14#0#3#3#5#24
+
+_ADT: General Trees
+
+A @{general tree}, as opposed to a @{binary tree}, is a
+tree whose nodes may have any number of children.
+Here it is implemented by the object @{generalTreeO}.
+Its nodes have to be objects inhereting from
+@{generalTreeNodeO}.  Each node is defined as a
+@{subtree}, and @{generalTreeO} keeps track of which
+subtree is the current one.
+
+Since this object is not used by FILTER, the reader
+is referred to the source code for more details.
+
+#39#0#5#5#0#0
+
+_                   Improvements
+
+_Bugs
+
+For some reason or other, the help system sometimes
+causes a system crash when invoked from FILTER.  It
+is therefore recommended not to use the help system
+when valuable configurations can be lost.  The help
+file can also be read using the program @{readHelp}.
+
+_Extensions
+
+As of yet, the user has to make the snapshots
+manually when this is required.
+
+A better solution would be that the @{CED program} sent
+a signal to the computer on which FILTER runs that a
+snapshot be taken when this program has received a
+set of values, and that FILTER react on this signal.
+
+The best solution would be to combine FILTER and the
+CED program in a new program that in one way or
+another saved the measured values from the animal's
+brain and the corresponding configuration of the LFP
+and MUA filters in the same file, together with
+information containing the time and date of the
+experiment, the name of the person responsible for
+the experiment, as well as any other piece of
+relevant information.  To save space on the hard
+disk, it would also be possible to save the filter
+configurations in a seperate file, and thus only
+when the current configuration no longer corresponds
+to the previously saved one, in other words that the
+file contains configurations valid over certain
+intervals of time.  The filter configuration
+corresponding to a given experiment can then be
+retreived from this file according to its time and
+date.
