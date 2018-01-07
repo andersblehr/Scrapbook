@@ -1,0 +1,21 @@
+H files:1=/shome/fast/dev/fixmlconvert/data/mirkwood/mirkwood.us.sample,2=/shome/fast/dev/fixmlconvert/data/mirkwood/mirkwood.addendum.us.sample
+H delimiters:1=TC|TG|TB,2=TC|TG|TB
+H recordtypes:1=category(TC)|sitelist(TG)|review(TB),2=category(TC)|sitelist(TG)|review(TB)
+H linetypes:1=tag+data+EOL,2=tag+data+EOL
+D file:1 tag:TC catalog:<recordtype> context:id summaryclass:<recordtype> sfield:id
+D file:1 tag:PR printable:1
+D file:1 tag:PL printable:0
+D file:1 tag:N catalog:<recordtype> context:short-name
+D file:1 tag:H catalog:<recordtype> context:title summaryclass:<recordtype> sfield:title
+D file:1 tag:D catalog:<recordtype> context:review summaryclass:<recordtype> sfield:review
+D file:1 tag:K rankclass:<recordtype> rfield:number-of-reviews
+D file:2 tag:TC catalog:<recordtype> context:path
+D file:2 tag:J0 catalog:<recordtype> context:keywords
+D file:2 tag:J2 catalog:<recordtype> context:definitive-keywords
+D file:1 tag:TG catalog:<recordtype> context:id summaryclass:<recordtype> sfield:id
+D file:1 tag:B rankclass:<recordtype> rfield:number-of-reviews
+D file:2 tag:TG catalog:<recordtype> context:path
+D file:1 tag:TB catalog:<recordtype> context:id summaryclass:<recordtype> sfield:id
+D file:1 tag:U catalog:<recordtype> context:url summaryclass:<recordtype> sfield:url
+D file:1 tag:O catalog:<recordtype> context:priority rankclass:<recordtype> rfield:priority summaryclass:<recordtype> sfield:priority
+D file:2 tag:TB catalog:<recordtype> context:path
