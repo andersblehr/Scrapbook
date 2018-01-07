@@ -1,0 +1,22 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>fast-gs-project</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <phases>
+          <validate>com.fastsearch.gs.mojo:maven-esp-plugin:validate</validate>
+          <generate-sources>com.fastsearch.gs.mojo:maven-esp-plugin:install</generate-sources>
+          <process-sources>com.fastsearch.gs.mojo:maven-esp-plugin:patch</process-sources>
+          <generate-resources>com.fastsearch.gs.mojo:maven-esp-plugin:overlay</generate-resources>
+          <process-resources>com.fastsearch.gs.mojo:maven-esp-plugin:bliss</process-resources>
+          <compile>com.fastsearch.gs.mojo:maven-esp-plugin:create-collections</compile>
+          <pre-integration-test>com.fastsearch.gs.mojo:maven-esp-plugin:load</pre-integration-test>
+          <integration-test>com.fastsearch.gs.mojo:maven-esp-plugin:integration-test</integration-test>
+          <verify>com.fastsearch.gs.mojo:maven-esp-plugin:verify</verify>
+        </phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>

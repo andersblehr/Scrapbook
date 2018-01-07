@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.fastsearch.gs</groupId>
+  <artifactId>ypref</artifactId>
+  <packaging>fast-gs-project</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>YellowPages Reference Project</name>
+  <url>http://www.ypref.url</url>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.fastsearch.gs.mojo</groupId>
+        <artifactId>maven-esp-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <customer>Sample Customer</customer>
+          <engagement>YellowPages</engagement>
+          <engagementPrefix>yp</engagementPrefix>
+          <targetEnvironment>test</targetEnvironment>
+          <interactive>false</interactive>
+          <collections>
+            <collection>
+              <name>ypCollection</name>
+              <pipeline>ypPipeline</pipeline>
+            </collection>
+          </collections>
+        </configuration>
+      </plugin>        	  
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.fastsearch.esp.release</groupId>
+      <artifactId>esp.5.1.3.00</artifactId>
+      <version>Linux</version>
+      <type>tar.gz</type>
+    </dependency>
+    <dependency>
+      <groupId>com.fastsearch.esp.hotfix</groupId>
+      <artifactId>esp.5.1.3.03h</artifactId>
+      <version>ALL</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>com.fastsearch.esp.hotfix</groupId>
+      <artifactId>esp.5.1.3.04h</artifactId>
+      <version>ALL</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>com.fastsearch.esp.hotfix</groupId>
+      <artifactId>esp.5.1.3.13h</artifactId>
+      <version>Linux</version>
+      <type>tar.gz</type>
+    </dependency>
+    <dependency>
+      <groupId>com.fastsearch.esp.hotfix</groupId>
+      <artifactId>esp.5.1.3.14h</artifactId>
+      <version>Linux</version>
+      <type>tar.gz</type>
+    </dependency>
+  </dependencies>
+</project>
