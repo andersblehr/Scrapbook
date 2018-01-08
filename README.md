@@ -1,10 +1,10 @@
 # Scrapbook
 
-Over the several decades that I have been writing code, some pieces have stuck with me more than others, and I have copied them onto floppies, FTP'ed them down, pulled them over from computer to computer, and kept them more or less at hand to reminisce over whenever nostalgia should hit. In reverse chronological order they are:
+Over the decades that I have been writing code, some pieces have stuck with me more than others, and I have copied them onto floppies, FTP'ed them down, pulled them over from computer to computer, and kept them more or less at hand to reminisce over whenever nostalgia should hit. In reverse chronological order they are:
 
 ## [JSONCache](https://github.com/andersblehr/JSONCache) (2017)
 
-My first and so far only open source project (not counting [Origon](https://github.com/andersblehr/Origon), which may or may not become one). I was on a project working on an iOS app that required local caching of backend data, and after having hit a brick wall with [3lvis](https://github.com/3lvis)'s eminent [Sync](https://github.com/3lvis/Sync) library (due to [this bug](https://github.com/3lvis/Sync/issues/373)), I decided to roll my own. I had already implemented a data caching and replication framework for [Origon](https://github.com/andersblehr/Origon) (see below), so I knew it wouldn't be too hard. I plugged it into the app (which is under NDA, so I can't give details), and it has been working flawlessly ever since.
+My first and so far only open source project (not counting [Origon](https://github.com/andersblehr/Origon) and [SheetMusicPlayer](https://github.com/andersblehr/SheetMusicPlayer), which for the time being are here only for historic and reference reasons). I was on a project working on an iOS app that required local caching of backend data, and after having hit a brick wall with [3lvis](https://github.com/3lvis)'s eminent [Sync](https://github.com/3lvis/Sync) library (due to [this bug](https://github.com/3lvis/Sync/issues/373)), I decided to roll my own. I had already implemented a data caching and replication framework for [Origon](https://github.com/andersblehr/Origon), so I knew it wouldn't be too hard. I plugged it into the app (which is under NDA, so I can't give details), and it has been working flawlessly ever since.
 
 **Language:** Swift<br/>
 **Platforms:** macOS, iOS, watchOS, tvOS
@@ -31,70 +31,42 @@ To enable users to mirror each other's contact information, I built a REST API t
 
 ## [Sheet music player](https://github.com/andersblehr/SheetMusicPlayer) (2011)
 
-With kids, you may happen upon a song, notes and all, when you read them their good night story. Or they may come home from day care or school with a song sheet and want you to help them learn the song. Even though I play the piano and know how to read music, I am not able to sing directly from notes on a sheet, and I found myself wanting an app with which I could snap a photo of the music sheet and have it play the melody back to me. No such app existed, and I took it upon myself to create one. I had never done any mobile development, but I had an iPhone and a Mac, so I installed Xcode, dug out the same Digital Image Processing book I referenced in my [thesis](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) back in 1993, and got going.
+With kids, you may happen upon a song, notes and all, when you read them their good night story. Or they may come home from daycare or school with a song sheet and want you to help them learn the song. Even though I play the piano and know how to read music, I am not able to sing directly from notes on a sheet, and I found myself wanting an app with which I could snap a photo of the music sheet and have it play the melody back to me. No such app existed, and I took it upon myself to create one. I had never done any mobile development, but I had an iPhone and a Mac, so I installed Xcode, dug out the same Digital Image Processing book I referenced in my [thesis](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) back in 1993, and got going.
 
 I got to a certain point when I realised that the hurdle I was struggling with was an artifact of my entire approach, and that I would have to start (almost) over to get past it. I still haven't started over, but if it hadn't been for this project, I might be still be shuffling papers around for a living, rather than write code.
 
 **Language:** Objective-C<br/>
 **Platform:** iOS (iPhone)
 
-## [FAST Maven plugin](https://github.com/andersblehr/Scrapbook/tree/2007/Work/FastMavenPlugin) (2007)
+## [FAST Maven plugin](https://github.com/andersblehr/Scrapbook/tree/2007/Work/FastMavenPlugin)[*](#abandonware) (2007)
 
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
-
-Back with FAST after having perfected my PowerPoint skills at Accenture, I was now heading up FAST's Solution Architecture Centre in Europe, aiming to streamline how we delivered projects to customers. Each _Enterprise Search Platform_ (ESP) installation was different, but the underpinnings were the same. Still, installation and configuration had to be done manually by on-site or remote FAST engineers. I had a hunch that [Apache Maven](https://maven.apache.org) might help to automate a lot of the manual work, and itching to code again, I took it upon myself to develop a prototype Maven ESP plugin. After a few weeks of development, I demoed a functional prototype to the team, and got the go-ahead to continue. Shortly thereafter, Microsoft's acquisition of FAST was announced, and the project was put on indefinite hold. The code here is essentially the same that I demoed.
+I was heading up FAST's Solution Architecture Centre in Europe, aiming to streamline how we delivered projects to customers. Each _Enterprise Search Platform_ (ESP) installation was different, but the underpinnings were the same. Still, installation and configuration had to be done manually by on-site or remote FAST engineers. I had a hunch that [Apache Maven](https://maven.apache.org) might help to automate a lot of the manual work, and itching to code again, I took it upon myself to develop an ESP plugin prototype for Maven.
 
 **Language:** Java<br/>
 **Platform:** Linux, Windows
 
-## [FAST XML indexer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastXMLIndexer) (2001)
+## FAST search components[*](#abandonware) (2000-2001)
 
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
-
-To be continued...
+Working as a developer in FAST's R&D department, I was tasked with developing a generic **[tokenizer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastTokenizer)** that would decompose raw data into indexable words, independently of source language (including Chinese and other East Asian languages). Another component I developed, was a **[SAX wrapper](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastSAXWrapper)** that abstracted away the implementation details of [libxml](http://xmlsoft.org) and other third party [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML) interfaces, effectively letting us inject whichever SAX library suited us best. Lastly, based on my experience with having to [convert to FiXML](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor) any raw data other than HTML, I developed a generic **[XML indexer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastXMLIndexer)** that could index any set of well-formed XML documents.
 
 **Language:** C++<br/>
 **Platform:** Linux
 
-## [FAST SAX wrapper](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastSAXWrapper) (2001)
+## [FAST indexing preprocessor](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor)[*](#abandonware) (2000)
 
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
-
-To be continued...
-
-**Language:** C++<br/>
-**Platform:** Linux
-
-## [FAST tokenizer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastTokenizer) (2001)
-
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
-
-To be continued...
-
-**Language:** C++<br/>
-**Platform:** Linux
-
-## [FAST indexing preprocessor](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor) (2000)
-
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
-
-To be continued...
+At the time that FAST's [alltheweb.com](https://en.wikipedia.org/wiki/AlltheWeb) was competing head to head with Google to be the first search engine to index 1 billion web documents, I was working on-site with [LookSmart](http://www.looksmart.com) in San Francisco to have their curated internet directory be powered by FAST Search. To index the directory, it first had to be exported and converted to _FAST indexing XML_ (FiXML). The raw directory export was in a format referred to internally as [Mirkwood](https://en.wikipedia.org/wiki/Mirkwood), and I wrote this suite of Perl scripts to convert it to indexable FiXML.
 
 **Language:** Perl<br/>
 **Platform:** Solaris
 
-## [Reactive rules engine](https://github.com/andersblehr/Scrapbook/tree/1999/Work/ReactiveRulesEngine) (1999)
-
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
+## [Reactive rules engine](https://github.com/andersblehr/Scrapbook/tree/1999/Work/ReactiveRulesEngine)[*](#abandonware) (1999)
 
 To be continued...
 
 **Language:** PL/SQL<br/>
 **Platform:** Oracle
 
-## [Client architecture](https://github.com/andersblehr/Scrapbook/tree/1995/Work/ClientArchitecture) (1995)
-
-_**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
+## [Client architecture](https://github.com/andersblehr/Scrapbook/tree/1995/Work/ClientArchitecture)[*](#abandonware) (1995)
 
 To be continued...
 
@@ -105,42 +77,35 @@ To be continued...
 
 To be continued...
 
-**Language:** Pascal<br/>
+**Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Master's Thesis: A Software-Based Approach to Real-Time Eye-Tracking](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) (1993)
 
 To be continued...
 
-**Language:** Pascal<br/>
+**Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Utilities collection](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/UtilitiesCollection) (1992)
 
 To be continued...
 
-**Language:** Pascal<br/>
-**Platform:** DOS
-
-## [Instrument reader](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/InstrumentReader) (1992)
-
-To be continued...
-
-**Language:** Pascal<br/>
+**Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [HyperHelp](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/HyperHelp) (1992)
 
 To be continued...
 
-**Language:** Pascal<br/>
+**Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
-## [Visual cortex filter](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/VisualCortexFilter) (1992)
+## [Visual cortex filter](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/VisualCortexFilter)[*](#abandonware) (1992)
 
 To be continued...
 
-**Language:** Pascal<br/>
+**Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Candidate elimination](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/CandidateElimination) (1992)
@@ -163,3 +128,6 @@ To be continued...
 
 **Language:** Smalltalk<br/>
 **Platform:** SunOS
+
+---<br/>
+<small><a id="abandonware">*</a> [Abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the original author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)</small>.
