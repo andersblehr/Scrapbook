@@ -29,7 +29,7 @@ To enable users to mirror each other's contact information, I built a REST API t
 **Language:** Java<br/>
 **Platform:** Google App Engine
 
-## [Sheet music player](https://github.com/andersblehr/Scrapbook/tree/2011/Hobby/SheetMusicPlayer) (2011)
+## [Sheet music player](https://github.com/andersblehr/SheetMusicPlayer) (2011)
 
 With kids, you may happen upon a song, notes and all, when you read them their good night story. Or they may come home from day care or school with a song sheet and want you to help them learn the song. Even though I play the piano and know how to read music, I am not able to sing directly from notes on a sheet, and I found myself wanting an app with which I could snap a photo of the music sheet and have it play the melody back to me. No such app existed, and I took it upon myself to create one. I had never done any mobile development, but I had an iPhone and a Mac, so I installed Xcode, dug out the same Digital Image Processing book I referenced in my [thesis](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) back in 1993, and got going.
 
@@ -42,7 +42,7 @@ I got to a certain point when I realised that the hurdle I was struggling with w
 
 _**Note:** This is [abandonware](https://en.wikipedia.org/wiki/Abandonware) still under copyright. However, as the author of this work, I claim [fair use](https://en.wikipedia.org/wiki/Fair_use)._
 
-Back with FAST after having perfected my PowerPoint skills at Accenture, I was now heading up FAST's Solution Architecture Centre in Europe, aiming to streamline how we delivered projects to customers. Each _Enterprise Search Platform_ (ESP) installation was different, but the underpinnings were the same. Still, installation and configuration had to be done manually by on-site or remote FAST engineers. I had a hunch that Maven might help to automate a lot of the manual work, and itching to code again, I took it upon myself to develop a prototype Maven ESP plugin. After a few weeks of development, I demoed a functional prototype to the team, and got the go-ahead to continue. Shortly thereafter, Microsoft's acquisition of FAST was announced, and the project was put on indefinite hold. The code here is essentially the same that I demoed.
+Back with FAST after having perfected my PowerPoint skills at Accenture, I was now heading up FAST's Solution Architecture Centre in Europe, aiming to streamline how we delivered projects to customers. Each _Enterprise Search Platform_ (ESP) installation was different, but the underpinnings were the same. Still, installation and configuration had to be done manually by on-site or remote FAST engineers. I had a hunch that [Apache Maven](https://maven.apache.org) might help to automate a lot of the manual work, and itching to code again, I took it upon myself to develop a prototype Maven ESP plugin. After a few weeks of development, I demoed a functional prototype to the team, and got the go-ahead to continue. Shortly thereafter, Microsoft's acquisition of FAST was announced, and the project was put on indefinite hold. The code here is essentially the same that I demoed.
 
 **Language:** Java<br/>
 **Platform:** Linux, Windows
