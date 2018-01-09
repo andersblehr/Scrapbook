@@ -4,30 +4,25 @@ Over the decades that I have been writing code, some pieces have stuck with me m
 
 ## [JSONCache](https://github.com/andersblehr/JSONCache) (2017)
 
-My first and so far only open source project (not counting [Origon](https://github.com/andersblehr/Origon) and [SheetMusicPlayer](https://github.com/andersblehr/SheetMusicPlayer), which for the time being are here only for historic and reference reasons). I was on a project working on an iOS app that required local caching of backend data, and after having hit a brick wall with [3lvis](https://github.com/3lvis)'s eminent [Sync](https://github.com/3lvis/Sync) library (due to [this bug](https://github.com/3lvis/Sync/issues/373)), I decided to roll my own. I had already implemented a data caching and replication framework for [Origon](https://github.com/andersblehr/Origon), so I knew it wouldn't be too hard. I plugged it into the app (which is under NDA, so I can't give details), and it has been working flawlessly ever since.
+My first open source project. I was on a project working on an iOS app that required local caching of backend data, and after having hit a brick wall with [3lvis](https://github.com/3lvis)'s eminent [Sync](https://github.com/3lvis/Sync) library (due to [this bug](https://github.com/3lvis/Sync/issues/373)), I decided to roll my own. I had already implemented a data caching and replication framework for [Origon](https://github.com/andersblehr/Origon), so I knew it wouldn't be too hard. I plugged it into the app (which is under NDA, so I can't give details), and it has been working flawlessly ever since.
 
 **Language:** Swift<br/>
 **Platforms:** macOS, iOS, watchOS, tvOS
 
-## [Origon - shared contact lists](https://github.com/andersblehr/Origon) (2012)
+## [Origon - shared contact lists](https://github.com/andersblehr/Origon) (2015)
 
-From [Origon's web page](https://origon.co):
+This was the app idea that I 'bet my house on' when I quit my day job in 2012. From [Origon's web page](https://origon.co):
 
 > _With Origon's shared contact lists, everybody keeps their own contact information up to date. Whenever one of your contacts updates their address, email or phone number, you will have their updated information at your fingertips the next time you open Origon. This way, the contact lists always stay up to date._
 
-This was the idea that I 'bet my house on' when I quit my day job in 2012. It took too long, was marketed too haphazardly (marketing most definitely is _not_ my strong suite), and the income was not sufficient to make a living. Then [Spond](https://spond.com/) launched with basically the same idea, and I realised Origon offered too little, if not too late.
+To enable users to mirror each other's contact information, the app (unfortunately iOS only) accesses a set of REST endpoints exposed by the **[Origon backend](https://github.com/andersblehr/OrigonBackend)**. Together, the app and the backend constitute a replication framework that seemlessly persists changes from indvidual users and pushes those same changes back out to linked users. The backend is hosted on [Google App Engine](https://cloud.google.com/appengine/) (GAE) and utilises [RESTEasy](http://resteasy.jboss.org) for the API and [Objectify](https://github.com/objectify/objectify) for interfacing with the GAE datastore.
 
-Still, it was an invaluable learning experience, both technologically and personally.
+Origon is still available in the iOS App Store (for free since 2017). However, it took too long too make, was marketed too haphazardly (marketing most definitely is _not_ my strong suite), and the income turned out not to be sufficient to make a living. Then [Spond](https://spond.com/) launched with essentially the same idea, and I realised Origon offered too little, if not too late.
 
-**Language:** Objective-C<br/>
-**Platform:** iOS (iPhone + iPad)
+Still, it was an invaluable learning experience, both technology wise and personally.
 
-## [Origon backend](https://github.com/andersblehr/OrigonBackend) (2012)
-
-To enable users to mirror each other's contact information, I built a REST API that interfaces with a replication framework that seemlessly persists changes from indvidual users to the backend, and pushes those same changes back out to linked users. It is hosted on [Google App Engine](https://cloud.google.com/appengine/) (GAE) and utilises [RESTEasy](http://resteasy.jboss.org) for the API and [Objectify](https://github.com/objectify/objectify) for interfacing with the GAE datastore.
-
-**Language:** Java<br/>
-**Platform:** Google App Engine
+**Languages:** Objective-C (iOS app), Java (backend)<br/>
+**Platforms:** iOS (app), Google App Engine (backend)
 
 ## [Sheet music player](https://github.com/andersblehr/SheetMusicPlayer) (2011)
 
@@ -43,46 +38,50 @@ I got to a certain point when I realised that the hurdle I was struggling with w
 I was heading up FAST's Solution Architecture Centre in Europe, aiming to streamline how we delivered projects to customers. Each _Enterprise Search Platform_ (ESP) installation was different, but the underpinnings were the same. Still, installation and configuration had to be done manually by on-site or remote FAST engineers. I had a hunch that [Apache Maven](https://maven.apache.org) might help to automate a lot of the manual work, and itching to code again, I took it upon myself to develop an ESP plugin prototype for Maven.
 
 **Language:** Java<br/>
-**Platform:** Linux, Windows
+**Platforms:** Linux, Windows
 
 ## FAST search components[*](#abandonware) (2000-2001)
 
-Working as a developer in FAST's R&D department, I was tasked with developing a generic **[tokenizer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastTokenizer)** that would decompose raw data into indexable words, independently of source language (including Chinese and other East Asian languages). Another component I developed, was a **[SAX wrapper](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastSAXWrapper)** that abstracted away the implementation details of [libxml](http://xmlsoft.org) and other third party [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML) interfaces, effectively letting us inject whichever SAX library suited us best. Lastly, based on my experience with having to [convert to FiXML](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor) any raw data other than HTML, I developed a generic **[XML indexer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastXMLIndexer)** that could index any set of well-formed XML documents.
+Working as a developer in FAST's R&D department, I was tasked with developing a generic **[tokenizer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastTokenizer)** that would decompose raw data into indexable words across a wide range of languages (including Chinese and other East Asian languages). Another component I developed, was a **[SAX wrapper](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastSAXWrapper)** that abstracted away the implementation details of [libxml](http://xmlsoft.org) and other third party [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML) interfaces, effectively letting us inject whichever SAX library suited us best. Lastly, based on my experience with having to [convert to FiXML](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor) any raw data other than HTML, I developed a generic **[XML indexer](https://github.com/andersblehr/Scrapbook/tree/2001/Work/FastXMLIndexer)** that could index any set of well-formed XML documents.
 
 **Language:** C++<br/>
-**Platform:** Linux
+**Platforms:** Linux, Solaris
 
 ## [FAST indexing preprocessor](https://github.com/andersblehr/Scrapbook/tree/2000/Work/FastIndexingPreprocessor)[*](#abandonware) (2000)
 
-At the time that FAST's [alltheweb.com](https://en.wikipedia.org/wiki/AlltheWeb) was competing head to head with Google to be the first search engine to index 1 billion web documents, I was working on-site with [LookSmart](http://www.looksmart.com) in San Francisco to have their curated internet directory be powered by FAST Search. To index the directory, it first had to be exported and converted to _FAST indexing XML_ (FiXML). The raw directory export was in a format referred to internally as [Mirkwood](https://en.wikipedia.org/wiki/Mirkwood), and I wrote this suite of Perl scripts to convert it to indexable FiXML.
+At the height of the dot-com bubble, FAST's flagship search engine [alltheweb.com](https://en.wikipedia.org/wiki/AlltheWeb) was competing head to head with Google to be the first search engine to index 1 billion web documents, and I was working on-site with [LookSmart](http://www.looksmart.com) in San Francisco to have their curated internet directory be powered by FAST Search. To index the directory, it had to be exported and converted to FIXML, a proprietory XML format that was the only other data format FAST Search could index in addition to HTML. The raw directory export was in a format referred to internally as [Mirkwood](https://en.wikipedia.org/wiki/Mirkwood), and I wrote this suite of Perl scripts to convert it to FIXML.
 
-**Language:** Perl<br/>
+**Languages:** Perl<br/>
 **Platform:** Solaris
 
 ## [Reactive rules engine](https://github.com/andersblehr/Scrapbook/tree/1999/Work/ReactiveRulesEngine)[*](#abandonware) (1999)
 
-To be continued...
+I developed a generic rules engine for the Norwegian Civial Aviation Authority, which based on the current fee regulations calculated landing and other fees for airlines operating on Norwegian airports. The fee regulations were entered into to a semantic data store, and the rules engine matched logged aircraft movements against the regulations, aggregating fees from all matching regulation directives. When the fee regulations changed, they were updated in the semantic data store, without having to change the code.
 
 **Language:** PL/SQL<br/>
-**Platform:** Oracle
+**Platforms:** Oracle, Windows
 
 ## [Client architecture](https://github.com/andersblehr/Scrapbook/tree/1995/Work/ClientArchitecture)[*](#abandonware) (1995)
 
-To be continued...
+At the peak of the '[fat client](https://en.wikipedia.org/wiki/Fat_client)' paradigm in [client-server computing](https://en.wikipedia.org/wiki/Client–server_model), I got a chance to dig deep into [OS/2](https://en.wikipedia.org/wiki/OS/2)'s [programming interfaces](ftp://public.dhe.ibm.com/4700/fiodd/docs/77os2prg.pdf) in order to develop, among other components, a **[Window Manager](https://github.com/andersblehr/Scrapbook/blob/1995/Work/ClientArchitecture/TAWIM.C)** for a cross client domain offering.
 
 **Language:** C<br/>
-**Platform:** OS/2, Windows
+**Platform:** OS/2
 
-## [mbox reader](https://github.com/andersblehr/Scrapbook/tree/1994/Hobby/MboxReader) (1994)
+## [`mbox` reader](https://github.com/andersblehr/Scrapbook/tree/1994/Hobby/MboxReader) (1994)
 
-To be continued...
+It was my first summer holiday after I finished Uni and had become a working man, and I had a bunch of emails from my Uni pals in an [`mbox`](https://en.wikipedia.org/wiki/Mbox) file which I had FTP'ed down from my home directory and saved onto a floppy while I still had access to the Uni network. I had only my aging DOS PC, and reminiscing over the good ol' days by means of old emails was a hassle. So rather than bake in the sun, I developed this `mbox` reader for DOS.
 
 **Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Master's Thesis: A Software-Based Approach to Real-Time Eye-Tracking](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) (1993)
 
-To be continued...
+I wrote my **[thesis](https://github.com/andersblehr/Scrapbook/blob/1993/Uni/Thesis/EyeTracker/TeX/diplom.pdf)** as an [ERASMUS](https://en.wikipedia.org/wiki/Erasmus_programme) exchange student at the Institute for Applied Physics and Biophysics at the [Univeristy of Marburg](https://en.wikipedia.org/wiki/University_of_Marburg) in Germany. This is the abstract:
+
+> This paper constitutes my diploma thesis at the Norwegian Institute of Technology, Division of Computer Science & Telematics. On the basis of a relatively broad discussion of general digital image processing techniques, an _O(N)_ algorithm for determining the location of the pupil in an _N_ × _N_ image of the eye has been developed. A prototype of the algorithm has been implemented and tested, and the results obtained were discussed in terms of a set of given requirements. Lastly, some suggestions were made as to how to employ the algorithm in a real-time eye-tracking system.
+
+Today, the same algorithm still forms the basis of the [eye tracking system](http://www.thomasrecording.com/products/neuroscience-products/eye-tracking-systems.html) that my old mentor's [company](http://www.thomasrecording.com) sells to neuroscience research centres all over the world.
 
 **Language:** Turbo Pascal<br/>
 **Platform:** DOS
