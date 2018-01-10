@@ -70,7 +70,7 @@ At the peak of the '[fat client](https://en.wikipedia.org/wiki/Fat_client)' para
 
 ## [`mbox` reader](https://github.com/andersblehr/Scrapbook/tree/1994/Hobby/MboxReader) (1994)
 
-It was my first summer holiday after I finished Uni and had become a working man, and I had a bunch of emails from my Uni pals in an [`mbox`](https://en.wikipedia.org/wiki/Mbox) file which I had FTP'ed down from my home directory and saved onto a floppy while I still had access to the Uni network. I had only my aging DOS PC, and reminiscing over the good ol' days by means of old emails was a hassle. So rather than bake in the sun, I developed this `mbox` reader for DOS.
+It was my first summer holiday after I finished Uni and had started work, and I had a bunch of emails from my Uni pals in an [`mbox`](https://en.wikipedia.org/wiki/Mbox) file which I had FTP'ed down from my home directory and saved onto a floppy while I still had access to the Uni network. I had only my aging DOS PC, and reminiscing over the good ol' days by means of old emails was a hassle. So rather than bake in the sun, I developed this `mbox` reader for DOS.
 
 **Language:** Turbo Pascal<br/>
 **Platform:** DOS
