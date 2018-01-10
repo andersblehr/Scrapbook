@@ -11,22 +11,22 @@ My first open source project. I was on a project working on an iOS app that requ
 
 ## [Origon - shared contact lists](https://github.com/andersblehr/Origon) (2015)
 
-This was the app idea that I 'bet my house on' when I quit my day job in 2012. From [Origon's web page](https://origon.co):
+This was the app idea that I 'bet the house on' when I quit my day job in 2012. From Origon's [web page](https://origon.co):
 
 > _With Origon's shared contact lists, everybody keeps their own contact information up to date. Whenever one of your contacts updates their address, email or phone number, you will have their updated information at your fingertips the next time you open Origon. This way, the contact lists always stay up to date._
 
-To enable users to mirror each other's contact information, the app (unfortunately iOS only) accesses a set of REST endpoints exposed by the **[Origon backend](https://github.com/andersblehr/OrigonBackend)**. Together, the app and the backend constitute a replication framework that seemlessly persists changes from indvidual users and pushes those same changes back out to linked users. The backend is hosted on [Google App Engine](https://cloud.google.com/appengine/) (GAE) and utilises [RESTEasy](http://resteasy.jboss.org) for the API and [Objectify](https://github.com/objectify/objectify) for interfacing with the GAE datastore.
+To enable users to mirror each other's contact information, the app (iOS only for the foreseeable future) accesses a set of REST endpoints exposed by the **[Origon backend](https://github.com/andersblehr/OrigonBackend)**. Together, the app and the backend constitute a replication framework that seemlessly persists changes from indvidual users and pushes those same changes back out to linked users. The backend is hosted on [Google App Engine](https://cloud.google.com/appengine/) (GAE) and utilises [RESTEasy](http://resteasy.jboss.org) for the API and [Objectify](https://github.com/objectify/objectify) for interfacing with the GAE datastore.
 
 Origon is still available in the iOS App Store (for free since 2017). However, it took too long too make, was marketed too haphazardly (marketing most definitely is _not_ my strong suite), and the income turned out not to be sufficient to make a living. Then [Spond](https://spond.com/) launched with essentially the same idea, and I realised Origon offered too little, if not too late.
 
-Still, it was an invaluable learning experience, both technology wise and personally.
+Still, it was an invaluable learning experience, both technology wise and personally. (And I still have my house.)
 
-**Languages:** Objective-C (iOS app), Java (backend)<br/>
+**Languages:** Objective-C (app), Java (backend)<br/>
 **Platforms:** iOS (app), Google App Engine (backend)
 
 ## [Sheet music player](https://github.com/andersblehr/SheetMusicPlayer) (2011)
 
-With kids, you may happen upon a song, notes and all, when you read them their good night story. Or they may come home from daycare or school with a song sheet and want you to help them learn the song. Even though I play the piano and know how to read music, I am not able to sing directly from notes on a sheet, and I found myself wanting an app with which I could snap a photo of the music sheet and have it play the melody back to me. No such app existed, and I took it upon myself to create one. I had never done any mobile development, but I had an iPhone and a Mac, so I installed Xcode, dug out the same Digital Image Processing book I referenced in my [thesis](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) back in 1993, and got going.
+With kids, you may happen upon a song, notes and all, when you read them their good night story. Or they may come home from daycare or school with a song sheet and want you to help them learn the song. Even though I play the piano and know how to read music, I am not able to sing directly from notes on a sheet, and I found myself wanting an app with which I could snap a photo of the music sheet and have it play the melody back to me. No such app existed, and I took it upon myself to create one. I had never done any mobile development, but I had an iPhone and a Mac, so I installed Xcode, dug out the same Digital Image Processing book I referenced in my **[thesis](https://github.com/andersblehr/Scrapbook/blob/1993/Uni/Thesis/EyeTracker/TeX/diplom.pdf)** back in 1993, and got going.
 
 I got to a certain point when I realised that the hurdle I was struggling with was an artifact of my entire approach, and that I would have to start (almost) over to get past it. I still haven't started over, but if it hadn't been for this project, I might be still be shuffling papers around for a living, rather than write code.
 
@@ -63,7 +63,7 @@ I developed a generic rules engine for the Norwegian Civial Aviation Authority, 
 
 ## [Client architecture](https://github.com/andersblehr/Scrapbook/tree/1995/Work/ClientArchitecture)[*](#abandonware) (1995)
 
-At the peak of the '[fat client](https://en.wikipedia.org/wiki/Fat_client)' paradigm in [client-server computing](https://en.wikipedia.org/wiki/Client–server_model), I got a chance to dig deep into [OS/2](https://en.wikipedia.org/wiki/OS/2)'s [programming interfaces](ftp://public.dhe.ibm.com/4700/fiodd/docs/77os2prg.pdf) in order to develop, among other components, a **[Window Manager](https://github.com/andersblehr/Scrapbook/blob/1995/Work/ClientArchitecture/TAWIM.C)** for a cross client domain offering.
+At the peak of the '[fat client](https://en.wikipedia.org/wiki/Fat_client)' paradigm in [client-server computing](https://en.wikipedia.org/wiki/Client–server_model), I got a chance to dig deep into [OS/2](https://en.wikipedia.org/wiki/OS/2)'s [programming interfaces](ftp://public.dhe.ibm.com/4700/fiodd/docs/77os2prg.pdf) in order to develop, among other components, a **[window manager](https://github.com/andersblehr/Scrapbook/blob/1995/Work/ClientArchitecture/TAWIM.C)** for a cross client domain offering, Hungarian prefix notation and all.
 
 **Language:** C<br/>
 **Platform:** OS/2
@@ -77,53 +77,54 @@ It was my first summer holiday after I finished Uni and had become a working man
 
 ## [Master's Thesis: A Software-Based Approach to Real-Time Eye-Tracking](https://github.com/andersblehr/Scrapbook/tree/1993/Uni/Thesis/EyeTracker) (1993)
 
-I wrote my **[thesis](https://github.com/andersblehr/Scrapbook/blob/1993/Uni/Thesis/EyeTracker/TeX/diplom.pdf)** as an [ERASMUS](https://en.wikipedia.org/wiki/Erasmus_programme) exchange student at the Institute for Applied Physics and Biophysics at the [Univeristy of Marburg](https://en.wikipedia.org/wiki/University_of_Marburg) in Germany. This is the abstract:
+I stayed on at the Institute for Applied Physics and Biophysics at the [University of Marburg](https://en.wikipedia.org/wiki/University_of_Marburg), Germany, and wrote my **[thesis](https://github.com/andersblehr/Scrapbook/blob/1993/Uni/Thesis/EyeTracker/TeX/diplom.pdf)** as an [ERASMUS](https://en.wikipedia.org/wiki/Erasmus_programme) exchange student, still within the context of visual cortex [gamma oscillations](https://en.wikipedia.org/wiki/Gamma_oscillations) research. This is the abstract:
 
-> This paper constitutes my diploma thesis at the Norwegian Institute of Technology, Division of Computer Science & Telematics. On the basis of a relatively broad discussion of general digital image processing techniques, an _O(N)_ algorithm for determining the location of the pupil in an _N_ × _N_ image of the eye has been developed. A prototype of the algorithm has been implemented and tested, and the results obtained were discussed in terms of a set of given requirements. Lastly, some suggestions were made as to how to employ the algorithm in a real-time eye-tracking system.
+> This paper constitutes my diploma thesis at the [Norwegian Institute of Technology](https://en.wikipedia.org/wiki/Norwegian_Institute_of_Technology), Division of Computer Science & Telematics. On the basis of a relatively broad discussion of general digital image processing techniques, an _O(N)_ algorithm for determining the location of the pupil in an _N_ × _N_ image of the eye has been developed. A prototype of the algorithm has been implemented and tested, and the results obtained were discussed in terms of a set of given requirements. Lastly, some suggestions were made as to how to employ the algorithm in a real-time eye-tracking system.
 
-Today, the same algorithm still forms the basis of the [eye tracking system](http://www.thomasrecording.com/products/neuroscience-products/eye-tracking-systems.html) that my old mentor's [company](http://www.thomasrecording.com) sells to neuroscience research centres all over the world.
+Today, the very same algorithm sits at the core of the [eye tracking systems](http://www.thomasrecording.com/products/neuroscience-products/eye-tracking-systems.html) that the [company](http://www.thomasrecording.com) of my old mentor in Marburg sells to neuroscience research centres all over the world.
 
-**Language:** Turbo Pascal<br/>
-**Platform:** DOS
-
-## [Utilities collection](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/UtilitiesCollection) (1992)
-
-To be continued...
+(Fun fact: I had retained the original RCS repos for the source code and TeX files, so the commit history for the bulk of the files goes all the way back to 1992-93.)
 
 **Language:** Turbo Pascal<br/>
-**Platform:** DOS
+**Platform:** DOS<br/>
 
 ## [HyperHelp](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/HyperHelp) (1992)
 
-To be continued...
+In conjunction with building the **[visual cortex filter](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/VisualCortexFilter)** (see below), I wrote a detailed online manual and created an essentially hypelinked help system to navigate it. (This was in 1992, before the web.) It could be run either from within the visual cortex filter, or separately as a standalone program. It was built entirely from scratch, depending only on a **[set of helper utilities](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/UtilitiesCollection)** I had developed myself.
+
+![](hyperhelp.png)
 
 **Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Visual cortex filter](https://github.com/andersblehr/Scrapbook/tree/1992/Internship/VisualCortexFilter)[*](#abandonware) (1992)
 
-To be continued...
+Through [IAESTE](https://en.wikipedia.org/wiki/International_Association_for_the_Exchange_of_Students_for_Technical_Experience), I obtained an internship at the Institute of Applied Physics and Biophysics at the [University of Marburg](https://en.wikipedia.org/wiki/University_of_Marburg), Germany, where I was tasked with implementing a 'visual cortex filter' to be used in their ongoing research on [gamma oscillations](https://en.wikipedia.org/wiki/Gamma_oscillations) in the visual cortex of macaque monkeys. Specifically, after the researchers had tuned a set of configurable parameters, the program collected, filtered and presented measurements of the [local field potential](https://en.wikipedia.org/wiki/Local_field_potential) (LFP) and [multi-unit activity](https://en.wikipedia.org/wiki/MUA) (MUA) signals in the visual cortex of trained macaques. It was built entirely from scratch, depending only on a **[set of helper utilities](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/UtilitiesCollection)** I had developed myself.
+
+![](filter.png)
 
 **Language:** Turbo Pascal<br/>
 **Platform:** DOS
 
 ## [Candidate elimination](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/CandidateElimination) (1992)
 
-To be continued...
+[Candidate elimination](https://en.wikipedia.org/wiki/Candidate_elimination) is a logical approach to [machine learning](https://en.wikipedia.org/wiki/Machine_learning) that eliminates inconsistent hypotheses from a disjunct set of hypotheses, thus iteratively refining the set of potentially consistent hypotheses. This Prolog implementation is my solution to an exercise given in the _Knowledge Technologies_ class at the Division of Computer Science and Telematics at the [Norwegian Institute of Technology](https://en.wikipedia.org/wiki/Norwegian_Institute_of_Technology).
 
 **Language:** Prolog<br/>
 **Platform:** SunOS
 
-## [Natural language shell](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/NaturalLanguageShell) (1992)
+## [Natural Language Interfaces to Rule Based Systems](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/NaturalLanguageShell) (1992)
 
-To be continued...
+Abstract from the **[project report](https://github.com/andersblehr/Scrapbook/blob/1992/Uni/NaturalLanguageShell/TeX/rapport.pdf)**:
+
+> This paper constitutes my final report in course _45073 Computer Science, Projects_ at the [Norwegian Institute of Technology](https://en.wikipedia.org/wiki/Norwegian_Institute_of_Technology), Division of Computer Science & Telematics. The aim of my work has been to develop and implement a prototype of a natural language based expert system shell. In connection with this, I have sought to address some of the general problems related to the field of natural language processing, as well as to define a suitable platform on which to base my implementation.
 
 **Language:** Prolog<br/>
 **Platform:** SunOS
 
 ## [ATM interface](https://github.com/andersblehr/Scrapbook/tree/1992/Uni/Minibank) (1992)
 
-To be continued...
+This is my solution to an exercise in the class _Systems Programming_ at the Division of Computer Science and Telematics at the [Norwegian Institute of Technology](https://en.wikipedia.org/wiki/Norwegian_Institute_of_Technology). It is far from rocket science, but it was my first and so far only encounter with Smalltalk. I remember really enjoying it, and Smalltalk remains high on my list of languages to pick up (or return to).
 
 **Language:** Smalltalk<br/>
 **Platform:** SunOS
