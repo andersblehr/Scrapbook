@@ -56,7 +56,7 @@ At the height of the dot-com bubble, FAST's flagship search engine [alltheweb.co
 
 ## <a name="ab">[Reactive rules engine](https://github.com/andersblehr/Scrapbook/tree/1999/Work/ReactiveRulesEngine)[*](#abandonware) (1999)
 
-I developed a generic rules engine for the Norwegian Civial Aviation Authority, which based on the current fee regulations calculated landing and other fees for airlines operating on Norwegian airports. The fee regulations were entered into to a semantic data store, and the rules engine matched logged aircraft movements against the regulations, aggregating fees from all matching regulation directives. When the fee regulations changed, they were updated in the semantic data store, without having to change the code.
+I developed a generic rules engine for the Norwegian Civil Aviation Authority, which based on the current fee regulations calculated landing and other fees for airlines operating on Norwegian airports. The fee regulations were entered into to a semantic data store, and the rules engine matched logged aircraft movements against the regulations, aggregating fees from all matching regulation directives. When the fee regulations changed, they were updated in the semantic data store, without having to change the code.
 
 **Language:** PL/SQL<br/>
 **Platforms:** Oracle, Windows
