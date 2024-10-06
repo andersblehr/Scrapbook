@@ -81,7 +81,7 @@ I stayed on at the Institute for Applied Physics and Biophysics at the [Universi
 
 > This paper constitutes my diploma thesis at the [Norwegian Institute of Technology](https://en.wikipedia.org/wiki/Norwegian_Institute_of_Technology), Division of Computer Science & Telematics. On the basis of a relatively broad discussion of general digital image processing techniques, an _O(N)_ algorithm for determining the location of the pupil in an _N_ × _N_ image of the eye has been developed. A prototype of the algorithm has been implemented and tested, and the results obtained were discussed in terms of a set of given requirements. Lastly, some suggestions were made as to how to employ the algorithm in a real-time eye-tracking system.
 
-Today, the very same algorithm sits at the core of the [eye tracking systems](http://www.thomasrecording.com/products/neuroscience-products/eye-tracking-systems.html) that the [company](http://www.thomasrecording.com) of my old mentor in Marburg sells to neuroscience research centres all over the world.
+Today, the very same algorithm sits at the core of the [eye tracking systems](https://www.thomasrecording.com/eye-tracking-systems) that the [company](http://www.thomasrecording.com) of my old mentor in Marburg sells to neuroscience research centres across the world.
 
 (Fun fact: I had retained the original RCS repos for the source code and TeX files, so the commit history for the bulk of the files goes all the way back to 1992-93.)
 
